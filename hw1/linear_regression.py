@@ -3,7 +3,6 @@ import numpy as np
 from random import randrange
 import math
 
-
 class LinearRegression:
     def load_data(self, filename, columns):
         '''
@@ -15,7 +14,6 @@ class LinearRegression:
         
         :return numpy ndarray
         '''
-        # return np.loadtxt(filename, delimiter=',',dtype='str',usecols=columns)
         return np.loadtxt(filename, delimiter=',', skiprows=1, dtype='int', usecols=columns)
 
     def shuffle_data(self, data, reseed_val):
@@ -95,24 +93,45 @@ class LinearRegression:
 
         return N, X, Y
 
-    def compute_closed_form(self, X, y):
+    def compute_model_using_direct_solution_and_apply(self, training, validation, should_print_weights):
         '''
-        Computes the closed form (direct) solution by first getting the number of observations,
-        adding a bias of ones to the features, and reshaping y to be a matrix. Next, we calculate
-        the weights of the based on our features and actual data. Once our weights are calculated,
-        we compute our y_hat our prediction and return the prediciton.
+        Computes the linear regression model using the clsoed form direct solution and returns
+        the actual / predicted training and validation data.
         
-        :param X: Features
-        :param y: Actuals
+        :param training: Training datasaet
+        :param validation: Validation dataset
+        :param should_prints_weights: Flag to print the weights
         
-        :return y_hat (prediction)
+        :return yTrain: Actual training data
+        :return train_preds: Predicted training data
+        :return yValid: Actual validation data
+        :return valid_preds: Predicted validation data
         '''
-        N, X, y_mat = self.get_bias_observations_reshape_y(X, y)
-                
-        weights = self.compute_weights(X, y_mat)
-        y_hat = self.compute_y_hat(X, weights)
-        return y_hat
-
+        # Get Training X (features) and y (actuals)
+        xTrain, yTrain = self.get_features_actuals(training)
+        
+        # Add bias to xTrain
+        N, XTrainBias, y_mat = self.get_bias_observations_reshape_y(xTrain, yTrain)
+        
+        # Compute the linear regression model using the direct solution.
+        learned_model = self.compute_weights(XTrainBias, y_mat)
+        if should_print_weights:
+            print("Learned Model:\n", learned_model, "\n")
+        
+        # Apply learned model to the training samples.
+        train_preds = self.compute_y_hat(XTrainBias, learned_model)
+        
+        # Get Validation X (features) and y (actuals) 
+        xValid, yValid = self.get_features_actuals(validation)
+        # Add bias to xValid to match shape
+        N, xValidBias, y_mat = self.get_bias_observations_reshape_y(xValid, yValid)
+        
+        # Apply the learned model to the validation samples.
+        valid_preds = self.compute_y_hat(xValidBias, learned_model)
+        
+        # Return the actual / predicted training and actual / prediction validation data
+        return yTrain, train_preds, yValid, valid_preds
+    
     def compute_weights(self, X, y_mat):
         '''
         Computes the weights based on the features and actuals
@@ -139,6 +158,20 @@ class LinearRegression:
         :return the predictions
         '''
         return np.dot(X, weights).flatten()
+    
+    def compute_se(self, actual, predictions):
+        '''
+        Computes the squared error based on the actual data
+        and our trained model predictions
+        
+        :param actual: Actual real data
+        :param predictions: Training model preditions
+        
+        :return the squared error
+        '''
+        differences = np.subtract(actual, predictions)
+        differences_squared = np.square(differences)
+        return differences_squared
 
     def compute_mse(self, actual, predictions):
         '''
@@ -150,8 +183,7 @@ class LinearRegression:
         
         :return the mean squared error
         '''
-        differences = np.subtract(actual, predictions)
-        differences_squared = np.square(differences)
+        differences_squared = self.compute_se(actual, predictions)
         mse = differences_squared.mean()
         return mse
 
@@ -167,7 +199,7 @@ class LinearRegression:
         mse = self.compute_mse(actual, predicted)
         rmse = np.sqrt(mse)
         return rmse
-
+    
     def compute_mape(self, actual, predicted):
         '''
         Computes the mean absolute percent error based on the actual
@@ -179,7 +211,7 @@ class LinearRegression:
         :return the mean absolute percent error
         '''
         abs = np.abs((np.subtract(actual, predicted)) / actual)
-        mape = np.mean(abs) * 100
+        mape = np.mean(abs) *100
         return mape
 
     def compute_s_folds_cross_validation(self, data, S):
@@ -200,6 +232,8 @@ class LinearRegression:
         # 2(c). Create S folds
         for i in range(1, 21):
             shuffled_data = self.shuffle_data(data, i)
+            
+            squared_errors_list = []
 
             # 2(d) For i = to 1
             for j in range(1, S + 1):
@@ -214,17 +248,17 @@ class LinearRegression:
                 validation_arr = self.convert_list_to_numpy_array(validation)
 
                 # 2(d)(ii) Train a linear regression model using the direct solution
-                xTrain, yTrain = self.get_features_actuals(training_arr)
-                xValid, yValid = self.get_features_actuals(validation_arr)
-
-                train_preds = self.compute_closed_form(xTrain, yTrain)
-                valid_preds = self.compute_closed_form(xValid, yValid)
+                # Get Training X (features) and y (actuals)
+                yTrain, train_preds, yValid, valid_preds = self.compute_model_using_direct_solution_and_apply(training_arr,validation_arr, False)
 
                 # 2(d)(iii) Compute the squared error for each sample in the current
                 # current validation fold
-                # 2(e) You should now have N squared errors. Compute the RMSE for these.
-                valid_rmse = self.compute_rmse(yValid, valid_preds)
-                rmse_list.append(valid_rmse)
+                squared_errors = self.compute_se(yValid, valid_preds)
+                squared_errors_list.append(squared_errors)
+            
+            # 2(e) You should now have N squared errors. Compute the RMSE for these.
+            rmse = np.sqrt(np.mean(squared_errors_list))
+            rmse_list.append(rmse)
 
         # 3. You should now have RMSE values. Compute the mean and standard
         # deviation of these. The former should give us a better "overall" mean,
@@ -252,8 +286,6 @@ class LinearRegression:
         # Create a list for the training data
         training_data = list()
         # Determine the fold size (or number of observation per fold)
-        # In our case, we have 44 observations so the fold size
-        # would be the following: 44 (length of data set) / 4 (num_folds) = 11
         num_observations_per_fold = int(len(data) / num_folds)
 
         # Iterate over the number of folds we need to split the data on
@@ -424,3 +456,4 @@ class LinearRegression:
         :return distance between observations
         '''
         return sum(abs(val1 - val2) for val1, val2 in zip(xi, x))
+
