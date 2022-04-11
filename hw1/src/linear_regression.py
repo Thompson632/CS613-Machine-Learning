@@ -110,16 +110,16 @@ class LinearRegression:
         xTrain, yTrain = self.get_features_actuals(training)
 
         # Add bias to xTrain
-        N, XTrainBias, y_mat = self.get_bias_observations_reshape_y(
+        N, xTrainBias, y_mat = self.get_bias_observations_reshape_y(
             xTrain, yTrain)
 
         # Compute the linear regression model using the direct solution.
-        learned_model = self.compute_weights(XTrainBias, y_mat)
+        learned_model = self.compute_weights(xTrainBias, y_mat)
         if should_print_weights:
             print("Learned Model:\n", learned_model, "\n")
 
         # Apply learned model to the training samples.
-        train_preds = self.compute_y_hat(XTrainBias, learned_model)
+        train_preds = self.compute_y_hat(xTrainBias, learned_model)
 
         # Get Validation X (features) and y (actuals)
         xValid, yValid = self.get_features_actuals(validation)

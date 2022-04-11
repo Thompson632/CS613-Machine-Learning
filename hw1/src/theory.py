@@ -82,6 +82,18 @@ def compute_mape(actual, predicted):
     mape = np.mean(abs) * 100
     return mape
 
+def compute_smape(actual, predicted):
+    '''
+    Computes the symmetric mean absolute percentage error based on the 
+    actual data and our trained models predictions
+    
+    :param actual: Actual real data
+    :param predictions: Training model predictions
+    
+    :return the symmetric mean absolute percent error
+    '''
+    return 1/len(actual) * np.sum(2 * np.abs(predicted - actual) / (np.abs(actual) + np.abs(predicted))*100)
+
 
 xg = [-2, -5, -3, 0, -8, -2, 1, 5, -1, 6]
 
@@ -101,6 +113,9 @@ print("Model:\n", model)
 y_hat = compute_y_hat(x,model)
 print("y_hat:\n", y_hat)
 
+print("y:\n", y)
+
 print("")
 print("RMSE:",compute_rmse(y_hat, y))
 print("MAPE:",compute_mape(y_hat, y))
+print("SMAPE:",compute_smape(y_hat, y))

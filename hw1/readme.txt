@@ -17,3 +17,8 @@ In each of those methods, there is a call to print the results of the different 
 How to Run:
 - From the directory where this zip file was unzipped, run the following command:
 python3 test_linear_regression.py
+
+Miscellaneous Notes:
+- Operating System: Mac
+- Architecture: 32 bit
+- Virtual Python Environment: No

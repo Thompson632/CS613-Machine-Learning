@@ -46,7 +46,7 @@ Y =
 \end{bmatrix}
 $
 
-\subsection{Add Bias Feature}\label{bias}
+\subsection{Add Bias Feature}
 $X =
 \begin{bmatrix}
 	1 & -2\\
@@ -77,9 +77,13 @@ $
 
 \newpage
 \subsection{Direct Solution}
+Matrices below are rounded to four decimals places due to page space limitations but the resulting weights (coefficients) and $\hat{Y}$ predictions contain all decimal places.
+
+\hfill \break
+\hfill \break
+
 $w = (X^TX)^{-1}X^TY$
 
-% The same as np.dot(X.T, X)
 \noindent $X^TX = \begin{bmatrix}
 	1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1\\
 	-2 & -5 & -3 & 0 & -8 & -2 & 1 & 5 & -1 & 6
@@ -103,20 +107,21 @@ $X^TX =
 -9 & 169\\
 \end{bmatrix}\\
 $
+
 \hfill \break
 \hfill \break
 
 \noindent $(X^TX)^{-1} = 
 \frac{1}{|(10*169)-(-9*-9)|}\begin{bmatrix}169 & 9\\ 9 & 10\end{bmatrix} = \frac{1}{1690-81}\begin{bmatrix}169 & 9\\ 9 & 10\end{bmatrix}=
 \hfill \break
-\frac{1}{1609}\begin{bmatrix}169 & 9\\ 9 & 10\end{bmatrix}=\begin{bmatrix}169/1609 & 9/1609\\ 9/1609 & 10/1609\end{bmatrix} = \begin{bmatrix}0.10503418 & 0.00559354\\ 0.00559354 & 0.00621504\end{bmatrix}\\
+\frac{1}{1609}\begin{bmatrix}169 & 9\\ 9 & 10\end{bmatrix}=\begin{bmatrix}169/1609 & 9/1609\\ 9/1609 & 10/1609\end{bmatrix} = \begin{bmatrix}0.1050 & 0.0056\\ 0.0056 & 0.0062\end{bmatrix}\\
 $
 
 \hfill \break
 \hfill \break
-% Function variables setup
+
 \noindent $(X^TX)^{-1}X^T = 
-\begin{bmatrix}0.10503418 & 0.00559354\\ 0.00559354 & 0.00621504\end{bmatrix}
+\begin{bmatrix}0.1050 & 0.0056\\ 0.0056 & 0.0062\end{bmatrix}
 \begin{bmatrix}
 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1\\
 -2 & -5 & -3 & 0 & -8 & -2 & 1 & 5 & -1 & 6
@@ -125,26 +130,26 @@ $
 \hfill \break
 \hfill \break
 
-% Output
 \noindent $(X^TX)^{-1}X^T =
 \hfill \break
 \hfill \break
 \begin{bmatrix}
-0.09384711 & 0.0770665 & 0.08825357 & 0.10503418 & 0.06028589 & 0.09384711 & 0.11062772 & 0.13300186  0.09944065 & 0.1385954\\
--0.00683654 & -0.02548167 & -0.01305158 & 0.00559354 & -0.04412679 & -0.00683654 0.01180858 & 0.03666874 & -0.0006215 & 0.04288378
+0.0938 & 0.0770 & 0.0883 & 0.1050 & 0.0603 & 0.0938 & 0.1106 & 0.1330 & 0.0994 & 0.1386\\
+-0.0068 & -0.0255 & -0.0130 & 0.0056 & -0.0441 & -0.0068 & 0.0118 & 0.0367 & -0.0006 & 0.0429
 \end{bmatrix}\\
 $
 \hfill \break
 \hfill \break
 
-% Function variables setup
 \noindent $(X^TX)^-1X^TY = 
 \hfill \break
 \hfill \break
 \begin{bmatrix}
-0.09384711 & 0.0770665 & 0.08825357 & 0.10503418 & 0.06028589 & 0.09384711 & 0.11062772 & 0.13300186  0.09944065 & 0.1385954\\
--0.00683654 & -0.02548167 & -0.01305158 & 0.00559354 & -0.04412679 & -0.00683654 0.01180858 & 0.03666874 & -0.0006215 & 0.04288378
+0.0938 & 0.0770 & 0.0883 & 0.1050 & 0.0603 & 0.0938 & 0.1106 & 0.1330 & 0.0994 & 0.1386\\
+-0.0068 & -0.0255 & -0.0130 & 0.0056 & -0.0441 & -0.0068 & 0.0118 & 0.0367 & -0.0006 & 0.0429
 \end{bmatrix}\\
+\hfill \break
+\hfill \break
 \begin{bmatrix}
 	1\\
 	-4\\	
@@ -190,7 +195,8 @@ $w = \begin{bmatrix}	1.0285891858297085 & -0.4126786824114355 \\\end{bmatrix}$
 
 \begin{enumerate}
    \item Root Mean Squared Error (RMSE): 3.7013259176662716
-   \item Mean Absolute Squared Error (MAPE): 142.73053114282442
+   \item Mean Absolute Percentage Error (MAPE) as Percent: 142.73053114282442
+   \item Mean Absolute Percentage Error (MAPE) as Decimal: 1.42730531143
 \end{enumerate}
 
 \newpage
@@ -201,12 +207,14 @@ $w = \begin{bmatrix}	1.0285891858297085 & -0.4126786824114355 \\\end{bmatrix}$
    \item Training Output
    \begin{itemize}
      \item Root Mean Squared Error (RMSE): $19.86256862907285$
-     \item Mean Absolute Percentage Error (MAPE): $21.397596050628863$
+     \item Mean Absolute Percentage Error (MAPE) as Percent: $21.397596050628863$
+     \item Mean Absolute Percentage Error (MAPE) as Decimal: $0.2139759605$
    \end{itemize}
    \item Validation Output
    \begin{itemize}
     \item Root Mean Squared Error (RMSE): $20.067704981328184$
-    \item Mean Absolute Percentage Error (MAPE): $30.47810152100226$
+    \item Mean Absolute Percentage Error (MAPE) as Percent: $30.47810152100226$
+    \item Mean Absolute Percentage Error (MAPE) as Decimal: $0.30478101521$
    \end{itemize}
 \end{enumerate}
 
@@ -241,7 +249,8 @@ $w = \begin{bmatrix}	1.0285891858297085 & -0.4126786824114355 \\\end{bmatrix}$
 \section{Locally-Weighted Linear Regression}
 \begin{enumerate}
     \item Validation Root Mean Squared Error (RMSE): $26.396286898865213$
-    \item Validation Mean Absolute Percentage Error (MAPE): $28.76650617672107$
+    \item Validation Mean Absolute Percentage Error (MAPE) Percent: $28.76650617672107$
+    \item Validation Mean Absolute Percentage Error (MAPE) as Decimal: $0.28766506176$
 \end{enumerate}
 
 \end{document}
