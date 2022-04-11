@@ -1,7 +1,6 @@
 from linear_regression import LinearRegression
 import numpy as np
 
-
 def print_results(lr, y, preds, type):
     print(type, "Actuals:", y)
     print(type, "Preds:", preds)
@@ -60,7 +59,7 @@ def test_s_folds_cross_validation(lr):
 
 
 def test_locally_weighted(lr):
-    print("Locally-Weight Linear Regression\n")
+    print("Locally-Weighted Linear Regression\n")
 
     # 1. Reads in the data, ignorning the first row (header) and first column (index)
     columns = [1, 2, 3]

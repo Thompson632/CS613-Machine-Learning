@@ -29,23 +29,23 @@ Validation MAPE: 30.47810152100226
 S-Folds Cross-Validation
 
 S-Fold: 4
-Mean RMSE: 21.70077684703403
-Standard Deviation RMSE: 2.381492342208445
+Mean RMSE: 20.564767965939097
+Standard Deviation RMSE: 1.5910361162918114
 
 S-Fold: 11
-Mean RMSE: 20.654015325326917
-Standard Deviation RMSE: 2.128079648728976
+Mean RMSE: 21.63071118123735
+Standard Deviation RMSE: 1.9486865976024081
 
 S-Fold: 22
-Mean RMSE: 20.360451447693144
-Standard Deviation RMSE: 2.1325648088599585
+Mean RMSE: 20.85926337333363
+Standard Deviation RMSE: 2.565799085084724
 
 S-Fold (N): 44
-Mean RMSE: 20.14664309802956
-Standard Deviation RMSE: 2.3348838587993987
+Mean RMSE: 20.182399573017975
+Standard Deviation RMSE: 2.648498314781664
 
 -------------------------------------
-Locally-Weight Linear Regression
+Locally-Weighted Linear Regression
 
 Validation Actuals: [ 28  69  28  14  41  97  28  55 153 125 139  97 139  55  14]
 Validation Preds: [  0.          83.          28.22982174  14.00232703  41.38765071
