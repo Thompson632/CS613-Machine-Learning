@@ -1,5 +1,7 @@
+from cProfile import label
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 class Evaluator():
     
@@ -13,7 +15,12 @@ class Evaluator():
 
         :return precision
         '''
-        return (tp / (tp + fp))
+        try:
+            precision = (tp / (tp + fp))
+        except:
+            precision = 1
+        
+        return precision
 
     def compute_recall(self, tp, fn):
         '''
@@ -24,7 +31,12 @@ class Evaluator():
 
         :return recall
         '''
-        return (tp / (tp + fn))
+        try:
+            recall = (tp / (tp + fn))
+        except:
+            recall = 1
+        
+        return recall
 
     def compute_f_measure(self, precision, recall):
         '''
@@ -37,7 +49,7 @@ class Evaluator():
         '''
         return (2 * precision * recall) / (precision + recall)
 
-    def evaulate_accuracy(self, actual, predicted):
+    def evaluate_accuracy(self, actual, predicted):
         '''
         Evaluates the accuracy of our actual and predicted data
 
@@ -64,7 +76,6 @@ class Evaluator():
         :return f-measure
         :return accuracy
         '''
-        predicted = np.array(predicted)
         # True Positive: Hit
         TP = np.sum(np.logical_and(predicted == 1, actual == 1))
         # True Negative: Correct rejection
@@ -73,46 +84,83 @@ class Evaluator():
         FP = np.sum(np.logical_and(predicted == 1, actual == 0))
         # False Negative: Miss (Type 2 error)
         FN = np.sum(np.logical_and(predicted == 0, actual == 1))
+        
+        TP = 0
+        FP = 0
+        FN = 0
+        
+        for i in range(actual.shape[0]):
+            if actual[i] == predicted[i] == 1:
+                TP +=1
+            if predicted[i] == 1 and actual[i] != predicted[i]:
+                FP +=1
+            if predicted[i] == 0 and actual[i] != predicted[i]:
+                FN +=1
 
         precision = self.compute_precision(TP, FP)
         recall = self.compute_recall(TP, FN)
         f_measure = self.compute_f_measure(precision, recall)
-        accuracy = self.evaulate_accuracy(actual, predicted)
+        accuracy = self.evaluate_accuracy(actual, predicted)
 
         return precision, recall, f_measure, accuracy
     
-    def plot_mean_log_loss(self, type, mean_log_loss, epochs):
+    def evaluate_prob_threshold(self, actual, predicted):
+        precision_scores = []
+        recall_scores = []
+        
+        probability_thresholds = np.linspace(0, 1, num=11)
+                
+        for p in probability_thresholds:
+            y_test_preds = []
+            
+            for prob in predicted:
+                if prob > p:
+                    y_test_preds.append(1)
+                else:
+                    y_test_preds.append(0)
+                    
+            precision, recall, f_measure, accuracy = self.evaluate_classifier(actual, y_test_preds)
+            
+            precision_scores.append(precision)
+            recall_scores.append(recall)
+        
+        return precision_scores, recall_scores
+    
+    def plot_mean_log_loss(self, train_log_loss, valid_log_loss, epochs):
         '''
         Plots the mean log loss as a function of the epoch
 
-        :param type: Type of data
-        :param mean_log_loss: Mean of the log loss
+        :param train_log_loss: Training data mean log loss
+        :param valid_log_loss: Validation data mean log loss
         :param epochs: Number of iterations
 
         :return none
         '''
-        fig = plt.figure(figsize=(8, 6))
-        plt.plot([i for i in range(epochs)], mean_log_loss, 'r-')
-        plt.title(type)
+        fig = plt.figure(figsize=(8, 6))        
+        plt.title("Training vs. Validation Loss")
         plt.xlabel('Epochs')
         plt.ylabel('Mean Log Loss')
+        plt.plot([i for i in range(epochs)], train_log_loss, label="Training")
+        plt.plot([i for i in range(epochs)], valid_log_loss, label="Validation")
+        plt.legend()
         plt.show()
 
-
-    def plot_precision_recall(self, type, precision, recall):
+    def plot_precision_recall(self, train_precisions, train_recalls, valid_precisions, valid_recalls):
         '''
-        Plots the precision recall graph.
-
-        :param type: Type of data
-        :param precision: Data precision
-        :param recall: Data recall
+        Plots the training vs. validation precision-recall graph.
+        
+        :param train_precisions: Training precision data
+        :param train_recalls: Training recall data
+        :param valid_precisions: Validation precision data
+        :param valid_recalls: Validation recall data
 
         :return none
         '''
         fig, ax = plt.subplots()
-        ax.plot(recall, precision, color='purple')
+        ax.plot(train_recalls, train_precisions, label="Training")
+        ax.plot(valid_recalls, valid_precisions, label="Validation")
 
-        ax.set_title(type)
+        ax.set_title("Training vs. Validation Precision-Recall")
         ax.set_ylabel('Precision')
         ax.set_xlabel('Recall')
 
@@ -120,5 +168,6 @@ class Evaluator():
         ax.xaxis.set_ticks(np.arange(0, 1, 0.1))
         ax.set_ylim([0, 1, ])
         ax.yaxis.set_ticks(np.arange(0, 1, 0.1))
-
+        
+        plt.legend()
         plt.show()

@@ -1,9 +1,18 @@
 import numpy as np
 
-
 class LogisticRegression():
-    
+
     def __init__(self, lr, epochs):
+        '''
+        Constructor that takes in a learning rate value
+        and the number of epochs to be ran in our 
+        training model
+
+        :param lr: The learning rate
+        :param epochs: The number of iterations
+
+        :return none
+        '''
         self.lr = lr
         self.epochs = epochs
 
@@ -70,20 +79,17 @@ class LogisticRegression():
         :param x_valid: Validation features
         :param y_valid: Validation actuals
 
-        :return training predictions
         :return training mean log loss
-        :return validation predictions
         :return validation mean log loss
+        :return learned weights
+        :return learned bias
         '''
         num_features = np.shape(x_train)[1]
 
         weights = np.zeros(num_features)
         bias = 0
 
-        training_preds = []
         training_losses = []
-
-        validation_preds = []
         validation_losses = []
 
         for i in range(self.epochs):
@@ -93,15 +99,7 @@ class LogisticRegression():
 
             # Compute sigmold (or logistic function) using gradient descent
             train_y_hat = self.compute_sigmold(train_gd)
-            # Add threshold of 0.5 for computing the classifiers
-            t = [1 if i > 0.5 else 0 for i in train_y_hat]
-            training_preds.append(t)
-
-            # Compute sigmold (or logistic function) using gradient descent
             valid_y_hat = self.compute_sigmold(valid_gd)
-            # Add threshold of 0.5 for computing the classifiers
-            v = [1 if i > 0.5 else 0 for i in valid_y_hat]
-            validation_preds.append(v)
 
             # Get gradients of loss
             dw, db = self.compute_derivatives_of_weights_and_bias(
@@ -119,8 +117,27 @@ class LogisticRegression():
             validation_loss = self.compute_mean_log_loss(y_valid, valid_y_hat)
             validation_losses.append(validation_loss)
 
-        # Converted list to numpy array
-        training_preds = np.array(training_preds)
-        validation_preds = np.array(validation_preds)
+        return training_losses, validation_losses, weights, bias
 
-        return training_preds, training_losses, validation_preds, validation_losses
+    def evaluate_model(self, X, weights, bias):
+        '''
+        Evaluates the model for the provided data by computing
+        the gradient descent and sigmold. Once evaluated, we
+        want to clean our data by considering a threshold. If 
+        the current value in y_hat is greater than 0.5, we set that
+        value to 1. Otherwise, we will set it to 0.
+
+        :param X: The training or validation data
+        :param weights: The learned weights
+        :param bias: The learned bias
+
+        :return the predicted values evaluated with a threshold
+        for the training or validation data
+        '''
+        # Compute Gradient Descent with learned weights and bias
+        gd = self.compute_gradient_descent(X, weights, bias)
+
+        # Compute sigmold (or logistic function) using gradient descent
+        y_hat = self.compute_sigmold(gd)
+
+        return y_hat.flatten()
