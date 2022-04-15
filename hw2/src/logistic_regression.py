@@ -1,8 +1,9 @@
 import numpy as np
 
+
 class LogisticRegression():
 
-    def __init__(self, lr, epochs):
+    def __init__(self, lr, epochs, stability_constant):
         '''
         Constructor that takes in a learning rate value
         and the number of epochs to be ran in our 
@@ -10,11 +11,14 @@ class LogisticRegression():
 
         :param lr: The learning rate
         :param epochs: The number of iterations
+        :param stability_constant: The constant to stabilize
+        our logs to ensure we do not get log(0) = infinity
 
         :return none
         '''
         self.lr = lr
         self.epochs = epochs
+        self.stability_constant = stability_constant
 
     def compute_sigmold(self, y_hat):
         '''
@@ -42,8 +46,10 @@ class LogisticRegression():
 
         :return the mean log loss of the data
         '''
-        first_term = y * np.log(y_hat)
-        second_term = (1 - y) * np.log(1 - y_hat)
+        first_term = y * np.log(y_hat + self.stability_constant)
+        one_minus_y_hat = 1 - y_hat + self.stability_constant
+
+        second_term = (1 - y) * np.log(one_minus_y_hat)
         third_term = -(first_term + second_term)
         return third_term.mean()
 
@@ -139,5 +145,4 @@ class LogisticRegression():
 
         # Compute sigmold (or logistic function) using gradient descent
         y_hat = self.compute_sigmold(gd)
-
         return y_hat.flatten()
