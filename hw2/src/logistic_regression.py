@@ -2,10 +2,11 @@ import numpy as np
 
 
 class LogisticRegression():
+    
     def __init__(self, lr, epochs):
         self.lr = lr
         self.epochs = epochs
-        
+
     def compute_sigmold(self, y_hat):
         '''
         Computes the logistic function (or sigmold) using the
@@ -63,28 +64,28 @@ class LogisticRegression():
         '''
         Traings a logistic regression model using gradient descent
         and sigmold (or the logistic function).
-        
+
         :param x_train: Training features
         :param y_train: Training actuals
         :param x_valid: Validation features
         :param y_valid: Validation actuals
-        
+
         :return training predictions
         :return training mean log loss
         :return validation predictions
         :return validation mean log loss
         '''
         num_features = np.shape(x_train)[1]
-        
+
         weights = np.zeros(num_features)
         bias = 0
-        
+
         training_preds = []
         training_losses = []
-        
+
         validation_preds = []
         validation_losses = []
-        
+
         for i in range(self.epochs):
             # Compute Gradient Descent
             train_gd = self.compute_gradient_descent(x_train, weights, bias)
@@ -92,14 +93,19 @@ class LogisticRegression():
 
             # Compute sigmold (or logistic function) using gradient descent
             train_y_hat = self.compute_sigmold(train_gd)
-            training_preds.append(train_y_hat)
-            
+            # Add threshold of 0.5 for computing the classifiers
+            t = [1 if i > 0.5 else 0 for i in train_y_hat]
+            training_preds.append(t)
+
             # Compute sigmold (or logistic function) using gradient descent
             valid_y_hat = self.compute_sigmold(valid_gd)
-            validation_preds.append(valid_y_hat)
-            
+            # Add threshold of 0.5 for computing the classifiers
+            v = [1 if i > 0.5 else 0 for i in valid_y_hat]
+            validation_preds.append(v)
+
             # Get gradients of loss
-            dw, db = self.compute_derivatives_of_weights_and_bias(x_train, y_train, train_y_hat)
+            dw, db = self.compute_derivatives_of_weights_and_bias(
+                x_train, y_train, train_y_hat)
 
             # Update our weights and bias
             weights = weights - self.lr * dw
@@ -108,9 +114,13 @@ class LogisticRegression():
             # Calculate log loss of training data
             training_loss = self.compute_mean_log_loss(y_train, train_y_hat)
             training_losses.append(training_loss)
-            
+
             # Calculate log loss of validation data
             validation_loss = self.compute_mean_log_loss(y_valid, valid_y_hat)
             validation_losses.append(validation_loss)
-            
+
+        # Converted list to numpy array
+        training_preds = np.array(training_preds)
+        validation_preds = np.array(validation_preds)
+
         return training_preds, training_losses, validation_preds, validation_losses

@@ -1,6 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-
 
 def load_data(filename):
     '''
@@ -13,6 +11,7 @@ def load_data(filename):
     :return numpy ndarray
     '''
     return np.loadtxt(filename, delimiter=',')
+
 
 def shuffle_data(data, reseed_val):
     '''
@@ -75,9 +74,9 @@ def add_bias_feature(X):
 
     :return X: Features with a bias
     '''
-    N = np.shape(X)[0]
+    num_observations = np.shape(X)[0]
 
-    ones = np.ones((N, 1))
+    ones = np.ones((num_observations, 1))
     X = np.concatenate((ones, X), axis=1)
     return X
 
@@ -90,12 +89,12 @@ def compute_training_mean_std(X):
 
     :return the vector of means and stds
     '''
-    N = np.shape(X)[1]
+    num_features = np.shape(X)[1]
 
     means = []
     stds = []
 
-    for i in range(N):
+    for i in range(num_features):
         current_feature = X[:, i]
 
         mean = np.mean(current_feature)
@@ -110,8 +109,9 @@ def compute_training_mean_std(X):
 
 def z_score_data(X, means, stds):
     '''
-    Z-scores the data by taking the subtracting each column by its
-    mean value and dividing by its standard deviation.
+    Z-scores the data by subtracting the mean of the current column
+    from the current column and dividing by the standard deviation
+    of the current column
 
     :param X: The features data
     :param means: The means vector for the training data
@@ -119,33 +119,16 @@ def z_score_data(X, means, stds):
 
     :return the z-scored data
     '''
-    N = np.shape(X)[1]
+    num_features = np.shape(X)[1]
 
-    for i in range(N):
+    for i in range(num_features):
         current_feature = X[:, i]
 
         numerator = current_feature - means[i]
         denominator = stds[i]
-        
+
         zscore = numerator / denominator
 
         X[:, i] = zscore
 
     return X
-
-def plot_mean_log_loss(type, mean_log_loss, epochs):
-    '''
-    Plots the mean log loss as a function of the epoch
-    
-    :param type: Type of data
-    :param mean_log_loss: Mean of the log loss
-    :param epochs: Number of iterations
-    
-    :return none
-    '''
-    fig = plt.figure(figsize = (8, 6))
-    plt.plot([i for i in range(epochs)], mean_log_loss, 'r-')
-    plt.title(type)
-    plt.xlabel('Epochs')
-    plt.ylabel('Mean Log Loss')
-    plt.show()
