@@ -1,3 +1,4 @@
+from sklearn.metrics import confusion_matrix
 import util
 from logistic_regression import LogisticRegression
 from evaluator import Evaluator
@@ -134,14 +135,16 @@ def multi_class_logistic_regression(learning_rate, epochs):
         # print("")
 
         # 7. Compute the precision, recall, and f-measure and accuracy of the learned model on the validation data
-        valid_class_one_preds, valid_class_two_preds, valid_accuracy = eval.evalulate_multi_class_classifier(
+        valid_class_one_preds, valid_class_two_preds, valid_accuracy, confusion_matrix = eval.evalulate_multi_class_classifier(
             y_valid, valid_preds)
         print(class_one, ":", valid_class_one_preds)
         print(class_two, ":", valid_class_two_preds)
         print("Validation Accuracy:", valid_accuracy)
+        print("Validation Confusion Matrix:\n", confusion_matrix)
+        eval.plot_confusion_matrix(confusion_matrix, class_one, class_two)
         print("")
+        eval.compare_metrics_against_sklearn(y_valid, valid_preds)
 
-
-binary_logistic_regression(learning_rate=0.1, epochs=1000)
-print("\n\n")
+#binary_logistic_regression(learning_rate=0.1, epochs=1000)
+#print("\n\n")
 multi_class_logistic_regression(learning_rate=0.1, epochs=1000)

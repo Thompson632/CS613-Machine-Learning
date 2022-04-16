@@ -2,35 +2,14 @@ Current Comparison: Iris-setosa vs. Iris-versicolor
 Iris-setosa : 19
 Iris-versicolor : 31
 Validation Accuracy: 1.0
-Validation Confusion Matrix:
- [[31  0]
- [ 0 19]]
 
-sklearn Confusion Matrix:
- [[31  0]
- [ 0 19]]
-sklearn Accuracy: 1.0
 Current Comparison: Iris-setosa vs. Iris-virginica
 Iris-setosa : 19
 Iris-virginica : 31
 Validation Accuracy: 1.0
-Validation Confusion Matrix:
- [[31  0]
- [ 0 19]]
 
-sklearn Confusion Matrix:
- [[31  0]
- [ 0 19]]
-sklearn Accuracy: 1.0
 Current Comparison: Iris-versicolor vs. Iris-virginica
 Iris-versicolor : 12
 Iris-virginica : 38
 Validation Accuracy: 0.78
-Validation Confusion Matrix:
- [[30  3]
- [ 8  9]]
 
-sklearn Confusion Matrix:
- [[30  3]
- [ 8  9]]
-sklearn Accuracy: 0.78

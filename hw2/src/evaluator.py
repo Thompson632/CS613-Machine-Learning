@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn.metrics import confusion_matrix
 
 
 class Evaluator():
@@ -48,8 +49,7 @@ class Evaluator():
             if y_val == 1 and y_hat_val == 0:
                 FN = FN + 1
 
-        # return TP, TN, FP, FN
-        return TP, FP, FN
+        return TP, TN, FP, FN
 
     def evaluate_y_hat_with_threshold(self, y_hat, threshold):
         '''
@@ -144,7 +144,7 @@ class Evaluator():
         :return recall
         '''
         # Compute the classification errors
-        TP, FP, FN = self.compute_classification_error_types(y, y_hat)
+        TP, TN, FP, FN = self.compute_classification_error_types(y, y_hat)
 
         precision = self.compute_precision(TP, FP)
         recall = self.compute_recall(TP, FN)
@@ -167,13 +167,11 @@ class Evaluator():
         '''
         # Evaluate y_hat with a threshold value of 0.5
         y_hat_with_threshold = self.evaluate_y_hat_with_threshold(y_hat, 0.5)
-
-        # Compute the classification errors
-        TP, FP, FN = self.compute_classification_error_types(
+        
+        # Calculate the precision and recall for the current increment
+        precision, recall = self.compute_precision_and_recall(
             y, y_hat_with_threshold)
-
-        precision = self.compute_precision(TP, FP)
-        recall = self.compute_recall(TP, FN)
+        
         f_measure = self.compute_f_measure(precision, recall)
         accuracy = self.evaluate_accuracy(y, y_hat_with_threshold)
 
@@ -196,8 +194,13 @@ class Evaluator():
         y_hat_with_threshold = self.evaluate_y_hat_with_threshold(y_hat, 0.5)
 
         # Compute the classification errors
-        TP, FP, FN = self.compute_classification_error_types(
+        TP, TN, FP, FN = self.compute_classification_error_types(
             y, y_hat_with_threshold)
+        
+        # Create Confusion Matrix
+        confusion_matrix = np.array(
+            [[TN, FP], 
+             [FN, TP]])
 
         class_one_preds = np.sum(np.logical_and(
             y_hat_with_threshold == 1, True))
@@ -206,7 +209,7 @@ class Evaluator():
 
         accuracy = self.evaluate_accuracy(y, y_hat_with_threshold)
 
-        return class_one_preds, class_two_preds, accuracy
+        return class_one_preds, class_two_preds, accuracy, confusion_matrix
 
     def evaluate_precision_recall_with_threshold(self, y, y_hat, threshold_start, threshold_end, increments):
         '''
@@ -291,3 +294,27 @@ class Evaluator():
 
         plt.legend()
         plt.show()
+
+    def plot_confusion_matrix(self, confusion_matrix, class_one, class_two):
+        import seaborn as sns
+
+        ax = sns.heatmap(confusion_matrix, annot=True, cmap='Blues')
+
+        ax.set_title('Confusion Matrix\n\n');
+        ax.set_xlabel('\nPredicted Flower Category')
+        ax.set_ylabel('Actual Flower ');
+
+        ## Ticket labels - List must be in alphabetical order
+        ax.xaxis.set_ticklabels([class_one,class_two])
+        ax.yaxis.set_ticklabels([class_one,class_two])
+
+        ## Display the visualization of the Confusion Matrix.
+        plt.show()
+        
+    def compare_metrics_against_sklearn(self, y, y_hat):
+        from sklearn import metrics
+        y_hat_with_threshold = self.evaluate_y_hat_with_threshold(y_hat, 0.5)
+        c_matrix = metrics.confusion_matrix(y, y_hat_with_threshold)
+        print("sklearn Confusion Matrix:\n", c_matrix)
+        print("sklearn Accuracy:", metrics.accuracy_score(y, y_hat_with_threshold))
+                
