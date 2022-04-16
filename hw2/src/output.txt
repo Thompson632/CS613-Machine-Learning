@@ -1,0 +1,28 @@
+
+Training Precision: 0.9307692307692308
+Training Recall: 0.8803556992724333
+Training F-Measure: 0.9048608226007478
+Training Accuracy: 0.925334202804043
+
+Validation Precision: 0.9113475177304965
+Validation Recall: 0.8923611111111112
+Validation F-Measure: 0.9017543859649124
+Validation Accuracy: 0.9269882659713168
+
+
+
+Current Comparison: Iris-setosa vs. Iris-versicolor
+Iris-setosa : 19
+Iris-versicolor : 31
+Validation Accuracy: 1.0
+
+Current Comparison: Iris-setosa vs. Iris-virginica
+Iris-setosa : 19
+Iris-virginica : 31
+Validation Accuracy: 1.0
+
+Current Comparison: Iris-versicolor vs. Iris-virginica
+Iris-versicolor : 12
+Iris-virginica : 38
+Validation Accuracy: 0.78
+

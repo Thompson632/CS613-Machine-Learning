@@ -31,9 +31,15 @@ class LogisticRegression():
         '''
         return 1 / (1 + np.exp(-y_hat))
 
-    def compute_gradient_descent(self, X, weights, bias):
+    def compute_y_hat(self, X, weights, bias):
         '''
-        Computes y_hat using gradient descent
+        Computes our y_hat based on the features, weights, and bias
+
+        :param X: The features
+        :param weights: The learned weights
+        :bias: The learned bias
+
+        :return the predicted value
         '''
         return np.dot(X, weights) + bias
 
@@ -75,10 +81,12 @@ class LogisticRegression():
 
         return dw, db
 
-    def train_logistic_regression_model(self, x_train, y_train, x_valid, y_valid):
+    def train_model(self, x_train, y_train, x_valid, y_valid):
         '''
-        Traings a logistic regression model using gradient descent
-        and sigmold (or the logistic function).
+        Trains a logistic regression model using gradient descent
+        and sigmold (or the logistic function). The eventual output will
+        be the learned weights and bias as well as the probability of the training 
+        and validation data.
 
         :param x_train: Training features
         :param y_train: Training actuals
@@ -99,31 +107,40 @@ class LogisticRegression():
         validation_losses = []
 
         for i in range(self.epochs):
-            # Compute Gradient Descent
-            train_gd = self.compute_gradient_descent(x_train, weights, bias)
-            valid_gd = self.compute_gradient_descent(x_valid, weights, bias)
-
-            # Compute sigmold (or logistic function) using gradient descent
-            train_y_hat = self.compute_sigmold(train_gd)
-            valid_y_hat = self.compute_sigmold(valid_gd)
-
-            # Get gradients of loss
-            dw, db = self.compute_derivatives_of_weights_and_bias(
-                x_train, y_train, train_y_hat)
+            # Compute gradients and train / valid probability
+            dw, db, train_probability, valid_probability = self.compute_gradients(
+                x_train, y_train, x_valid, y_valid, weights, bias)
 
             # Update our weights and bias
             weights = weights - self.lr * dw
             bias = bias - self.lr * db
 
-            # Calculate log loss of training data
-            training_loss = self.compute_mean_log_loss(y_train, train_y_hat)
+            # Calculate log loss of training datax
+            training_loss = self.compute_mean_log_loss(
+                y_train, train_probability)
             training_losses.append(training_loss)
 
             # Calculate log loss of validation data
-            validation_loss = self.compute_mean_log_loss(y_valid, valid_y_hat)
+            validation_loss = self.compute_mean_log_loss(
+                y_valid, valid_probability)
             validation_losses.append(validation_loss)
 
         return training_losses, validation_losses, weights, bias
+
+    def compute_gradients(self, x_train, y_train, x_valid, y_valid, weights, bias):
+        # Compute y_hat
+        train_y_hat = self.compute_y_hat(x_train, weights, bias)
+        valid_y_hat = self.compute_y_hat(x_valid, weights, bias)
+
+        # Compute sigmold (or logistic function)
+        train_probability = self.compute_sigmold(train_y_hat)
+        valid_probability = self.compute_sigmold(valid_y_hat)
+
+        # Get gradients of loss
+        dw, db = self.compute_derivatives_of_weights_and_bias(
+            x_train, y_train, train_probability)
+
+        return dw, db, train_probability, valid_probability
 
     def evaluate_model(self, X, weights, bias):
         '''
@@ -140,9 +157,9 @@ class LogisticRegression():
         :return the predicted values evaluated with a threshold
         for the training or validation data
         '''
-        # Compute Gradient Descent with learned weights and bias
-        gd = self.compute_gradient_descent(X, weights, bias)
+        # Compute y_hat
+        y_hat = self.compute_y_hat(X, weights, bias)
 
-        # Compute sigmold (or logistic function) using gradient descent
-        y_hat = self.compute_sigmold(gd)
-        return y_hat.flatten()
+        # Compute sigmold (or logistic function)
+        probability = self.compute_sigmold(y_hat)
+        return probability.flatten()

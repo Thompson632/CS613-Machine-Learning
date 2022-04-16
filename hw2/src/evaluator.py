@@ -1,4 +1,3 @@
-from cProfile import label
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -180,16 +179,45 @@ class Evaluator():
 
         return precision, recall, f_measure, accuracy
 
+    def evalulate_multi_class_classifier(self, y, y_hat):
+        '''
+        Evaluates our multi-class classifier by first evaluating y_hat with a threshold
+        of 0.5, then we calculate the classification error, and finally we get the number
+        of class one and class two y_hats were correct.
+
+        :param y: The actual data
+        :param y_hat: The predicted data
+
+        :return the number of class one actuals predicted correctly
+        :return the number of class two actuals predicted correctly
+        :return accuracy
+        '''
+        # Evaluate y_hat with a threshold value of 0.5
+        y_hat_with_threshold = self.evaluate_y_hat_with_threshold(y_hat, 0.5)
+
+        # Compute the classification errors
+        TP, FP, FN = self.compute_classification_error_types(
+            y, y_hat_with_threshold)
+
+        class_one_preds = np.sum(np.logical_and(
+            y_hat_with_threshold == 1, True))
+        class_two_preds = np.sum(np.logical_and(
+            y_hat_with_threshold == 0, True))
+
+        accuracy = self.evaluate_accuracy(y, y_hat_with_threshold)
+
+        return class_one_preds, class_two_preds, accuracy
+
     def evaluate_precision_recall_with_threshold(self, y, y_hat, threshold_start, threshold_end, increments):
         '''
         Evaluates the precision and recall values for each increment as provided.
-        
+
         :param y: The actual data
         :param y_hat: The predicted data
         :param threshold_start: The starting point of the threshold
         :param threshold_end: The ending point of the threshold
         :param increments: Number of increments between threshold start and end
-        
+
         :return the list of precisions
         :return the list of recalls
         '''
@@ -198,13 +226,14 @@ class Evaluator():
 
         threshold_increments = np.linspace(
             threshold_start, threshold_end, num=increments)
-        
+
         # For each of the increments (ex. 0.1, 0.2,..., 1.0)
         for increment in threshold_increments:
             y_hat_thresholds = []
-            
+
             # If the current y_hat_val is greater than the increment, append 1. Otherwise, add 0.
-            [y_hat_thresholds.append(1) if y_hat_val > increment else y_hat_thresholds.append(0) for y_hat_val in y_hat]
+            [y_hat_thresholds.append(1) if y_hat_val > increment else y_hat_thresholds.append(
+                0) for y_hat_val in y_hat]
 
             # Recalculate the precision and recall for the current increment
             precision, recall = self.compute_precision_and_recall(
