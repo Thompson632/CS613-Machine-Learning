@@ -1,32 +1,22 @@
-from sklearn.metrics import confusion_matrix
+from multi_class_logistic_regression import MultiClassLogisticRegression
 import util
 from logistic_regression import LogisticRegression
 from evaluator import Evaluator
 import numpy as np
-from itertools import combinations
 
 
-def binary_logistic_regression(learning_rate, epochs):
-    # Define stability
-    stability = 10e-7
-
-    # Instantiate our LogisticRegression class
-    lr = LogisticRegression(learning_rate, epochs, stability)
-    # Instantiate our Evaluator class
-    eval = Evaluator()
+def binary_logistic_regression(learning_rate, epochs, stability):
+    print("Binary Logistic Regression:")
 
     # Load data
-    data = util.load_data("spambase.data")
+    data = util.load_data("spambase.data", False)
     # Shuffle data
     data = util.shuffle_data(data, 0)
 
-    # Split and get training and validation
     training, validation = util.get_train_valid_data(data)
 
-    # Get training features and actuals
-    x_train, y_train = util.get_features_actuals(training)
-    # Get validation features and actuals
-    x_valid, y_valid = util.get_features_actuals(validation)
+    x_train, y_train = util.get_features_actuals(training, False)
+    x_valid, y_valid = util.get_features_actuals(validation, False)
 
     # Get mean and std of training data
     means, stds = util.compute_training_mean_std(x_train)
@@ -37,16 +27,16 @@ def binary_logistic_regression(learning_rate, epochs):
     # 4. Z-Score our validation data with the means and std
     x_valid_zscored = util.z_score_data(x_valid, means, stds)
 
-    # 5. Train Logistic Regression Model
-    train_losses, valid_losses, weights, bias = lr.train_model(
-        x_train_zscored, y_train, x_valid_zscored, y_valid)
-    train_preds = lr.evaluate_model(x_train_zscored, weights, bias)
-    valid_preds = lr.evaluate_model(x_valid_zscored, weights, bias)
+    eval = Evaluator()
+    lr = LogisticRegression(learning_rate, epochs, stability)
 
-    #print("Training Actuals:", y_train)
-    #print("Training Preds:", train_preds)
-    #print("\nValidation Actuals:", y_valid)
-    #print("Validation Preds:", valid_preds)
+    # 5. Train Logistic Regression Model
+    train_losses, valid_losses = lr.train_model(
+        x_train_zscored, y_train, x_valid_zscored, y_valid)
+
+    # Evaluate Model
+    train_preds = lr.evaluate_model(x_train_zscored)
+    valid_preds = lr.evaluate_model(x_valid_zscored)
 
     # 6. Plot Training and Validation Loss
     eval.plot_mean_log_loss(train_losses, valid_losses, epochs)
@@ -76,75 +66,52 @@ def binary_logistic_regression(learning_rate, epochs):
         training_precisions, training_recalls, valid_precisions, valid_recalls)
 
 
-def multi_class_logistic_regression(learning_rate, epochs):
+def multi_class_logistic_regression(learning_rate, epochs, stability):
+    print("Multi-Class Logistic Regression:")
+
     # Load Data
-    data = util.load_multi_class_data("iris.data")
+    data = util.load_data("iris.data", True)
 
     # Shuffle data
     data = util.shuffle_data(data, 0)
 
-    # Get our number of classes and combinations of classes
-    classes = data[:, -1]
-    combos = combinations(np.unique(data[:, -1]), 2)
+    # Unique Classes
+    unique_classes = np.unique(data[:, -1])
 
-    # Define stability
-    stability = 10e-7
-
-    # Instantiate our LogisticRegression class
-    lr = LogisticRegression(learning_rate, epochs, stability)
-    # Instantiate our Evaluator class
-    eval = Evaluator()
-
-    # Split and get training and validation
     training, validation = util.get_train_valid_data(data)
 
-    for c in combos:
-        class_one, class_two = c
-        print("Current Comparison:", class_one, "vs.", class_two)
+    x_train, y_train = util.get_features_actuals(training, True)
+    x_valid, y_valid = util.get_features_actuals(validation, True)
 
-        # Get training features and actuals
-        x_train, y_train = util.get_multi_class_features_actuals(
-            training, class_one, class_two)
-        # Get validation features and actuals
-        x_valid, y_valid = util.get_multi_class_features_actuals(
-            validation, class_one, class_two)
+    means, stds = util.compute_training_mean_std(x_train)
 
-        # # Get mean and std of training data
-        means, stds = util.compute_training_mean_std(x_train)
+    # 4. Z-Score our training data with the means and std
+    x_train_zscored = util.z_score_data(x_train, means, stds)
 
-        # # 4. Z-Score our training data with the means and std
-        x_train_zscored = util.z_score_data(x_train, means, stds)
+    # 4. Z-Score our validation data with the means and std
+    x_valid_zscored = util.z_score_data(x_valid, means, stds)
 
-        # 4. Z-Score our validation data with the means and std
-        x_valid_zscored = util.z_score_data(x_valid, means, stds)
+    eval = Evaluator()
+    mc = MultiClassLogisticRegression(
+        learning_rate, epochs, stability, unique_classes)
 
-        # 5. Train Logistic Regression Model using gradient descent
-        train_losses, valid_losses, weights, bias = lr.train_model(
-            x_train_zscored, y_train, x_valid_zscored, y_valid)
-        train_preds = lr.evaluate_model(x_train_zscored, weights, bias)
-        valid_preds = lr.evaluate_model(x_valid_zscored, weights, bias)
+    # 5(b). Train Logistic Regression Model
+    mc.train_model(x_train_zscored, y_train, x_valid_zscored, y_valid)
 
-        # print("Training Actuals:", y_train)
-        # print("Training Actuals Shape:",y_train.shape)
-        # print("Training Preds:", train_preds)
-        # print("Training Preds Shape:",train_preds.shape)
-        # print("\nValidation Actuals:", y_valid)
-        # print("Validation Actuals Shape:", y_valid.shape)
-        # print("Validation Preds:", valid_preds)
-        # print("Validation Preds Shape:", valid_preds.shape)
-        # print("")
+    # 6. Applies the models to each validation sample to determine the most likely class.
+    valid_preds = mc.evaluate_model(x_valid_zscored)
 
-        # 7. Compute the precision, recall, and f-measure and accuracy of the learned model on the validation data
-        valid_class_one_preds, valid_class_two_preds, valid_accuracy, confusion_matrix = eval.evalulate_multi_class_classifier(
-            y_valid, valid_preds)
-        print(class_one, ":", valid_class_one_preds)
-        print(class_two, ":", valid_class_two_preds)
-        print("Validation Accuracy:", valid_accuracy)
-        print("Validation Confusion Matrix:\n", confusion_matrix)
-        eval.plot_confusion_matrix(confusion_matrix, class_one, class_two)
-        print("")
-        eval.compare_metrics_against_sklearn(y_valid, valid_preds)
+    # 7. Computes the validation accuracy
+    valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
+    print("\nValidation Accuracy:", valid_accuracy)
 
-#binary_logistic_regression(learning_rate=0.1, epochs=1000)
-#print("\n\n")
-multi_class_logistic_regression(learning_rate=0.1, epochs=1000)
+    # 8. Creates a confusion matrix for the validation data
+    confusion_matrix = eval.compute_confusion_matrix(
+        y_valid, valid_preds, unique_classes)
+    print("Confusion Matrix:\n", confusion_matrix)
+
+
+binary_logistic_regression(learning_rate=0.1, epochs=10000, stability=10e-7)
+print("\n\n")
+multi_class_logistic_regression(
+    learning_rate=0.1, epochs=10000, stability=10e-7)

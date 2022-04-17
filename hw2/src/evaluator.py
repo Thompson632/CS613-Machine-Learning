@@ -1,7 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
-from sklearn.metrics import confusion_matrix
 
 
 class Evaluator():
@@ -167,49 +165,15 @@ class Evaluator():
         '''
         # Evaluate y_hat with a threshold value of 0.5
         y_hat_with_threshold = self.evaluate_y_hat_with_threshold(y_hat, 0.5)
-        
+
         # Calculate the precision and recall for the current increment
         precision, recall = self.compute_precision_and_recall(
             y, y_hat_with_threshold)
-        
+
         f_measure = self.compute_f_measure(precision, recall)
         accuracy = self.evaluate_accuracy(y, y_hat_with_threshold)
 
         return precision, recall, f_measure, accuracy
-
-    def evalulate_multi_class_classifier(self, y, y_hat):
-        '''
-        Evaluates our multi-class classifier by first evaluating y_hat with a threshold
-        of 0.5, then we calculate the classification error, and finally we get the number
-        of class one and class two y_hats were correct.
-
-        :param y: The actual data
-        :param y_hat: The predicted data
-
-        :return the number of class one actuals predicted correctly
-        :return the number of class two actuals predicted correctly
-        :return accuracy
-        '''
-        # Evaluate y_hat with a threshold value of 0.5
-        y_hat_with_threshold = self.evaluate_y_hat_with_threshold(y_hat, 0.5)
-
-        # Compute the classification errors
-        TP, TN, FP, FN = self.compute_classification_error_types(
-            y, y_hat_with_threshold)
-        
-        # Create Confusion Matrix
-        confusion_matrix = np.array(
-            [[TN, FP], 
-             [FN, TP]])
-
-        class_one_preds = np.sum(np.logical_and(
-            y_hat_with_threshold == 1, True))
-        class_two_preds = np.sum(np.logical_and(
-            y_hat_with_threshold == 0, True))
-
-        accuracy = self.evaluate_accuracy(y, y_hat_with_threshold)
-
-        return class_one_preds, class_two_preds, accuracy, confusion_matrix
 
     def evaluate_precision_recall_with_threshold(self, y, y_hat, threshold_start, threshold_end, increments):
         '''
@@ -247,6 +211,32 @@ class Evaluator():
             recall_list.append(recall)
 
         return precision_list, recall_list
+
+    def compute_confusion_matrix(self, y, y_hat, classes):
+        '''
+        Computes the confusion matrix for our multi-class classifier
+        by creating a confusion matrix of size class x class. 
+
+        :param y: Actual values
+        :param y_hat: Predicted values
+        :param classes: Unique classes
+
+        :return the confusion matrix of the number of classes
+        '''
+        # Number of classes
+        num_classes = len(classes)
+
+        # Create our confusion matrix classes x classes
+        confusion_matrix = np.zeros((num_classes, num_classes))
+
+        # For each row...
+        for i in range(num_classes):
+            # For each column...
+            for j in range(num_classes):
+                confusion_matrix[i, j] = np.sum(
+                    (y == classes[i]) & (y_hat == classes[j]))
+
+        return confusion_matrix
 
     def plot_mean_log_loss(self, train_log_loss, valid_log_loss, epochs):
         '''
@@ -294,27 +284,3 @@ class Evaluator():
 
         plt.legend()
         plt.show()
-
-    def plot_confusion_matrix(self, confusion_matrix, class_one, class_two):
-        import seaborn as sns
-
-        ax = sns.heatmap(confusion_matrix, annot=True, cmap='Blues')
-
-        ax.set_title('Confusion Matrix\n\n');
-        ax.set_xlabel('\nPredicted Flower Category')
-        ax.set_ylabel('Actual Flower ');
-
-        ## Ticket labels - List must be in alphabetical order
-        ax.xaxis.set_ticklabels([class_one,class_two])
-        ax.yaxis.set_ticklabels([class_one,class_two])
-
-        ## Display the visualization of the Confusion Matrix.
-        plt.show()
-        
-    def compare_metrics_against_sklearn(self, y, y_hat):
-        from sklearn import metrics
-        y_hat_with_threshold = self.evaluate_y_hat_with_threshold(y_hat, 0.5)
-        c_matrix = metrics.confusion_matrix(y, y_hat_with_threshold)
-        print("sklearn Confusion Matrix:\n", c_matrix)
-        print("sklearn Accuracy:", metrics.accuracy_score(y, y_hat_with_threshold))
-                

@@ -2,7 +2,6 @@ import numpy as np
 
 
 class LogisticRegression():
-
     def __init__(self, lr, epochs, stability_constant):
         '''
         Constructor that takes in a learning rate value
@@ -20,6 +19,9 @@ class LogisticRegression():
         self.epochs = epochs
         self.stability_constant = stability_constant
 
+        self.weights = 0
+        self.bias = 0
+
     def compute_sigmold(self, y_hat):
         '''
         Computes the logistic function (or sigmold) using the
@@ -31,17 +33,15 @@ class LogisticRegression():
         '''
         return 1 / (1 + np.exp(-y_hat))
 
-    def compute_y_hat(self, X, weights, bias):
+    def compute_y_hat(self, X):
         '''
         Computes our y_hat based on the features, weights, and bias
 
         :param X: The features
-        :param weights: The learned weights
-        :bias: The learned bias
 
         :return the predicted value
         '''
-        return np.dot(X, weights) + bias
+        return np.dot(X, self.weights) + self.bias
 
     def compute_mean_log_loss(self, y, y_hat):
         '''
@@ -59,17 +59,17 @@ class LogisticRegression():
         third_term = -(first_term + second_term)
         return third_term.mean()
 
-    def compute_derivatives_of_weights_and_bias(self, X, y, y_hat):
+    def compute_partial_derivatives_of_weights_and_bias(self, X, y, y_hat):
         '''
-        Computes the derivatives of weights and bias
+        Computes the partial derivatives of weights and bias
         with respect to the loss.
 
         :param X: Features
         :param y: Actual values
         :param y_hat: Predicted values
 
-        :return dw: Derivative of weights
-        :return db: Derivative of bias
+        :return the derivative of weights
+        :return the derivative of bias
         '''
         num_observations = X.shape[0]
 
@@ -85,8 +85,7 @@ class LogisticRegression():
         '''
         Trains a logistic regression model using gradient descent
         and sigmold (or the logistic function). The eventual output will
-        be the learned weights and bias as well as the probability of the training 
-        and validation data.
+        be the training and validation data mean log loss.
 
         :param x_train: Training features
         :param y_train: Training actuals
@@ -95,13 +94,10 @@ class LogisticRegression():
 
         :return training mean log loss
         :return validation mean log loss
-        :return learned weights
-        :return learned bias
         '''
         num_features = np.shape(x_train)[1]
 
-        weights = np.zeros(num_features)
-        bias = 0
+        self.weights = np.zeros(num_features)
 
         training_losses = []
         validation_losses = []
@@ -109,13 +105,13 @@ class LogisticRegression():
         for i in range(self.epochs):
             # Compute gradients and train / valid probability
             dw, db, train_probability, valid_probability = self.compute_gradients(
-                x_train, y_train, x_valid, y_valid, weights, bias)
+                x_train, y_train, x_valid)
 
             # Update our weights and bias
-            weights = weights - self.lr * dw
-            bias = bias - self.lr * db
+            self.weights = self.weights - self.lr * dw
+            self.bias = self.bias - self.lr * db
 
-            # Calculate log loss of training datax
+            # Calculate log loss of training data
             training_loss = self.compute_mean_log_loss(
                 y_train, train_probability)
             training_losses.append(training_loss)
@@ -125,24 +121,39 @@ class LogisticRegression():
                 y_valid, valid_probability)
             validation_losses.append(validation_loss)
 
-        return training_losses, validation_losses, weights, bias
+        return training_losses, validation_losses
 
-    def compute_gradients(self, x_train, y_train, x_valid, y_valid, weights, bias):
+    def compute_gradients(self, x_train, y_train, x_valid):
+        '''
+        Computes the gradients by first calculating the y_hat for the 
+        training and validation data. Next, it compute the sigmold (or logistic function)
+        in order to get the probably values for each training set. Once that is done,
+        we are able to calculate the derivates of the weights and bias'.
+
+        :param x_train: Training features
+        :param y_train: Training actuals
+        :param x_valid: Validation features
+
+        :return derivative of weights with respect to loss
+        :return derivative of bias with respect to bias
+        :return the training data probability
+        :return the validation data probability
+        '''
         # Compute y_hat
-        train_y_hat = self.compute_y_hat(x_train, weights, bias)
-        valid_y_hat = self.compute_y_hat(x_valid, weights, bias)
+        train_y_hat = self.compute_y_hat(x_train)
+        valid_y_hat = self.compute_y_hat(x_valid)
 
         # Compute sigmold (or logistic function)
         train_probability = self.compute_sigmold(train_y_hat)
         valid_probability = self.compute_sigmold(valid_y_hat)
 
         # Get gradients of loss
-        dw, db = self.compute_derivatives_of_weights_and_bias(
+        dw, db = self.compute_partial_derivatives_of_weights_and_bias(
             x_train, y_train, train_probability)
 
         return dw, db, train_probability, valid_probability
 
-    def evaluate_model(self, X, weights, bias):
+    def evaluate_model(self, X):
         '''
         Evaluates the model for the provided data by computing
         the gradient descent and sigmold. Once evaluated, we
@@ -151,14 +162,11 @@ class LogisticRegression():
         value to 1. Otherwise, we will set it to 0.
 
         :param X: The training or validation data
-        :param weights: The learned weights
-        :param bias: The learned bias
 
-        :return the predicted values evaluated with a threshold
-        for the training or validation data
+        :return the predicted values
         '''
         # Compute y_hat
-        y_hat = self.compute_y_hat(X, weights, bias)
+        y_hat = self.compute_y_hat(X)
 
         # Compute sigmold (or logistic function)
         probability = self.compute_sigmold(y_hat)

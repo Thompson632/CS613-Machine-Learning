@@ -1,29 +1,23 @@
 import numpy as np
 
 
-def load_data(filename):
+def load_data(filename, should_read_as_strings):
     '''
-    Reads in a csv file ignoring the first rows (headers)
-    and only returning the columns as specified in the parameter.
+    Reads in a file as a numpy ndarray and returns the data. 
+    Added a flag to read in the data as strings in the case
+    of multi-class classification where our target class is a label
+    instead of binary.
 
-    :param filename: The file name specified at runtime
-
-    :return numpy ndarray of data
-    '''
-    return np.loadtxt(filename, delimiter=',')
-
-
-def load_multi_class_data(filename):
-    '''
-    Loads the multi-class data by taking the columns as data and classes.
-
-    :param filename: The file name specified at runtime
-    :param data_columns: The data columns to load
-    :param class_columns: The class columns to load
+    :param filename: The name of the filename to be loaded
+    :param should_read_as_strings: Flag to read in the data as 
+    strictly strings
 
     :return the numpy ndarray of data
     '''
-    return np.loadtxt(filename, delimiter=',', dtype=str)
+    if should_read_as_strings:
+        return np.loadtxt(filename, delimiter=',', dtype=str)
+
+    return np.loadtxt(filename, delimiter=',')
 
 
 def shuffle_data(data, reseed_val):
@@ -61,82 +55,25 @@ def get_train_valid_data(data):
     return training, validation
 
 
-def get_features_actuals(data):
+def get_features_actuals(data, should_convert_to_float):
     '''
     Helper function that retrieves the features and
-    actual values from the data. Currently it retrieves
-    the features as the last two columns (Temp of Water
-    and Length of Fish) in the ndarray and the first column
-    (Age) as the actuals.
-    and the
+    actual values from the data. 
 
     :param data: The data we are using
+    :param should_convert_to_float: If set to true, will convert
+    the string data to float
 
     :return the features data as X
     :return the actual data as y
     '''
     X = data[:, : -1]
+
+    if should_convert_to_float:
+        X = X.astype(float)
+
     y = data[:, -1]
     return X, y
-
-
-def get_multi_class_features_actuals(data, class_one, class_two):
-    '''
-    Helper function that retrieves the features and actual values from the data
-    based on the classes we are used for multi-class classification.
-
-    :param data: The data we are using
-    :param class_one: The current class
-    :param class_two: The class we are using to compare
-
-    :return the features data as X
-    :return the actual data as y
-    '''
-    x_list = []
-    y_list = []
-
-    for observation in data:
-        X, y = convert_multi_class_observation(
-            observation, class_one, class_two)
-        x_list.append(X)
-        y_list.append(y)
-
-    x_list = np.array(x_list)
-    y_list = np.array(y_list)
-    return x_list, y_list
-
-
-def convert_multi_class_observation(observation, class_one, class_two):
-    '''
-    Helper method converts our features observation from a string array to an
-    array of floats. Also, converts our y-values from their string representation
-    to a 1 or zero. If the current y-observation is equal to class one, that means
-    we are evaluating for class one and this should be set to 1 (or true). If the
-    current y-observation is not equal to class one but it is equal to class two,
-    that means we are using class two to compare against class one.
-
-    :param observation: The current observation in the data
-    :param class_one: The current class
-    :param class_two: The class we are using to compare
-
-    :return the features data as Xi
-    :return the binary value as yi
-    '''
-    # Get the current observation features
-    X = observation[: -1]
-    # Get the current observation actual
-    y = observation[-1]
-
-    # Convert our X data from a string array to a float array
-    X = [float(i) for i in X]
-
-    y_int = 0
-    if y == class_one:
-        y_int = 1
-    elif y == class_two:
-        y_int = 0
-
-    return X, y_int
 
 
 def compute_training_mean_std(X):

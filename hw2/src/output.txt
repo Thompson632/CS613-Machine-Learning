@@ -1,36 +1,21 @@
-Current Comparison: Iris-setosa vs. Iris-versicolor
-Iris-setosa : 19
-Iris-versicolor : 31
-Validation Accuracy: 1.0
-Validation Confusion Matrix:
- [[31  0]
- [ 0 19]]
+Binary Logistic Regression:
 
-sklearn Confusion Matrix:
- [[31  0]
- [ 0 19]]
-sklearn Accuracy: 1.0
-Current Comparison: Iris-setosa vs. Iris-virginica
-Iris-setosa : 19
-Iris-virginica : 31
-Validation Accuracy: 1.0
-Validation Confusion Matrix:
- [[31  0]
- [ 0 19]]
+Training Precision: 0.9267676767676768
+Training Recall: 0.8900565885206144
+Training F-Measure: 0.9080412371134021
+Training Accuracy: 0.9272905119008803
 
-sklearn Confusion Matrix:
- [[31  0]
- [ 0 19]]
-sklearn Accuracy: 1.0
-Current Comparison: Iris-versicolor vs. Iris-virginica
-Iris-versicolor : 12
-Iris-virginica : 38
-Validation Accuracy: 0.78
-Validation Confusion Matrix:
- [[30  3]
- [ 8  9]]
+Validation Precision: 0.9076655052264808
+Validation Recall: 0.9045138888888888
+Validation F-Measure: 0.9060869565217391
+Validation Accuracy: 0.9295958279009127
 
-sklearn Confusion Matrix:
- [[30  3]
- [ 8  9]]
-sklearn Accuracy: 0.78
+
+
+Multi-Class Logistic Regression:
+
+Validation Accuracy: 0.84
+Confusion Matrix:
+ [[19.  0.  0.]
+ [ 0.  9.  2.]
+ [ 0.  0. 14.]]

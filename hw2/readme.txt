@@ -1,5 +1,5 @@
 CS-613 Machine Learning
-Assignment 1 - Linear Regression 
+Assignment 2 - Logistic Regression 
 Robert Thompson
 
 Versions:
@@ -8,15 +8,19 @@ Versions:
 - numpy: 1.22.3
 
 Description:
-- In test_linear_regression.py, there is a main method that calls three other methods to test each of the different parts of the assignment:
-  - test_closed_form
-  - test_s_folds_cross_validation
-  - test_locally_weighted
-In each of those methods, there is a call to print the results of the different methods run to the console for verification.
+- In test_logistic_regression.py, there is two methods at the end of the file that execute for each of the different parts of the assignment:
+  - binary_logistic_regression
+  - multi_class_logistic_regression
+  
+Each of the methods take the following parameter (learning rate, epochs, and stability) that can be adjusted for more accuracy. I left the the parameters
+as follows because as I increased the epochs, my CPU increased exponentially but I did let it run and did notice increased accuracy for both models:
+  - learning rate = 0.1
+  - epochs = 10000
+  - stability = 10e-7
 
 How to Run:
 - From the directory where this zip file was unzipped, run the following command:
-python3 test_linear_regression.py
+python3 test_logistic_regression.py
 
 Miscellaneous Notes:
 - Operating System: Mac
