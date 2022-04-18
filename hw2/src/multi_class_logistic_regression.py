@@ -32,7 +32,7 @@ class MultiClassLogisticRegression:
     def train_model(self, x_train, y_train, x_valid, y_valid):
         '''
         Trains a logistic regression model using gradient descent
-        and sigmold (or the logistic function) for each of the classes.
+        and sigmoid (or the logistic function) for each of the classes.
         This function will generate the following number of binary
         classifiers: K(K-1)/2
 

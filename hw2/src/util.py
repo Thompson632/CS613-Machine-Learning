@@ -127,3 +127,19 @@ def z_score_data(X, means, stds):
         X[:, i] = zscore
 
     return X
+
+def add_bias_feature(X):
+    '''
+    Adds a bias feature of ones to the first column.
+    Doing this after we z-score due to divide by 0
+    when calculating the mean/std for each feature.
+    
+    :param X: The features data
+    
+    :return the features data with a bias feature of
+    ones prepended to the original data
+    '''
+    num_observations = np.shape(X)[0]
+    ones = np.ones((num_observations, 1))
+    X = np.concatenate((ones, X), axis=1)
+    return X

@@ -5,10 +5,10 @@ Training Recall: 0.8900565885206144
 Training F-Measure: 0.9080412371134021
 Training Accuracy: 0.9272905119008803
 
-Validation Precision: 0.9076655052264808
+Validation Precision: 0.9092495636998255
 Validation Recall: 0.9045138888888888
-Validation F-Measure: 0.9060869565217391
-Validation Accuracy: 0.9295958279009127
+Validation F-Measure: 0.9068755439512619
+Validation Accuracy: 0.9302477183833116
 
 
 

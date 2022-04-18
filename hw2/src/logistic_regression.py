@@ -22,14 +22,14 @@ class LogisticRegression():
         self.weights = 0
         self.bias = 0
 
-    def compute_sigmold(self, y_hat):
+    def compute_sigmoid(self, y_hat):
         '''
-        Computes the logistic function (or sigmold) using the
+        Computes the logistic function (or sigmoid) using the
         y_hat computed using gradient descent
 
         :param y_hat: Gradient descent computed prediction
 
-        :return the logistic function (or sigmold)
+        :return the logistic function (or sigmoid)
         '''
         return 1 / (1 + np.exp(-y_hat))
 
@@ -84,7 +84,7 @@ class LogisticRegression():
     def train_model(self, x_train, y_train, x_valid, y_valid):
         '''
         Trains a logistic regression model using gradient descent
-        and sigmold (or the logistic function). The eventual output will
+        and sigmoid (or the logistic function). The eventual output will
         be the training and validation data mean log loss.
 
         :param x_train: Training features
@@ -126,7 +126,7 @@ class LogisticRegression():
     def compute_gradients(self, x_train, y_train, x_valid):
         '''
         Computes the gradients by first calculating the y_hat for the 
-        training and validation data. Next, it compute the sigmold (or logistic function)
+        training and validation data. Next, it compute the sigmoid (or logistic function)
         in order to get the probably values for each training set. Once that is done,
         we are able to calculate the derivates of the weights and bias'.
 
@@ -143,9 +143,9 @@ class LogisticRegression():
         train_y_hat = self.compute_y_hat(x_train)
         valid_y_hat = self.compute_y_hat(x_valid)
 
-        # Compute sigmold (or logistic function)
-        train_probability = self.compute_sigmold(train_y_hat)
-        valid_probability = self.compute_sigmold(valid_y_hat)
+        # Compute sigmoid (or logistic function)
+        train_probability = self.compute_sigmoid(train_y_hat)
+        valid_probability = self.compute_sigmoid(valid_y_hat)
 
         # Get gradients of loss
         dw, db = self.compute_partial_derivatives_of_weights_and_bias(
@@ -156,7 +156,7 @@ class LogisticRegression():
     def evaluate_model(self, X):
         '''
         Evaluates the model for the provided data by computing
-        the gradient descent and sigmold. Once evaluated, we
+        the gradient descent and sigmoid. Once evaluated, we
         want to clean our data by considering a threshold. If 
         the current value in y_hat is greater than 0.5, we set that
         value to 1. Otherwise, we will set it to 0.
@@ -168,6 +168,6 @@ class LogisticRegression():
         # Compute y_hat
         y_hat = self.compute_y_hat(X)
 
-        # Compute sigmold (or logistic function)
-        probability = self.compute_sigmold(y_hat)
+        # Compute sigmoid (or logistic function)
+        probability = self.compute_sigmoid(y_hat)
         return probability.flatten()

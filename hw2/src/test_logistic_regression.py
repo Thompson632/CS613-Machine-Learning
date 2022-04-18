@@ -26,17 +26,23 @@ def binary_logistic_regression(learning_rate, epochs, stability):
 
     # 4. Z-Score our validation data with the means and std
     x_valid_zscored = util.z_score_data(x_valid, means, stds)
+    
+    # Add bias feature to the training data
+    x_train_bias = util.add_bias_feature(x_train_zscored)
+    
+    # Add bias feature to the validation data
+    x_valid_bias = util.add_bias_feature(x_valid_zscored)
 
     eval = Evaluator()
     lr = LogisticRegression(learning_rate, epochs, stability)
 
     # 5. Train Logistic Regression Model
     train_losses, valid_losses = lr.train_model(
-        x_train_zscored, y_train, x_valid_zscored, y_valid)
+        x_train_bias, y_train, x_valid_bias, y_valid)
 
     # Evaluate Model
-    train_preds = lr.evaluate_model(x_train_zscored)
-    valid_preds = lr.evaluate_model(x_valid_zscored)
+    train_preds = lr.evaluate_model(x_train_bias)
+    valid_preds = lr.evaluate_model(x_valid_bias)
 
     # 6. Plot Training and Validation Loss
     eval.plot_mean_log_loss(train_losses, valid_losses, epochs)
@@ -90,16 +96,22 @@ def multi_class_logistic_regression(learning_rate, epochs, stability):
 
     # 4. Z-Score our validation data with the means and std
     x_valid_zscored = util.z_score_data(x_valid, means, stds)
+    
+    # Add bias feature to the training data
+    x_train_bias = util.add_bias_feature(x_train_zscored)
+    
+    # Add bias feature to the validation data
+    x_valid_bias = util.add_bias_feature(x_valid_zscored)
 
     eval = Evaluator()
     mc = MultiClassLogisticRegression(
         learning_rate, epochs, stability, unique_classes)
 
     # 5(b). Train Logistic Regression Model
-    mc.train_model(x_train_zscored, y_train, x_valid_zscored, y_valid)
+    mc.train_model(x_train_bias, y_train, x_valid_bias, y_valid)
 
     # 6. Applies the models to each validation sample to determine the most likely class.
-    valid_preds = mc.evaluate_model(x_valid_zscored)
+    valid_preds = mc.evaluate_model(x_valid_bias)
 
     # 7. Computes the validation accuracy
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
