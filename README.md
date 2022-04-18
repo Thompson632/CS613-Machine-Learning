@@ -1,0 +1,1 @@
+The purpose of this repository is to store all homework source and reports for CS613 Machine Learning at Drexel University for the Spring 2022 semester.
