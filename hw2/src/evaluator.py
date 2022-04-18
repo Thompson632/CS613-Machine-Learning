@@ -63,7 +63,8 @@ class Evaluator():
         y_hat_with_threshold = []
 
         # Add threshold for computing the classifiers
-        y_hat_t = [1 if y_hat_val > threshold else 0 for y_hat_val in y_hat]
+        # If the current y_hat_val is greater than or equal to the threshold, set to 1. Otherwise, set to 0.
+        y_hat_t = [1 if y_hat_val >= threshold else 0 for y_hat_val in y_hat]
         y_hat_with_threshold.append(y_hat_t)
 
         # Flatten to one dimension
@@ -198,8 +199,8 @@ class Evaluator():
         for increment in threshold_increments:
             y_hat_thresholds = []
 
-            # If the current y_hat_val is greater than the increment, append 1. Otherwise, add 0.
-            [y_hat_thresholds.append(1) if y_hat_val > increment else y_hat_thresholds.append(
+            # If the current y_hat_val is greater than or equal to the increment, append 1. Otherwise, add 0.
+            [y_hat_thresholds.append(1) if y_hat_val >= increment else y_hat_thresholds.append(
                 0) for y_hat_val in y_hat]
 
             # Recalculate the precision and recall for the current increment
@@ -233,8 +234,9 @@ class Evaluator():
         for i in range(num_classes):
             # For each column...
             for j in range(num_classes):
-                confusion_matrix[i, j] = np.sum(
-                    (y == classes[i]) & (y_hat == classes[j]))
+                y_true = (y == classes[i])
+                y_hat_true = (y_hat == classes[j])
+                confusion_matrix[i, j] = np.sum(y_true & y_hat_true)
 
         return confusion_matrix
 

@@ -76,6 +76,49 @@ def get_features_actuals(data, should_convert_to_float):
     return X, y
 
 
+def add_bias_feature(X):
+    '''
+    Adds a bias feature of ones to the first column.
+    Doing this after we z-score due to divide by 0
+    when calculating the mean/std for each feature.
+
+    :param X: The features data
+
+    :return the features data with a bias feature of
+    ones prepended to the original data
+    '''
+    num_observations = np.shape(X)[0]
+    ones = np.ones((num_observations, 1))
+    X = np.concatenate((ones, X), axis=1)
+    return X
+
+
+def convert_data_to_binary(X, y, current_class):
+    '''
+    Helper method to manipulate the data by arranging the data of the current class
+    we are modeling as the first subset of data in our array and the second set of data
+    that is not equal to the class we are modeling on the bottom. Once that is completed, 
+    we do the smae thing for the actual values but instead set the class we are modeling
+    from its label to 1 and 0 for the data we are not modeling. 
+
+    :param X: The features data
+    :param y: The actuals data
+    :param current_class: The current class we are modeling
+
+    :return the sorted feature data by the class we are modeling
+    :return the binary actual data sorted by the class we are modeling
+    '''
+    x_one = X[y == current_class]
+    x_zero = X[y != current_class]
+    x_sorted = np.vstack((x_one, x_zero))
+
+    y_one = np.ones(np.shape(x_one)[0])
+    y_zero = np.zeros(np.shape(x_zero)[0])
+    y_sorted_binary = np.hstack((y_one, y_zero))
+
+    return x_sorted, y_sorted_binary
+
+
 def compute_training_mean_std(X):
     '''
     Computes the mean and standard deviation for each column.
@@ -126,20 +169,4 @@ def z_score_data(X, means, stds):
 
         X[:, i] = zscore
 
-    return X
-
-def add_bias_feature(X):
-    '''
-    Adds a bias feature of ones to the first column.
-    Doing this after we z-score due to divide by 0
-    when calculating the mean/std for each feature.
-    
-    :param X: The features data
-    
-    :return the features data with a bias feature of
-    ones prepended to the original data
-    '''
-    num_observations = np.shape(X)[0]
-    ones = np.ones((num_observations, 1))
-    X = np.concatenate((ones, X), axis=1)
     return X

@@ -89,6 +89,7 @@ def multi_class_logistic_regression(learning_rate, epochs, stability):
     x_train, y_train = util.get_features_actuals(training, True)
     x_valid, y_valid = util.get_features_actuals(validation, True)
 
+    # Get mean and std of training data
     means, stds = util.compute_training_mean_std(x_train)
 
     # 4. Z-Score our training data with the means and std

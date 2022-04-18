@@ -14,8 +14,8 @@ Validation Accuracy: 0.9302477183833116
 
 Multi-Class Logistic Regression:
 
-Validation Accuracy: 0.84
+Validation Accuracy: 0.96
 Confusion Matrix:
  [[19.  0.  0.]
- [ 0.  9.  2.]
+ [ 0. 15.  2.]
  [ 0.  0. 14.]]

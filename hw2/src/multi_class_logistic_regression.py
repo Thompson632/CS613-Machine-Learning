@@ -1,5 +1,6 @@
 import numpy as np
 from logistic_regression import LogisticRegression
+import util
 
 
 class MultiClassLogisticRegression:
@@ -26,9 +27,6 @@ class MultiClassLogisticRegression:
         self.unique_classes = unique_classes
         self.class_models = []
 
-        self.class_training_losses = []
-        self.class_validation_losses = []
-
     def train_model(self, x_train, y_train, x_valid, y_valid):
         '''
         Trains a logistic regression model using gradient descent
@@ -44,46 +42,18 @@ class MultiClassLogisticRegression:
         :return none
         '''
         for c in self.unique_classes:
-            x_train_sorted, y_train_sorted_binary = self.convert_data_to_binary(
+            x_train_sorted, y_train_sorted_binary = util.convert_data_to_binary(
                 x_train, y_train, c)
-            x_valid_sorted, y_valid_sorted_binary = self.convert_data_to_binary(
+            x_valid_sorted, y_valid_sorted_binary = util.convert_data_to_binary(
                 x_valid, y_valid, c)
 
             model = LogisticRegression(
                 self.lr, self.epochs, self.stability_constant)
 
-            train_losses, valid_losses = model.train_model(
-                x_train_sorted, y_train_sorted_binary, x_valid_sorted, y_valid_sorted_binary)
-
-            self.class_training_losses.append([c, train_losses])
-            self.class_validation_losses.append([c, valid_losses])
+            # Not storing returned training and validation loss as not needed for assigning a class
+            model.train_model(x_train_sorted, y_train_sorted_binary, x_valid_sorted, y_valid_sorted_binary)
 
             self.class_models.append([c, model])
-
-    def convert_data_to_binary(self, X, y, current_class):
-        '''
-        Helper method to manipulate the data by arranging the data of the current class
-        we are modeling as the first subset of data in our array and the second set of data
-        that is not equal to the class we are modeling on the bottom. Once that is completed, 
-        we do the smae thing for the actual values but instead set the class we are modeling
-        from its label to 1 and 0 for the data we are not modeling. 
-
-        :param X: The features data
-        :param y: The actuals data
-        :param current_class: The current class we are modeling
-        
-        :return the sorted feature data by the class we are modeling
-        :return the binary actual data sorted by the class we are modeling
-        '''
-        x_one = X[y == current_class]
-        x_zero = X[y != current_class]
-        x_sorted = np.vstack((x_one, x_zero))
-
-        y_one = np.ones(np.shape(x_one)[0])
-        y_zero = np.zeros(np.shape(x_zero)[0])
-        y_sorted_binary = np.hstack((y_one, y_zero))
-
-        return x_sorted, y_sorted_binary
 
     def evaluate_model(self, X):
         '''
@@ -98,41 +68,63 @@ class MultiClassLogisticRegression:
         '''
         probabilities = []
 
-        # Evaluate the validation data for each of our learned models (weights and bias)
-        # that are stored in our LogisticRegression class.
+        # Evaluate the validation data for each of our learned models
         for class_model in self.class_models:
             label, lr = class_model
             probability = lr.evaluate_model(X)
             probabilities.append([label, probability])
 
-        mean_of_losses = []
-
-        # Compute the mean of all our training losses
-        for class_model in self.class_training_losses:
-            label, mle = class_model
-            mean_of_losses.append(np.mean(mle))
-
-        # Max Mean Likelihood
-        max_mle = max(mean_of_losses)
-
         num_observations = np.shape(X)[0]
+
+        # Assign a class to each observation based on the max likelihood
+        class_preds = self.assign_class_to_observation(
+            num_observations, probabilities)
+
+        return class_preds
+
+    def assign_class_to_observation(self, num_observations, probabilities):
+        '''
+        Method used to loop through all observations to determine the correct
+        class to assign to the observation. For each observation, we have an
+        inner loop that loops through the predictions for that specific
+        observation and updates a local variable with the max likelihood
+        that the observation belongs to the class. After we have looped through
+        all predictions of the observations, we will assign the class that was last
+        set to a local variable to later be returned.
+
+        :param num_observations: The number of observations in our validation
+        data set
+        :param probabilities: The list of probabilities for each observation for 
+        each class label
+
+        :return the predicted classes for each observation in our validation 
+        data set
+        '''
         num_preds = len(probabilities)
 
-        preds = []
+        class_preds = []
 
         # For each observation...
         for i in range(num_observations):
+            # Class to assign to this specific observation
             class_to_assign = None
 
-            # For each prediction...
+            # Default this to 0 to start
+            max_likelihood = 0.0
+
+            # For each model...
             for j in range(num_preds):
-                current_probability = probabilities[j][1][i]
+                # Get this models predicted probability for this observation
+                model_predicted_prob = probabilities[j][1][i]
 
-                # If our current predicted probability is greater than
-                # the largest mean likelihood, we will assign this class to this observation
-                if current_probability > max_mle:
+                # If the current predicted probability for this model is larger
+                # than the current largest likelihood, we will assign this models
+                # class to this observation and will update the largest likelihood
+                # value for the next iteration
+                if model_predicted_prob > max_likelihood:
                     class_to_assign = probabilities[j][0]
+                    max_likelihood = model_predicted_prob
 
-            preds.append(class_to_assign)
+            class_preds.append(class_to_assign)
 
-        return np.array(preds)
+        return np.array(class_preds)
