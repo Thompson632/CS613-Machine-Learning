@@ -15,7 +15,7 @@ The purpose of this repository is to hold the assignment deliverables for CS613 
 - [Report](hw2/report/CS613_HW2_RobertThompson_rt598.pdf)
 
 ## Homework 3: Classification
-- [Assignment]()
+- [Assignment](hw3/HW3.pdf)
 - [Naive Bayes]()
 - [Decision Trees]()
 - [Naive Bayes vs. Decision Tree Classification]()
