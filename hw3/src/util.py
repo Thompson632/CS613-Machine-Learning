@@ -98,7 +98,7 @@ def convert_data_to_binary(X, y, current_class):
     Helper method to manipulate the data by arranging the data of the current class
     we are modeling as the first subset of data in our array and the second set of data
     that is not equal to the class we are modeling on the bottom. Once that is completed, 
-    we do the smae thing for the actual values but instead set the class we are modeling
+    we do the same thing for the actual values but instead set the class we are modeling
     from its label to 1 and 0 for the data we are not modeling. 
 
     :param X: The features data
@@ -119,54 +119,35 @@ def convert_data_to_binary(X, y, current_class):
     return x_sorted, y_sorted_binary
 
 
-def compute_training_mean_std(X):
+def split_data_by_class(X, y):
     '''
-    Computes the mean and standard deviation for each column.
+    Splits the training data by iterating through 
+    each observation and adding the observation to the correct
+    class based on the index of our y-value.
 
     :param X: The feature data
+    :param y: The target data
 
-    :return the vector of means and stds
+    :return dictionary of our classes with their respective
+    observations.    
     '''
-    num_features = np.shape(X)[1]
+    split_data_dict = {}
 
-    means = []
-    stds = []
+    num_observations = np.shape(X)[0]
 
-    for i in range(num_features):
-        current_feature = X[:, i]
+    # For each observation...
+    for i in range(num_observations):
+        # Get the observation (row) at the index
+        current_observation = X[i]
+        # Get the target value at the index
+        class_value = y[i]
 
-        mean = np.mean(current_feature)
-        # Need ddof for one less degree of freedom
-        std = np.std(current_feature, ddof=1)
+        # If the class value is not in our dictionary,
+        # create a list to store our 1D numpy observation array
+        if (class_value not in split_data_dict):
+            split_data_dict[class_value] = list()
 
-        means.append(mean)
-        stds.append(std)
+        # Add this observation to this class
+        split_data_dict[class_value].append(current_observation)
 
-    return means, stds
-
-
-def z_score_data(X, means, stds):
-    '''
-    Z-scores the data by subtracting the mean of the current column
-    from the current column and dividing by the standard deviation
-    of the current column
-
-    :param X: The features data
-    :param means: The means vector for the training data
-    :param: stds: The standard deviation vector for the training data
-
-    :return the z-scored data
-    '''
-    num_features = np.shape(X)[1]
-
-    for i in range(num_features):
-        current_feature = X[:, i]
-
-        numerator = current_feature - means[i]
-        denominator = stds[i]
-
-        zscore = numerator / denominator
-
-        X[:, i] = zscore
-
-    return X
+    return split_data_dict
