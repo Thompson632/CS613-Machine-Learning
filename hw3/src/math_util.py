@@ -1,26 +1,66 @@
 import numpy as np
 
 
-def compute_mean(feature):
+def compute_mean(X, axis=None):
     '''
     Computes the mean based on the feature data.
 
-    :param feature: The current feature (or column) to be averaged
+    :param X: The current feature (or column) to be averaged
+    :param axis: Optional parameter that if set will
+    compute the mean of the specified axis
 
     :return the average of the feature data
     '''
-    return np.mean(feature)
+    if axis == None:
+        return np.mean(X)
+    else:
+        return np.mean(X, axis=axis)
 
 
-def compute_std(feature):
+def compute_std(X, axis=None):
     '''
     Computes the standard deviation based on the feature data.
 
-    :param feature: the current feature (or column) to be standardized
+    :param X: The current feature (or column) to be standardized
+    :param axis: Optional parameter that if set will
+    compute the standard deviation of the specified axis
 
     :return the standard deviation of the feature data    
     '''
-    return np.std(feature, ddof=1)
+    if axis == None:
+        return np.std(X, ddof=1)
+    else:
+        return np.std(X, axis=axis, ddof=1)
+    
+def compute_variance(X, axis=None):
+    '''
+    Computes the variance based on the feature data.
+    
+    :param X: The current feature (or column) to be standardized
+    :param axis: Optional parameter that if set will
+    compute the variance of the specified axis
+
+    :return the variance of the feature data  
+    '''
+    if axis == None:
+        return np.var(X, ddof=1)
+    else:
+        return np.var(X, ddof=1, axis=axis)
+
+
+def compute_initial_classifier_probability(classifier_observations, total_observations):
+    '''
+    Computes the initial classifier probably by dividing the observations for
+    this particular classifier by the total observations in the data set:
+
+    :param classifier_observations: The number of observations in
+    this classifier
+    :param total_observations: The number of observations in 
+    this dataset
+
+    :return the initial classifier_probability
+    '''
+    return classifier_observations / total_observations
 
 
 def compute_training_mean_std_by_feature(X):
@@ -74,18 +114,17 @@ def z_score_data(X, means, stds):
 
     return X
 
-
-def compute_mean_std_of_features_list(list_of_feature_tuples):
+def get_indices_of_max_values(arr, axis=None):
     '''
-    Computes the mean and standard deviation given 
-    a list of feature tuples and their observation data.
+    Helper function to get the indices of maximum values of the array.
+    
+    :param arr: The array to be searched
+    :param axis: Optional parameter that if set will
+    get the indices of the maximum values along the axis
 
-    :param list_of_features: The list of features to compute
-    the mean and standard deviation 
-
-    :return the list of mean and standard deviation tuples for each
-    feature
+    :return the array with the indices
     '''
-    list_of_features_mean_std_tuples = [(compute_mean(feature_tuple), compute_std(
-        feature_tuple), len(feature_tuple)) for feature_tuple in zip(*list_of_feature_tuples)]
-    return list_of_features_mean_std_tuples
+    if axis == None:
+        return np.argmax(arr)
+    else:
+        return np.argmax(arr, axis=axis)
