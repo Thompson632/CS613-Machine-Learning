@@ -1,9 +1,9 @@
-Naive Bayes Classifier:
-
-Validation Precision: 0.6646919431279621
-Validation Recall: 0.9739583333333334
-Validation F-Measure: 0.7901408450704226
-Validation Accuracy: 0.8057366362451108
-
+NAIVES BAYES CLASSIFIER:
+Validation Precision: 0.9006024096385542
+Validation Recall: 0.5190972222222222
+Validation F-Measure: 0.6585903083700441
+Validation Accuracy: 0.7979139504563233
 
 
+MULTI-CLASS NAIVE BAYES CLASSIFIER:
+Validation Accuracy: 0.8138222849083215

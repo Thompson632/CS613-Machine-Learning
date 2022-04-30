@@ -11,10 +11,10 @@ def compute_mean(X, axis=None):
 
     :return the average of the feature data
     '''
-    if axis == None:
+    if axis is None:
         return np.mean(X)
-    else:
-        return np.mean(X, axis=axis)
+
+    return np.mean(X, axis=axis)
 
 
 def compute_std(X, axis=None):
@@ -27,40 +27,41 @@ def compute_std(X, axis=None):
 
     :return the standard deviation of the feature data    
     '''
-    if axis == None:
+    if axis is None:
         return np.std(X, ddof=1)
-    else:
-        return np.std(X, axis=axis, ddof=1)
-    
+
+    return np.std(X, axis=axis, ddof=1)
+
+
 def compute_variance(X, axis=None):
     '''
     Computes the variance based on the feature data.
-    
+
     :param X: The current feature (or column) to be standardized
     :param axis: Optional parameter that if set will
     compute the variance of the specified axis
 
     :return the variance of the feature data  
     '''
-    if axis == None:
+    if axis is None:
         return np.var(X, ddof=1)
-    else:
-        return np.var(X, ddof=1, axis=axis)
+
+    return np.var(X, ddof=1, axis=axis)
 
 
-def compute_initial_classifier_probability(classifier_observations, total_observations):
+def compute_class_prior(class_observations, total_observations):
     '''
-    Computes the initial classifier probably by dividing the observations for
+    Computes the initial class probability by dividing the observations for
     this particular classifier by the total observations in the data set:
 
-    :param classifier_observations: The number of observations in
-    this classifier
+    :param class_observations: The number of observations in
+    this class
     :param total_observations: The number of observations in 
     this dataset
 
-    :return the initial classifier_probability
+    :return the class' prior probability 
     '''
-    return classifier_observations / total_observations
+    return class_observations / total_observations
 
 
 def compute_training_mean_std_by_feature(X):
@@ -113,18 +114,3 @@ def z_score_data(X, means, stds):
         X[:, i] = zscore
 
     return X
-
-def get_indices_of_max_values(arr, axis=None):
-    '''
-    Helper function to get the indices of maximum values of the array.
-    
-    :param arr: The array to be searched
-    :param axis: Optional parameter that if set will
-    get the indices of the maximum values along the axis
-
-    :return the array with the indices
-    '''
-    if axis == None:
-        return np.argmax(arr)
-    else:
-        return np.argmax(arr, axis=axis)

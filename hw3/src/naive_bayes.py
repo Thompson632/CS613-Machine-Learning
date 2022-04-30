@@ -1,128 +1,165 @@
 import numpy as np
+import util
 import math_util
-import math
 
 
-class NaiveBayes():
-    def __init__(self, epsilon):
+class NaiveBayes:
+    def __init__(self, stability_constant):
         '''
-        Constructor that takes in an epsilon to be used in the 
-        calculation of the Gaussian Probability Density Function
-        to increase the variance when performing calculations.
-        
-        :param epsilon: The constant epsilion value
-        
+        Constructor that takes in a stability constant to be used 
+        in case of taking a log of 0. The constructor also
+        initializes attributes that will be used throughout
+        the life of this class.
+
+        :param stability_constant: The stability constant 
+
         :return none
         '''
-        self.num_total_observations = 0
-        self.num_total_features = 0
+        self.num_observations = 0
+        self.num_features = 0
 
-        self.classifiers = None
-        self.num_classifiers = 0
+        self.classes = None
+        self.num_classes = 0
 
-        self.classifier_mean = {}
-        self.classifier_stds = {}
-        self.classifier_initial_probs = {}
+        self.class_means = None
+        self.class_vars = None
+        self.class_priors = None
 
-        self.epsilon = epsilon
+        self.stability_constant = stability_constant
 
     def train_model(self, X, y):
         '''
-        Computes the normal models (mean and standard deviation) of each feature 
-        for each classifier in the dataset.
-        
-        :param X: The training features data
-        :param y: The training targets data
-        
+        Trains our model by computing the mean and variance for each
+        column associated with the specific class we are training on
+        and the prior probability of each class. The calculated
+        values for each class will be used later when we evaluate
+        the models.
+
+        :param X: The training features
+        :param y: The training targets
+
         :return none
         '''
-        # Set our total observtation and feature of the training data
-        self.num_total_observations, self.num_total_features = np.shape(X)
+        # Get number of observations and features
+        self.num_observations, self.num_features = np.shape(X)
 
-        # Get our unique classifiers of this dataset
-        self.classifiers = np.unique(y)
-        # Get the number of classifiers in this dataset
-        self.num_classifiers = len(self.classifiers)
+        # Get the unique classes
+        self.classes = np.unique(y)
 
-        # For each classifier...
-        for classifier in range(self.num_classifiers):
-            # Get the observations where y is equal to the classifier
-            classifier_observations = X[y == classifier]
+        # Get the number of classes
+        self.num_classes = len(self.classes)
 
-            # Get the number of observations for this classifier
-            num_classifier_observations = np.shape(classifier_observations)[0]
+        # Create the class mean, variance, and prior probability arrays
+        self.class_means, self.class_vars, self.class_priors = util.create_mean_var_prior_arrays(
+            self.num_classes, self.num_features)
 
-            # 6. Create Normal models for each feature for each class
-            self.classifier_mean[str(classifier)] = math_util.compute_mean(
-                classifier_observations, 0)
-            self.classifier_stds[str(classifier)] = math_util.compute_variance(
-                classifier_observations, 0)
-            self.classifier_initial_probs[str(classifier)] = math_util.compute_initial_classifier_probability(
-                num_classifier_observations, self.num_total_observations)
-            
-            # print("\nClass:", classifier)
-            # print("Mean:\n", self.classifier_mean[str(classifier)] )
-            # print("Stds:\n", self.classifier_stds[str(classifier)])
-            # print("Prob:", self.classifier_initial_probs[str(classifier)])
+        # For each class...
+        for i, c in enumerate(self.classes):
+            # Get the observations associated with this class
+            class_observations = X[y == c]
+
+            # Compute this class' prior probability
+            self.class_priors[i] = math_util.compute_class_prior(
+                np.shape(class_observations)[0], self.num_observations)
+
+            # Compute the mean and variance of all observations
+            self.class_means[i, :] = math_util.compute_mean(
+                class_observations, 0)
+            self.class_vars[i, :] = math_util.compute_variance(
+                class_observations, 0)
 
     def evaluate_model(self, X):
         '''
-        Evaluates our models using the learned models and the 
-        Gaussian Probability Density Function to compute the 
-        probability that each observation belongs to a specific
-        classifier. We set the class with the highest probability 
-        to each observation.
-        
-        :param X: The validation features data
-        
-        return the classifier predictions
-        '''
-        num_observations = np.shape(X)[0]
-        
-        # Create a 2-D numpy array with num_observations as row count
-        # and num_classifier as column count
-        probabilities = np.zeros((num_observations, self.num_classifiers))
-        
-        # For each classifier...
-        for classifier in range(self.num_classifiers):
-            # Get the initial probability for this classifier
-            classifier_initial_prob = self.classifier_initial_probs[str(classifier)]
-            
-            # Get the mean and std for this classifier
-            mean = self.classifier_mean[str(classifier)]
-            std = self.classifier_stds[str(classifier)]
-            
-            # Calculate the probability given the normal models
-            probabilities_of_classifier = self.compute_gaussian_pdf(X, mean, std)
-            
-            # Set the probabilities for every observation for this classifier
-            probabilities[:, classifier] = probabilities_of_classifier + np.log(classifier_initial_prob)
-        
-        return math_util.get_indices_of_max_values(probabilities, axis=1)
-        
+        Evaluates our models by iterating through each observation
+        in the validation data, assigning the class with the highest
+        probability, and returning the predicted classes.
 
-    def compute_gaussian_pdf(self, X, mean, std):
+        :param X: The validation features data
+
+        :return the predicted classes 
         '''
-        Computes the gaussian probability density function
-        for all observation.
+        class_preds = []
+
+        # For each observation...
+        for x in X:
+            # Compute the class probabilities for this observation
+            class_probabilities = self.compute_class_probabilities(x)
+
+            # Get the index of the max class probability
+            max_probability_index = np.argmax(class_probabilities)
+
+            # Get the class associated with this index
+            class_to_assign = self.classes[max_probability_index]
+
+            # Assign the class
+            class_preds.append(class_to_assign)
+
+        return np.array(class_preds)
+
+    def compute_class_probabilities(self, x):
+        '''
+        Computes the probabilities of each classes being assigned to
+        the given observation. We compute the probability for each class
+        by using the Gaussian Probability Density Function (or Normal Distribution).
+        We take the logs of the class' prior probability and the output of
+        the Gaussian PDF to stabilize our calculations.
+
+        :param x: The current observation we are trying to assign
+
+        :return the list of probabilities for each calss
+        '''
+        class_posteriors = []
+
+        # For each class...
+        for c in range(self.num_classes):
+            # Get the prior probability of this class
+            class_prior = self.class_priors[c]
+            # Take the log of it for stability
+            prior = np.log(class_prior)
+
+            # Get the mean values for this class
+            means = self.class_means[c]
+
+            # Get the variance values for this class
+            vars = self.class_vars[c]
+
+            # Compute the probability using the Gaussian
+            # Probability Density Function
+            gpdf = self.compute_gaussian_pdf(x, means, vars)
+
+            # To avoid log divide by zero, we assign a stability constant
+            gpdf[gpdf > 0.0000000001] = self.stability_constant
+
+            # Take the log of it for stability
+            log_gpdf = np.log(gpdf)
+            # Get the summation of the log of our probabilities
+            sum_log_gpdf = np.sum(log_gpdf)
+
+            # Compute the class' posterior probability
+            posterior = prior + sum_log_gpdf
+            class_posteriors.append(posterior)
+
+        return class_posteriors
+
+    def compute_gaussian_pdf(self, x, means, vars):
+        '''
+        Computes the probability for this observation using the 
+        Gaussian Probability Density Function or otherwise known
+        as the normal distribution.
 
         Function Reference: https://en.wikipedia.org/wiki/Gaussian_function
 
-        :param X: The observations
-        :param mean: The mean of the observations
-        :param std: The standard deviation of the observations
+        :param x: The observation we are evaluating
+        :param means: The calculated mean values for a particular class
+        :param vars: The calculated variance values for a particular class
 
-        :return the gaussian probability density function calculation
+        :return the calculated probability
         '''
-        const_numerator = -self.num_total_features
-        const_denominator = 2 * np.log(2 * math.pi)
-        const_val = 0.5 * np.sum(np.log(std + self.epsilon))
-        const = const_numerator / const_denominator - const_val
-        
-        prob_numerator = np.power(X - mean, 2)
-        prob_denominator = std + self.epsilon
-        prob = 0.5 * np.sum(prob_numerator / prob_denominator, 1)
-        
-        # Since we are taking the log, the original product makes this into
-        # a sum, so we can subtract our probability from our constant 
-        return const - prob
+        exp_numerator = -((x - means)**2)
+        exp_denominator = (2 * vars)
+
+        numerator = np.exp(exp_numerator / exp_denominator)
+        denominator = np.sqrt(2 * np.pi * vars)
+
+        pdf = numerator / denominator
+        return pdf

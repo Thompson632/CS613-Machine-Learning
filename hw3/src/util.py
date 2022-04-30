@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def load_data(filename, should_read_as_strings):
+def load_data(filename, rows_to_skip=None):
     '''
     Reads in a file as a numpy ndarray and returns the data. 
     Added a flag to read in the data as strings in the case
@@ -9,13 +9,13 @@ def load_data(filename, should_read_as_strings):
     instead of binary.
 
     :param filename: The name of the filename to be loaded
-    :param should_read_as_strings: Flag to read in the data as 
-    strictly strings
+    :param rows_to_skip: Optional parameter that if set will
+    skip the specified rows in the file            
 
     :return the numpy ndarray of data
     '''
-    if should_read_as_strings:
-        return np.loadtxt(filename, delimiter=',', dtype=str)
+    if rows_to_skip is not None:
+        return np.loadtxt(filename, delimiter=',', skiprows=rows_to_skip)
 
     return np.loadtxt(filename, delimiter=',')
 
@@ -55,39 +55,40 @@ def get_train_valid_data(data):
     return training, validation
 
 
-def get_features_actuals(data, should_convert_to_float):
+def get_features_actuals(data):
     '''
     Helper function that retrieves the features and
     actual values from the data. 
 
     :param data: The data we are using
-    :param should_convert_to_float: If set to true, will convert
-    the string data to float
 
     :return the features data as X
     :return the actual data as y
     '''
     X = data[:, : -1]
-
-    if should_convert_to_float:
-        X = X.astype(float)
-
     y = data[:, -1]
     return X, y
 
 
-def add_bias_feature(X):
+def create_mean_var_prior_arrays(num_classes, num_features):
     '''
-    Adds a bias feature of ones to the first column.
-    Doing this after we z-score due to divide by 0
-    when calculating the mean/std for each feature.
+    Helper function that creates mean and variance numpy arrays
+    based on the number of classes and features in a particular 
+    dataset. This function also creates a classes prior probability
+    array.
 
-    :param X: The features data
+    :param num_classes: The number of classes in a particular data set
+    :param num_features: The number of features in a particular data set
 
-    :return the features data with a bias feature of
-    ones prepended to the original data
+    :return the initial array of means with num_classes as rows
+    and num_features as columns
+    :return the initial array of variances with num_classes as rows
+    and num_features as columns
+    :return the initial array of class prior probabilities with a 
+    size of num_classes
     '''
-    num_observations = np.shape(X)[0]
-    ones = np.ones((num_observations, 1))
-    X = np.concatenate((ones, X), axis=1)
-    return X
+    means = np.zeros((num_classes, num_features))
+    variances = np.zeros((num_classes, num_features))
+    priors = np.zeros(num_classes)
+
+    return means, variances, priors
