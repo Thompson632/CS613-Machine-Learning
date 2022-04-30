@@ -7,7 +7,7 @@ class NaiveBayes:
     def __init__(self, stability_constant):
         '''
         Constructor that takes in a stability constant to be used 
-        in case of taking a log of 0. The constructor also
+        to avoid division by zero. The constructor also
         initializes attributes that will be used throughout
         the life of this class.
 
@@ -57,10 +57,12 @@ class NaiveBayes:
         for i, c in enumerate(self.classes):
             # Get the observations associated with this class
             class_observations = X[y == c]
+            # Get the number of observations with this class
+            class_count = np.shape(class_observations)[0]
 
             # Compute this class' prior probability
             self.class_priors[i] = math_util.compute_class_prior(
-                np.shape(class_observations)[0], self.num_observations)
+                class_count, self.num_observations)
 
             # Compute the mean and variance of all observations
             self.class_means[i, :] = math_util.compute_mean(
@@ -108,14 +110,14 @@ class NaiveBayes:
 
         :return the list of probabilities for each calss
         '''
-        class_posteriors = []
+        posteriors = []
 
         # For each class...
         for c in range(self.num_classes):
             # Get the prior probability of this class
             class_prior = self.class_priors[c]
             # Take the log of it for stability
-            prior = np.log(class_prior)
+            posterior = np.log(class_prior)
 
             # Get the mean values for this class
             means = self.class_means[c]
@@ -127,19 +129,16 @@ class NaiveBayes:
             # Probability Density Function
             gpdf = self.compute_gaussian_pdf(x, means, vars)
 
-            # To avoid log divide by zero, we assign a stability constant
-            gpdf[gpdf > 0.0000000001] = self.stability_constant
-
             # Take the log of it for stability
             log_gpdf = np.log(gpdf)
             # Get the summation of the log of our probabilities
             sum_log_gpdf = np.sum(log_gpdf)
 
             # Compute the class' posterior probability
-            posterior = prior + sum_log_gpdf
-            class_posteriors.append(posterior)
+            posterior = posterior + sum_log_gpdf
+            posteriors.append(posterior)
 
-        return class_posteriors
+        return posteriors
 
     def compute_gaussian_pdf(self, x, means, vars):
         '''
@@ -155,11 +154,11 @@ class NaiveBayes:
 
         :return the calculated probability
         '''
-        exp_numerator = -((x - means)**2)
-        exp_denominator = (2 * vars)
+        exp_numerator = -np.power((x - means), 2)
+        exp_denominator = (2 * vars + self.stability_constant)
 
         numerator = np.exp(exp_numerator / exp_denominator)
-        denominator = np.sqrt(2 * np.pi * vars)
+        denominator = np.sqrt(2 * np.pi * vars + self.stability_constant)
 
         pdf = numerator / denominator
         return pdf
