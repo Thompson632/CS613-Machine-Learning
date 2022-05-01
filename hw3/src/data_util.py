@@ -93,6 +93,23 @@ def create_mean_var_prior_arrays(num_classes, num_features):
     return means, variances, priors
 
 
+def merge_arrays(X, y):
+    '''
+    Helper function that merges two arrays into one by first reshape our 
+    one-dimensional y-array into a two dimensional array. Once the two 
+    arrays are compatible, we add the reshaped y-array to the end of the 
+    two-dimensional X-array.
+
+    :param X: The features data
+    :param y: The targets data
+
+    :return the merged features and targets data
+    '''
+    y = y.reshape(-1, 1)
+    data = np.concatenate((X, y), axis=1)
+    return data
+
+
 def split_on_feature(data, feature_index, threshold):
     '''
     Helper function used in determing the best feature to split our data
