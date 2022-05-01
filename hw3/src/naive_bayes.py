@@ -53,10 +53,9 @@ class NaiveBayes:
 
         # For each class...
         for i, c in enumerate(self.classes):
-            # Get the observations associated with this class
-            class_observations = X[y == c]
-            # Get the number of observations with this class
-            class_count = np.shape(class_observations)[0]
+            # Get observations and number of observations
+            class_observations, class_count = data_util.get_observation_counts(
+                X, y, c)
 
             # Compute this class' prior probability
             self.class_priors[i] = math_util.calculate_prior_probability(

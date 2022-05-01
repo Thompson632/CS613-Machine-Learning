@@ -158,10 +158,8 @@ class DecisionTree:
 
         # For each class..
         for c in unique_classes:
-            # Get the observations for this class
-            class_observations = y[y == c]
-            # Get the number of observation for this class
-            class_count = len(class_observations)
+            # Get the number of observations for this class
+            _, class_count = data_util.get_observation_counts(y=y, c=c)
 
             # Calculate this class' probability
             class_probability = class_count / num_observations
@@ -187,10 +185,8 @@ class DecisionTree:
 
         # For each class...
         for c in unique_classes:
-            # Get the observations for this class
-            class_observations = y[y == c]
-            # Get the number of observation for this class
-            class_count = len(class_observations)
+            # Get the number of observations for this class
+            _, class_count = data_util.get_observation_counts(y=y, c=c)
 
             # If the current class count is greater than the max class count,
             # update the max class count, and temporarily assign this class

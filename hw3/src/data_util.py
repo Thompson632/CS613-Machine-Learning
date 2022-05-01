@@ -135,3 +135,31 @@ def split_on_feature(data, feature_index, threshold):
         [observation for observation in data if observation[feature_index] > threshold])
 
     return left, right
+
+
+def get_observation_counts(X=None, y=None, c=None):
+    '''
+    Helper function that gets the observations present in an array
+    where a value in the array meets the criteria. We then get the number
+    of observations once we have the observations. Finally, we return the
+    observations and the number of observations for the given array and
+    criteria.
+
+    :param X: Optional value that if set will search the X array
+    for the given criteria
+    :param y: The array to be used in determining if the criteria is met
+    :param c: The criteria we are checking if our arrays meet
+
+    :return the observations that met the criteria
+    :return the number of observation that met the criteria
+    '''
+    observations = 0
+    count = 0
+
+    if X is not None:
+        observations = X[y == c]
+    else:
+        observations = y[y == c]
+
+    count = np.shape(observations)[0]
+    return observations, count
