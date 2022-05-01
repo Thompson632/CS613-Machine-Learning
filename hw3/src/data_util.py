@@ -4,9 +4,7 @@ import numpy as np
 def load_data(filename, rows_to_skip=None):
     '''
     Reads in a file as a numpy ndarray and returns the data. 
-    Added a flag to read in the data as strings in the case
-    of multi-class classification where our target class is a label
-    instead of binary.
+    Added a flag for skipping rows if it value is provided.
 
     :param filename: The name of the filename to be loaded
     :param rows_to_skip: Optional parameter that if set will
@@ -37,11 +35,12 @@ def shuffle_data(data, reseed_val):
 
 def get_train_valid_data(data):
     '''
-    Gets the training and validation data by first calculating the index of the first 2/3 of data.
-    Once that is found, we set the training data from 0 to the index of the first 2/3 of data
-    and the validation data from the index to the end of the data.
+    Gets the training and validation data by first calculating the index of the 
+    first 2/3 of data. Once that is found, we set the training data from 0 to the 
+    index of the first 2/3 of data and the validation data from the index to the 
+    end of the data.
 
-    :param data: Data to be searched
+    :param data: The data to be split
 
     :return training, validation data
     '''
@@ -93,8 +92,29 @@ def create_mean_var_prior_arrays(num_classes, num_features):
 
     return means, variances, priors
 
+
 def split_on_feature(data, feature_index, threshold):
-    left = np.array([sample for sample in data if sample[feature_index] <= threshold])
-    right = np.array([sample for sample in data if sample[feature_index] > threshold])
+    '''
+    Helper function used in determing the best feature to split our data
+    on when building our decision tree. For the left sub-tree, we iterate
+    through all the rows of data for the particular feature and we check
+    to see if the current row is less than or to the threshold. If it is, 
+    we add it to our left sub-tree array. For the right sub-tree, we iterate
+    through all the rows of data for the particular feature provided index
+    and we check to see if the current row is greater than the threshold. 
+    If it is , we add it to our right sub-tree array. 
+
+    :param data: The current data
+    :param feature_index: The index of the current feature we are trying
+    to split on
+    :param threshold: The threshold value to be used for splitting. 
+    In our case, this will be the mean of the entire column
+
+    :return the left and right sub-trees for splitting
+    '''
+    left = np.array(
+        [observation for observation in data if observation[feature_index] <= threshold])
+    right = np.array(
+        [observation for observation in data if observation[feature_index] > threshold])
+
     return left, right
-    

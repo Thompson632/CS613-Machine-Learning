@@ -70,9 +70,9 @@ class Evaluator:
         y_hat_with_threshold = np.array(y_hat_with_threshold).flatten()
         return y_hat_with_threshold
 
-    def compute_precision(self, tp, fp):
+    def calculate_precision(self, tp, fp):
         '''
-        Computes the percentage of things that were classified as position
+        Calculates the percentage of things that were classified as position
         and actually were positive.
 
         :param tp: True Positive (hit)
@@ -88,9 +88,9 @@ class Evaluator:
 
         return precision
 
-    def compute_recall(self, tp, fn):
+    def calculate_recall(self, tp, fn):
         '''
-        Computes the percentage of true positives (sensitivity) correctly identified
+        Calculates the percentage of true positives (sensitivity) correctly identified
 
         :param tp: True Positive (hit)
         :param fn: False Negative (miss)
@@ -105,9 +105,9 @@ class Evaluator:
 
         return recall
 
-    def compute_f_measure(self, precision, recall):
+    def calculate_f_measure(self, precision, recall):
         '''
-        Computes the weighted harmonic mean and recall
+        Calculates the weighted harmonic mean and recall
 
         :param precision: Percentage of things actually true
         :param recall: Percentage of true positives
@@ -128,11 +128,11 @@ class Evaluator:
         num_observations = np.shape(y)[0]
         return (1 / num_observations) * np.sum(y == y_hat)
 
-    def compute_precision_and_recall(self, y, y_hat):
+    def calculate_precision_and_recall(self, y, y_hat):
         '''
-        Computes the precision and recall by first calculating the 
+        Calculates the precision and recall by first calculating the 
         actual and non-thresholded predicted classification errors. 
-        Then computes the precision and recall using the
+        Then calculates the precision and recall using the
         true positive, false positive, and false negative counts.
 
         :param y: The actual data
@@ -141,11 +141,10 @@ class Evaluator:
         :return precision
         :return recall
         '''
-        # Compute the classification errors
         TP, TN, FP, FN = self.compute_classification_error_types(y, y_hat)
 
-        precision = self.compute_precision(TP, FP)
-        recall = self.compute_recall(TP, FN)
+        precision = self.calculate_precision(TP, FP)
+        recall = self.calculate_recall(TP, FN)
 
         return precision, recall
 
@@ -167,10 +166,10 @@ class Evaluator:
         y_hat_with_threshold = self.evaluate_y_hat_with_threshold(y_hat, 0.5)
 
         # Calculate the precision and recall for the current increment
-        precision, recall = self.compute_precision_and_recall(
+        precision, recall = self.calculate_precision_and_recall(
             y, y_hat_with_threshold)
 
-        f_measure = self.compute_f_measure(precision, recall)
+        f_measure = self.calculate_f_measure(precision, recall)
         accuracy = self.evaluate_accuracy(y, y_hat_with_threshold)
 
         return precision, recall, f_measure, accuracy
@@ -203,7 +202,7 @@ class Evaluator:
                 0) for y_hat_val in y_hat]
 
             # Recalculate the precision and recall for the current increment
-            precision, recall = self.compute_precision_and_recall(
+            precision, recall = self.calculate_precision_and_recall(
                 y, y_hat_thresholds)
 
             # Add recalculated precision and recall to our lists

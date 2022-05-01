@@ -1,5 +1,5 @@
 import numpy as np
-import util
+import data_util
 import math_util
 
 
@@ -11,13 +11,11 @@ class NaiveBayes:
         initializes attributes that will be used throughout
         the life of this class.
 
-        :param stability_constant: The stability constant 
+        :param stability_constant: The stability constant to be used
+        to avoid divide by zero in the probability calculation
 
         :return none
         '''
-        self.num_observations = 0
-        self.num_features = 0
-
         self.classes = None
         self.num_classes = 0
 
@@ -41,7 +39,7 @@ class NaiveBayes:
         :return none
         '''
         # Get number of observations and features
-        self.num_observations, self.num_features = np.shape(X)
+        num_observations, num_features = np.shape(X)
 
         # Get the unique classes
         self.classes = np.unique(y)
@@ -50,8 +48,8 @@ class NaiveBayes:
         self.num_classes = len(self.classes)
 
         # Create the class mean, variance, and prior probability arrays
-        self.class_means, self.class_vars, self.class_priors = util.create_mean_var_prior_arrays(
-            self.num_classes, self.num_features)
+        self.class_means, self.class_vars, self.class_priors = data_util.create_mean_var_prior_arrays(
+            self.num_classes, num_features)
 
         # For each class...
         for i, c in enumerate(self.classes):
@@ -61,13 +59,13 @@ class NaiveBayes:
             class_count = np.shape(class_observations)[0]
 
             # Compute this class' prior probability
-            self.class_priors[i] = math_util.compute_class_prior(
-                class_count, self.num_observations)
+            self.class_priors[i] = math_util.calculate_prior_probability(
+                class_count, num_observations)
 
             # Compute the mean and variance of all observations
-            self.class_means[i, :] = math_util.compute_mean(
+            self.class_means[i, :] = math_util.calculate_mean(
                 class_observations, 0)
-            self.class_vars[i, :] = math_util.compute_variance(
+            self.class_vars[i, :] = math_util.calculate_variance(
                 class_observations, 0)
 
     def evaluate_model(self, X):
@@ -84,7 +82,8 @@ class NaiveBayes:
 
         # For each observation...
         for x in X:
-            # Compute the class probabilities for this observation
+            # Calculate the probabilities for each class for
+            # this observation
             class_probabilities = self.compute_class_probabilities(x)
 
             # Get the index of the max class probability
@@ -117,7 +116,7 @@ class NaiveBayes:
             # Get the prior probability of this class
             class_prior = self.class_priors[c]
             # Take the log of it for stability
-            posterior = np.log(class_prior)
+            prior = np.log(class_prior)
 
             # Get the mean values for this class
             means = self.class_means[c]
@@ -129,13 +128,11 @@ class NaiveBayes:
             # Probability Density Function
             gpdf = self.compute_gaussian_pdf(x, means, vars)
 
-            # Take the log of it for stability
-            log_gpdf = np.log(gpdf)
-            # Get the summation of the log of our probabilities
-            sum_log_gpdf = np.sum(log_gpdf)
+            # Get the summation of our probabilities
+            sum_gpdf = np.sum(gpdf)
 
             # Compute the class' posterior probability
-            posterior = posterior + sum_log_gpdf
+            posterior = prior + sum_gpdf
             posteriors.append(posterior)
 
         return posteriors
@@ -144,7 +141,8 @@ class NaiveBayes:
         '''
         Computes the probability for this observation using the 
         Gaussian Probability Density Function or otherwise known
-        as the normal distribution.
+        as the normal distribution. For stability purposes, we take
+        the log of the output of the Gaussian PDF.
 
         Function Reference: https://en.wikipedia.org/wiki/Gaussian_function
 
@@ -152,7 +150,7 @@ class NaiveBayes:
         :param means: The calculated mean values for a particular class
         :param vars: The calculated variance values for a particular class
 
-        :return the calculated probability
+        :return the log of the calculated probability
         '''
         exp_numerator = -np.power((x - means), 2)
         exp_denominator = (2 * vars + self.stability_constant)
@@ -161,4 +159,4 @@ class NaiveBayes:
         denominator = np.sqrt(2 * np.pi * vars + self.stability_constant)
 
         pdf = numerator / denominator
-        return pdf
+        return np.log(pdf)

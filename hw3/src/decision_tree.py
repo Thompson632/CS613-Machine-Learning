@@ -1,7 +1,8 @@
 import numpy as np
 from node import Node
 import math_util
-import util
+import data_util
+
 
 class DecisionTree:
     def __init__(self, min_samples_split=2, min_information_gain=1e-7, max_depth=float("inf")):
@@ -16,11 +17,11 @@ class DecisionTree:
         y = y.reshape(-1, 1)
         # Merge our X and y into one for easier splitting
         data = np.concatenate((X, y), axis=1)
-        
+
         self.root = self.build_tree(data)
 
     def build_tree(self, data, current_depth=0):
-        X, y = util.get_features_actuals(data)
+        X, y = data_util.get_features_actuals(data)
         num_observations, num_features = np.shape(X)
 
         if num_observations >= self.min_samples_split and current_depth <= self.max_depth:
@@ -54,9 +55,9 @@ class DecisionTree:
             # Get all rows for this column
             feature_values = data[:, feature_index]
             # Compute the mean of the data for our initial threshold for this feature
-            feature_mean = math_util.compute_mean(feature_values)
+            feature_mean = math_util.calculate_mean(feature_values)
             # Split the data based on this feature's threshold value
-            left, right = util.split_on_feature(
+            left, right = data_util.split_on_feature(
                 data, feature_index, feature_mean)
 
             # If both our split data sets have at minimum 1 sample in them...

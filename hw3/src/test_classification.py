@@ -1,4 +1,4 @@
-import util
+import data_util
 import math_util
 from evaluator import Evaluator
 from naive_bayes import NaiveBayes
@@ -9,23 +9,45 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-def naive_bayes(stability_constant):
+def load_spambase(filename):
+    data = data_util.load_data(filename)
+    data = data_util.shuffle_data(data, 0)
+
+    training, validation = data_util.get_train_valid_data(data)
+    x_train, y_train = data_util.get_features_actuals(training)
+    x_valid, y_valid = data_util.get_features_actuals(validation)
+
+    means, stds = math_util.calculate_mean_std_of_features(x_train)
+    x_train_zscored = math_util.z_score_data(x_train, means, stds)
+    x_valid_zscored = math_util.z_score_data(x_valid, means, stds)
+
+    return x_train_zscored, y_train, x_valid_zscored, y_valid
+
+
+def load_ctg(filename):
+    data = data_util.load_data(filename, 2)
+    data = np.delete(data, -2, axis=1)
+    data = data_util.shuffle_data(data, 0)
+
+    training, validation = data_util.get_train_valid_data(data)
+    x_train, y_train = data_util.get_features_actuals(training)
+    x_valid, y_valid = data_util.get_features_actuals(validation)
+
+    means, stds = math_util.calculate_mean_std_of_features(x_train)
+    x_train_zscored = math_util.z_score_data(x_train, means, stds)
+    x_valid_zscored = math_util.z_score_data(x_valid, means, stds)
+
+    return x_train_zscored, y_train, x_valid_zscored, y_valid
+
+
+def naive_bayes(stability_constant, filename):
     print("NAIVES BAYES CLASSIFIER:")
 
-    data = util.load_data("spambase.data")
-    data = util.shuffle_data(data, 0)
-
-    training, validation = util.get_train_valid_data(data)
-    x_train, y_train = util.get_features_actuals(training)
-    x_valid, y_valid = util.get_features_actuals(validation)
-
-    means, stds = math_util.compute_training_mean_std_by_feature(x_train)
-    x_train_zscored = math_util.z_score_data(x_train, means, stds)
-    x_valid_zscored = math_util.z_score_data(x_valid, means, stds)
+    x_train, y_train, x_valid, y_valid = load_spambase(filename)
 
     nb = NaiveBayes(stability_constant=stability_constant)
-    nb.train_model(x_train_zscored, y_train)
-    valid_preds = nb.evaluate_model(x_valid_zscored)
+    nb.train_model(x_train, y_train)
+    valid_preds = nb.evaluate_model(x_valid)
 
     eval = Evaluator()
     valid_precision, valid_recall, valid_f_measure, valid_accuracy = eval.evaluate_classifier(
@@ -36,58 +58,30 @@ def naive_bayes(stability_constant):
     print("Validation F-Measure:", valid_f_measure)
     print("Validation Accuracy:", valid_accuracy)
 
-    # For verification purposes only, we compare our results with the sklearn
-    # GaussianNB implementation with our z-scored features.
-    compare_against_sklearn(x_train_zscored, y_train,
-                            x_valid_zscored, y_valid, use_nb=True, is_multi=False)
 
+def multi_class_naive_bayes(stability_constant, filename):
+    print("\nMULTI-CLASS NAIVE BAYES CLASSIFIER:")
 
-def multi_class_naive_bayes(stability_constant):
-    print("MULTI-CLASS NAIVE BAYES CLASSIFIER:")
-
-    data = util.load_data("CTG.csv", rows_to_skip=2)
-    data = np.delete(data, -2, axis=1)
-    data = util.shuffle_data(data, 0)
-
-    training, validation = util.get_train_valid_data(data)
-    x_train, y_train = util.get_features_actuals(training)
-    x_valid, y_valid = util.get_features_actuals(validation)
-
-    means, stds = math_util.compute_training_mean_std_by_feature(x_train)
-    x_train_zscored = math_util.z_score_data(x_train, means, stds)
-    x_valid_zscored = math_util.z_score_data(x_valid, means, stds)
+    x_train, y_train, x_valid, y_valid = load_ctg(filename)
 
     nb = NaiveBayes(stability_constant=stability_constant)
-    nb.train_model(x_train_zscored, y_train)
-    valid_preds = nb.evaluate_model(x_valid_zscored)
+    nb.train_model(x_train, y_train)
+    valid_preds = nb.evaluate_model(x_valid)
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
     print("Validation Accuracy:", valid_accuracy)
 
-    # For verification purposes only, we compare our results with the sklearn
-    # GaussianNB implementation with our z-scored features.
-    compare_against_sklearn(x_train_zscored, y_train,
-                            x_valid_zscored, y_valid, use_nb=True, is_multi=True)
 
+def decision_tree(filename):
+    print("\nDECISION TREE CLASSIFIER:")
 
-def decision_tree():
-    print("DECISION TREE:")
-
-    data = util.load_data("spambase.data")
-    data = util.shuffle_data(data, 0)
-
-    training, validation = util.get_train_valid_data(data)
-    x_train, y_train = util.get_features_actuals(training)
-    x_valid, y_valid = util.get_features_actuals(validation)
-
-    means, stds = math_util.compute_training_mean_std_by_feature(x_train)
-    x_train_zscored = math_util.z_score_data(x_train, means, stds)
-    x_valid_zscored = math_util.z_score_data(x_valid, means, stds)
+    x_train, y_train, x_valid, y_valid = load_spambase(
+        filename)
 
     dt = DecisionTree()
-    dt.train_model(x_train_zscored, y_train)
-    valid_preds = dt.evaluate_model(x_valid_zscored)
+    dt.train_model(x_train, y_train)
+    valid_preds = dt.evaluate_model(x_valid)
 
     eval = Evaluator()
     valid_precision, valid_recall, valid_f_measure, valid_accuracy = eval.evaluate_classifier(
@@ -98,73 +92,22 @@ def decision_tree():
     print("Validation F-Measure:", valid_f_measure)
     print("Validation Accuracy:", valid_accuracy)
 
-    # For verification purposes only, we compare our results with the sklearn
-    # GaussianNB implementation with our z-scored features.
-    compare_against_sklearn(x_train_zscored, y_train,
-                            x_valid_zscored, y_valid, use_nb=False, is_multi=False)
 
+def multi_class_decision_tree(filename):
+    print("\nMULTI-CLASS DECISION TREE CLASSIFIER:")
 
-def multi_class_decision_tree():
-    print("MULTI-CLASS DECISION TREE:")
-
-    data = util.load_data("CTG.csv", rows_to_skip=2)
-    data = np.delete(data, -2, axis=1)
-    data = util.shuffle_data(data, 0)
-
-    training, validation = util.get_train_valid_data(data)
-    x_train, y_train = util.get_features_actuals(training)
-    x_valid, y_valid = util.get_features_actuals(validation)
-
-    means, stds = math_util.compute_training_mean_std_by_feature(x_train)
-    x_train_zscored = math_util.z_score_data(x_train, means, stds)
-    x_valid_zscored = math_util.z_score_data(x_valid, means, stds)
+    x_train, y_train, x_valid, y_valid = load_ctg(filename)
 
     dt = DecisionTree()
-    dt.train_model(x_train_zscored, y_train)
-    valid_preds = dt.evaluate_model(x_valid_zscored)
+    dt.train_model(x_train, y_train)
+    valid_preds = dt.evaluate_model(x_valid)
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
     print("Validation Accuracy:", valid_accuracy)
 
-    # For verification purposes only, we compare our results with the sklearn
-    # GaussianNB implementation with our z-scored features.
-    compare_against_sklearn(x_train_zscored, y_train,
-                            x_valid_zscored, y_valid, use_nb=False, is_multi=True)
 
-
-def compare_against_sklearn(x_train, y_train, x_valid, y_valid, use_nb=True, is_multi=False):
-    from sklearn.naive_bayes import GaussianNB
-    from sklearn.tree import DecisionTreeClassifier
-
-    from sklearn.metrics import precision_score
-    from sklearn.metrics import recall_score
-    from sklearn.metrics import f1_score
-    from sklearn.metrics import accuracy_score
-
-    model = None
-
-    if use_nb:
-        model = GaussianNB()
-        model.fit(x_train, y_train)
-    else:
-        model = DecisionTreeClassifier(criterion='entropy', max_depth=8)
-        model.fit(x_train, y_train)
-
-    y_predict = model.predict(x_valid)
-
-    if not is_multi:
-        print("\nsklearn Precision:", precision_score(y_valid, y_predict))
-        print("sklearn Recall:", recall_score(y_valid, y_predict))
-        print("sklearn F-Measure:", f1_score(y_valid, y_predict))
-
-    print("sklearn Accuracy:", accuracy_score(y_valid, y_predict))
-
-
-naive_bayes(stability_constant=1e-4)
-print("")
-multi_class_naive_bayes(stability_constant=1e-4)
-print("\n")
-decision_tree()
-print("")
-multi_class_decision_tree()
+naive_bayes(stability_constant=1e-4, filename="spambase.data")
+decision_tree(filename="spambase.data")
+multi_class_naive_bayes(stability_constant=1e-4, filename="CTG.csv")
+multi_class_decision_tree(filename="CTG.csv")
