@@ -3,9 +3,8 @@ from node import Node
 import math_util
 import util
 
-
 class DecisionTree:
-    def __init__(self, min_samples_split, min_information_gain=1e-7, max_depth=float("inf")):
+    def __init__(self, min_samples_split=2, min_information_gain=1e-7, max_depth=float("inf")):
         self.root = None
 
         self.min_samples_split = min_samples_split
@@ -13,20 +12,22 @@ class DecisionTree:
         self.max_depth = max_depth
 
     def train_model(self, X, y):
-        self.root_node = self.build_tree(X, y)
-
-    def build_tree(self, X, y, current_depth):
+        # Reshape y to merge our data
+        y = y.reshape(-1, 1)
         # Merge our X and y into one for easier splitting
         data = np.concatenate((X, y), axis=1)
+        
+        self.root = self.build_tree(data)
 
-        # Get our num observations and features
+    def build_tree(self, data, current_depth=0):
+        X, y = util.get_features_actuals(data)
         num_observations, num_features = np.shape(X)
 
         if num_observations >= self.min_samples_split and current_depth <= self.max_depth:
             # Find the best feature split
             best_feature_split = self.find_best_feature(data, num_features)
 
-            if best_feature_split["information_gain"] > self.min_information_gain:
+            if len(best_feature_split) >= 1 and best_feature_split["information_gain"] > self.min_information_gain:
                 # Build left sub-tree
                 left_sub_tree = self.build_tree(
                     best_feature_split["left_sub_tree"], current_depth + 1)
@@ -46,7 +47,7 @@ class DecisionTree:
         max_info_gain = 0
 
         # This will be the best node for this
-        best_node = None
+        best_node = dict()
 
         # For each feature...
         for feature_index in range(num_features):
@@ -76,13 +77,11 @@ class DecisionTree:
                 if feature_information_gain > max_info_gain:
                     max_info_gain = feature_information_gain
 
-                    best_node = {
-                        "feature_index": feature_index,
-                        "threshold": feature_mean,
-                        "left_sub_tree": left,
-                        "right_sub_tree": right,
-                        "information_gain": feature_information_gain
-                    }
+                    best_node["feature_index"] = feature_index
+                    best_node["threshold"] = feature_mean
+                    best_node["left_sub_tree"] = left
+                    best_node["right_sub_tree"] = right
+                    best_node["information_gain"] = feature_information_gain
 
         return best_node
 
@@ -107,7 +106,7 @@ class DecisionTree:
         return entropy
 
     def compute_leaf_value(self, y):
-        Y = list(Y)
+        Y = list(y)
         return max(Y, key=Y.count)
 
     def evaluate_model(self, X):
@@ -126,6 +125,6 @@ class DecisionTree:
         feature_value = x[tree.feature_index]
 
         if feature_value <= tree.threshold:
-            return self.evaluate(x, tree.left)
+            return self.evaluate(x, tree.left_sub_tree)
         else:
-            return self.evaluate(x, tree.right)
+            return self.evaluate(x, tree.right_sub_tree)

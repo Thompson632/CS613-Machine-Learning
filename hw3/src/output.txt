@@ -1,9 +1,30 @@
 NAIVES BAYES CLASSIFIER:
-Validation Precision: 0.9006024096385542
-Validation Recall: 0.5190972222222222
-Validation F-Measure: 0.6585903083700441
-Validation Accuracy: 0.7979139504563233
+Validation Precision: 0.6631205673758865
+Validation Recall: 0.9739583333333334
+Validation F-Measure: 0.7890295358649789
+Validation Accuracy: 0.8044328552803128
 
+sklearn Precision: 0.6569086651053864
+sklearn Recall: 0.9739583333333334
+sklearn F-Measure: 0.7846153846153845
+sklearn Accuracy: 0.7992177314211213
 
 MULTI-CLASS NAIVE BAYES CLASSIFIER:
 Validation Accuracy: 0.8138222849083215
+sklearn Accuracy: 0.8208744710860366
+
+
+DECISION TREE:
+Validation Precision: 0.8317307692307693
+Validation Recall: 0.9010416666666666
+Validation F-Measure: 0.8650000000000001
+Validation Accuracy: 0.894393741851369
+
+sklearn Precision: 0.878839590443686
+sklearn Recall: 0.8940972222222222
+sklearn F-Measure: 0.8864027538726333
+sklearn Accuracy: 0.9139504563233377
+
+MULTI-CLASS DECISION TREE:
+Validation Accuracy: 0.8998589562764456
+sklearn Accuracy: 0.921015514809591
