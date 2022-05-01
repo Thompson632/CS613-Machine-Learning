@@ -6,12 +6,13 @@ import numpy as np
 
 
 class DecisionTree:
-    def __init__(self, min_observation_split=2, min_information_gain=1e-7, max_tree_depth=float("inf")):
+    def __init__(self, min_observation_split=2, min_information_gain=0):
         '''
         Constructor that creates our decision tree classifier. The construction takes in
         a value for the minimum observations required to continue splitting the feature data, 
         minimum information gain required to continuing splitting the feature data, and
-        the maximum depth to grow our tree.
+        the maximum depth to grow our tree. By default we will required at least two observations
+        to continue splitting and that our information gain is greater than 0.
 
         :param min_observation_split: The minimum number of observations required to
         continue splitting the feature data
@@ -25,9 +26,17 @@ class DecisionTree:
 
         self.min_observation_split = min_observation_split
         self.min_information_gain = min_information_gain
-        self.max_tree_depth = max_tree_depth
 
     def train_model(self, X, y):
+        '''
+        Method that is used to train our model or in this case, we are building
+        a decision tree to be used in order to classify an observation.
+
+        :param X: The features data
+        :param y: The actual data
+
+        :return none
+        '''
         # To make it easier when manipulating our data, we are going to
         # merge our X and y back into one data set
         data = data_util.merge_arrays(X, y)
@@ -35,18 +44,29 @@ class DecisionTree:
         # Build our tree from our training data
         self.root = self.build_tree(data=data)
 
-    def build_tree(self, data, current_depth=0):
+    def build_tree(self, data):
+        '''
+        We build our decision tree by first finding the feature that has the most 
+        information gain value and then we recursively build out each left and 
+        right subtree until we have reached our pre-set determination criteria. 
+        The determination criteria by default requires the minimum number of 
+        observations to continue building the tree to be 2 and that our feature's
+        calculated information gain is greater than 0.
+
+        :param data: The data that we will use to find the most informative feature
+        and to compute the leaf node's value (or classification)
+
+        :return the decision node or leaf node to be added to our decision tree
+        '''
         # Split our data back into X and y
         X, y = data_util.get_features_actuals(data)
 
         # Get number of observations and features
         num_observations, num_features = np.shape(X)
 
-        # Stop building our tree if we don't have at least 2 observation
-        # and our current_depth is less than or equal to infinity. The former
-        # will generally stop the building of this tree
-        if num_observations >= self.min_observation_split and current_depth <= self.max_tree_depth:
-            # Find the most informative
+        # Stop building our tree if we don't have at least 2 observations
+        if num_observations >= self.min_observation_split:
+            # Find the most informative feature
             most_informative_feature = self.find_most_informative_feature(
                 data, num_features)
 
@@ -55,27 +75,38 @@ class DecisionTree:
                 # If our most informative feature's information gain is greater than the
                 # minimum value we set, keep building the tree
                 if most_informative_feature["information_gain"] > self.min_information_gain:
-                    # Increment the current depth of our tree
-                    current_depth = current_depth + 1
-                    # Build left sub-tree
                     left_subtree = self.build_tree(
-                        data=most_informative_feature["left_subtree"], current_depth=current_depth)
-                    # Build right sub-tree
+                        data=most_informative_feature["left_subtree"])
                     right_subtree = self.build_tree(
-                        data=most_informative_feature["right_subtree"], current_depth=current_depth)
+                        data=most_informative_feature["right_subtree"])
 
                     # Build and return decision node
                     return Node(feature_index=most_informative_feature["feature_index"],
                                 threshold=most_informative_feature["threshold"], left_subtree=left_subtree,
                                 right_subtree=right_subtree)
 
-        # If we are here, we have completed building our tree and need to calculate the value for our leaf
-        leaf_value = self.calculate_leaf_value(y)
+        # We have reached the bottom of our branch and need to classify this leaf node
+        leaf_value = self.classify_leaf_node(y)
 
         # Build and return our leaf node
         return Node(leaf_value=leaf_value)
 
     def find_most_informative_feature(self, data, num_features):
+        '''
+        Finds the feature with the highest information value by iterating through each feature, 
+        calculating the mean of the feature that will be used as our threshold value per Professor
+        Burlick's instructions, and splits our data into two arrays based on the threshold value.
+        Once we have the split arrays, we compute the information gain of the feature, compare it 
+        to the current max information gain variable, and update the max information gain and
+        max information gain feature value if it is greater than. Finally, we return a dictionary
+        containing the attributes of the feature with the max information that is required to 
+        create a node in our decision tree.
+
+        :param data: The data we are iterating searching
+        :param num_features: The number of features in the current data
+
+        :return a dictionary of attributes pertaining to the feature with the most information gain
+        '''
         # Starting maximum information gain value
         max_info_gain = -1
 
@@ -94,7 +125,7 @@ class DecisionTree:
                 data=data, feature_index=feature_index, threshold=feature_mean)
 
             # If we have at least one observation in either of the sub-arrays
-            if len(left) > 0 and len(right) > 0:
+            if len(left) >= 1 and len(right) >= 1:
                 # Get the y-values of all our data and the split
                 # left and right datasets
                 data_y = data[:, -1]
@@ -122,6 +153,19 @@ class DecisionTree:
         return max_info_gain_feature
 
     def calculate_information_gain(self, data_y, left_y, right_y):
+        '''
+        Calculates the feature's total information gain by first computing the entropy
+        of the entire data set and then calculating the entropy of the split arrays
+        based on the feature's threshold value. Finally, we return this feature's
+        total information gain by subtracting the feature's information gain from
+        the total data set's entropy
+
+        :param data_y: The data set's y-values
+        :param left_y: The left branch data set's y-values
+        :param right_y: The right branch data set's y-values
+
+        :return the feature's total information gain
+        '''
         # Get the number of observations
         num_observations = len(data_y)
 
@@ -147,6 +191,16 @@ class DecisionTree:
         return total_entropy - feature_info_gain
 
     def calculate_entropy(self, y):
+        '''
+        Calculates the entropy of the provided target values by first
+        calculating the entropy for each unique class in the provided data.
+
+        Function Reference: https://en.wikipedia.org/wiki/Entropy_(information_theory)
+
+        :param y: The target values
+
+        :return the sum of each class' entropy calculation 
+        '''
         # Get our unique classes
         unique_classes = np.unique(y)
 
@@ -172,7 +226,16 @@ class DecisionTree:
 
         return entropy
 
-    def calculate_leaf_value(self, y):
+    def classify_leaf_node(self, y):
+        '''
+        Classifies the leaf node value by iterating through the each of the unique
+        classes in the data set and assigning the class that has the most occurences
+        in the dataset.
+
+        :param y: The target values
+
+        :return the class value to assign to this leaf node
+        '''
         # Get our unique classes
         unique_classes = np.unique(y)
 
@@ -197,6 +260,16 @@ class DecisionTree:
         return class_to_assign
 
     def evaluate_model(self, X):
+        '''
+        Evaluates our model (or tree) by iterating through each observation in the validation
+        data, recursively search our model (or tree) until we reach a leaf node, return the 
+        class to assign to this observation, and finally return an array of our class
+        predicitions for the data.
+
+        :param X: The validation features data
+
+        :return the predicted classes
+        '''
         class_preds = []
 
         # For each observation...
@@ -210,8 +283,22 @@ class DecisionTree:
         return np.array(class_preds)
 
     def search_tree(self, x, tree):
+        '''
+        Recursive function that searches our decision tree by using our 
+        current decision node's threhold value to determine what branch (left or right)
+        we need to traverse in order to get to the correct leaf node classification
+        for this particular observation. When we eventually reach a node that has 
+        a leaf value, we return this as our prediction.
+
+        :param x: The current observation we are attempting to classify
+        :param tree: The current root node of our decision tree
+
+        :return the classification for this observation
+        '''
+
         # First, check to see if we are at a leaf node
         # and if we are, then return the prediction value
+        # for this observation
         if tree.leaf_value is not None:
             return tree.leaf_value
 
