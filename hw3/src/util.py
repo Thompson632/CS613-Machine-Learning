@@ -92,3 +92,9 @@ def create_mean_var_prior_arrays(num_classes, num_features):
     priors = np.zeros(num_classes)
 
     return means, variances, priors
+
+def split_on_feature(data, feature_index, threshold):
+    left = np.array([sample for sample in data if sample[feature_index] <= threshold])
+    right = np.array([sample for sample in data if sample[feature_index] > threshold])
+    return left, right
+    
