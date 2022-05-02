@@ -22,5 +22,9 @@ The purpose of this repository is to hold the assignment deliverables for CS613 
 - [Naive Bayes vs. Decision Tree Classification](hw3/src/test_classification.py)
 - [Report](hw3/report/CS613_HW3_RobertThompson_rt598.pdf)
 
+## Homework 4: Dimensionality Reduction
+- [Assignment](hw4/HW4.pdf)
+- [Report](hw4/report/CS613_HW4_RobertThompson_rt598.pdf)
+
 ## Authors
 [Robert Thompson](rt598@drexel.edu)
