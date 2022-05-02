@@ -20,14 +20,14 @@ class NaiveBayes:
         self.num_classes = 0
 
         self.class_means = None
-        self.class_vars = None
+        self.class_stds = None
         self.class_priors = None
 
         self.stability_constant = stability_constant
 
     def train_model(self, X, y):
         '''
-        Trains our model by computing the mean and variance for each
+        Trains our model by computing the mean and standard devation for each
         column associated with the specific class we are training on
         and the prior probability of each class. The calculated
         values for each class will be used later when we evaluate
@@ -47,8 +47,8 @@ class NaiveBayes:
         # Get the number of classes
         self.num_classes = len(self.classes)
 
-        # Create the class mean, variance, and prior probability arrays
-        self.class_means, self.class_vars, self.class_priors = data_util.create_mean_var_prior_arrays(
+        # Create the class mean, standard deviation, and prior probability arrays
+        self.class_means, self.class_stds, self.class_priors = data_util.create_mean_std_prior_arrays(
             self.num_classes, num_features)
 
         # For each class...
@@ -61,10 +61,10 @@ class NaiveBayes:
             self.class_priors[i] = math_util.calculate_prior_probability(
                 class_count, num_observations)
 
-            # Compute the mean and variance of all observations
+            # Compute the mean and standard deviation of all observations
             self.class_means[i, :] = math_util.calculate_mean(
                 class_observations, 0)
-            self.class_vars[i, :] = math_util.calculate_variance(
+            self.class_stds[i, :] = math_util.calculate_std(
                 class_observations, 0)
 
     def evaluate_model(self, X):
@@ -120,12 +120,12 @@ class NaiveBayes:
             # Get the mean values for this class
             means = self.class_means[c]
 
-            # Get the variance values for this class
-            vars = self.class_vars[c]
+            # Get the standard deviation values for this class
+            stds = self.class_stds[c]
 
             # Compute the probability using the Gaussian
             # Probability Density Function
-            gpdf = self.compute_gaussian_pdf(x, means, vars)
+            gpdf = self.compute_gaussian_pdf(x, means, stds)
 
             # Get the summation of our probabilities
             sum_gpdf = np.sum(gpdf)
@@ -136,7 +136,7 @@ class NaiveBayes:
 
         return posteriors
 
-    def compute_gaussian_pdf(self, x, means, vars):
+    def compute_gaussian_pdf(self, x, means, stds):
         '''
         Computes the probability for this observation using the 
         Gaussian Probability Density Function or otherwise known
@@ -147,15 +147,15 @@ class NaiveBayes:
 
         :param x: The observation we are evaluating
         :param means: The calculated mean values for a particular class
-        :param vars: The calculated variance values for a particular class
+        :param stds: The calculated standard deviation values for a particular class
 
         :return the log of the calculated probability
         '''
         exp_numerator = -np.power((x - means), 2)
-        exp_denominator = (2 * vars + self.stability_constant)
+        exp_denominator = (2 * (np.power(stds, 2) + self.stability_constant))
 
         numerator = np.exp(exp_numerator / exp_denominator)
-        denominator = np.sqrt(2 * np.pi * vars + self.stability_constant)
+        denominator = (stds + self.stability_constant) * np.sqrt(2 * np.pi)
 
         pdf = numerator / denominator
         return np.log(pdf)

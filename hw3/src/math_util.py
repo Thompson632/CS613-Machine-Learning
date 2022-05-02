@@ -33,22 +33,6 @@ def calculate_std(X, axis=None):
     return np.std(X, axis=axis, ddof=1)
 
 
-def calculate_variance(X, axis=None):
-    '''
-    Calculates the variance based on the feature data.
-
-    :param X: The current feature (or column) to be standardized
-    :param axis: Optional parameter that if set will
-    compute the variance of the specified axis
-
-    :return the variance of the feature data  
-    '''
-    if axis is None:
-        return np.var(X, ddof=1)
-
-    return np.var(X, ddof=1, axis=axis)
-
-
 def calculate_prior_probability(class_observations, total_observations):
     '''
     Calculates the prior probability for a given class by dividing the observations for

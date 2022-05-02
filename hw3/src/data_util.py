@@ -69,9 +69,9 @@ def get_features_actuals(data):
     return X, y
 
 
-def create_mean_var_prior_arrays(num_classes, num_features):
+def create_mean_std_prior_arrays(num_classes, num_features):
     '''
-    Helper function that creates mean and variance numpy arrays
+    Helper function that creates mean and standard deviation numpy arrays
     based on the number of classes and features in a particular 
     dataset. This function also creates a classes prior probability
     array.
@@ -81,16 +81,16 @@ def create_mean_var_prior_arrays(num_classes, num_features):
 
     :return the initial array of means with num_classes as rows
     and num_features as columns
-    :return the initial array of variances with num_classes as rows
+    :return the initial array of standard deviation with num_classes as rows
     and num_features as columns
     :return the initial array of class prior probabilities with a 
     size of num_classes
     '''
     means = np.zeros((num_classes, num_features))
-    variances = np.zeros((num_classes, num_features))
+    stds = np.zeros((num_classes, num_features))
     priors = np.zeros(num_classes)
 
-    return means, variances, priors
+    return means, stds, priors
 
 
 def merge_arrays(X, y):
