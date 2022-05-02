@@ -1,5 +1,5 @@
 # CS613 Machine Learning
-The purpose of this repository is to hold the assignment deliverables for CS613 Machine Learnning at Drexel University for the Spring 2022 Semester.
+The purpose of this repository is to hold the assignment deliverables for CS613 Machine Learning at Drexel University for the Spring 2022 Semester.
 
 ## Homework 1: Linear Regression
 - [Assignment](hw1/HW1.pdf)
@@ -12,14 +12,15 @@ The purpose of this repository is to hold the assignment deliverables for CS613 
 - [Assignment](hw2/HW2.pdf)
 - [Binary Logistic Regression](hw2/src/logistic_regression.py)
 - [Multi-Class Logistic Regression](hw2/src/multi_class_logistic_regression.py)
+- [Binary vs. Multi-Class Logistic Regression](hw2/src/test_logistic_regression.py)
 - [Report](hw2/report/CS613_HW2_RobertThompson_rt598.pdf)
 
 ## Homework 3: Classification
 - [Assignment](hw3/HW3.pdf)
-- [Naive Bayes]()
-- [Decision Trees]()
-- [Naive Bayes vs. Decision Tree Classification]()
+- [Naive Bayes](hw3/src/naive_bayes.py)
+- [Decision Trees](hw3/src/decision_tree.py)
+- [Naive Bayes vs. Decision Tree Classification](hw3/src/test_classification.py)
+- [Report](hw3/report/CS613_HW3_RobertThompson_rt598.pdf)
 
 ## Authors
-
 [Robert Thompson](rt598@drexel.edu)
