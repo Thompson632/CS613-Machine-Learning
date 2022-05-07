@@ -1,7 +1,8 @@
-from hashlib import new
 import data_util
 import math_util
-import numpy as np
+from pca import PCA
+import plot
+
 
 def load_wildfaces(filename):
     data = data_util.load_data(filename)
@@ -11,25 +12,20 @@ def load_wildfaces(filename):
     x_stabilized = math_util.stabilize_data(X)
 
     means, stds = math_util.calculate_mean_std_of_features(x_stabilized)
-    x_train_zscored = math_util.z_score_data(x_stabilized, means, stds)
+    x_train_zscored = math_util.zscore_data(x_stabilized, means, stds)
 
-    # TODO: Might need to merge these two back together
-    new_data = data_util.merge_arrays(x_train_zscored, y)
-    #return new_data
     return x_train_zscored, y
 
 
-X, y = load_wildfaces("lfw20.csv")
-# data= load_wildfaces("lfw20.csv")
-# print("Data:", data.shape)
+def pca(filename, num_components):
+    print("DIMENSIONALITY REDUCTION FOR VISUALIZATION")
 
-# Covariance of our features
-cov_matrix = np.cov(X.T)
-print("Cov:", cov_matrix.shape)
+    X, y = load_wildfaces(filename)
 
-# Perform Eigendecomposition
-values, vectors = np.linalg.eig(cov_matrix)
+    pca = PCA()
+    projections = pca.compute_pca(X, num_components)
 
-# Get highest vectors
+    plot.plot_pca_scatterplot(y=y, projections=projections)
 
-# Plot data
+
+pca(filename="lfw20.csv", num_components=2)
