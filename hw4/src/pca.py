@@ -28,13 +28,19 @@ class PCA:
         # Compute Eigendecomposition
         eigen_values, eigen_vectors = self.compute_eigendecomposition(
             cov_matrix)
+        
+        # Largest eigen values
+        largest_eigen_values = eigen_values[:num_components]
 
-        # Get the principle components
-        pcs = eigen_vectors[:, :num_components]
+        # Largest eigen vectors
+        largest_eigen_vectors = eigen_vectors[:, :num_components]
 
-        # Project our data based on the number of components
-        projection = np.dot(pcs.T, X.T).T
-        return projection
+        # Project the data based on the number of components
+        nonwhitened_projection = np.dot(largest_eigen_vectors.T, X.T).T
+
+        # Whiten the data
+        whitened_projection = nonwhitened_projection / np.sqrt(largest_eigen_values)
+        return nonwhitened_projection, whitened_projection
 
     def compute_eigendecomposition(self, covariance_matrix):
         '''
@@ -52,7 +58,7 @@ class PCA:
         eigen_values, eigen_vectors = np.linalg.eig(covariance_matrix)
 
         # Get the indices to sort in decreasing order
-        sorted_indices = np.argsort(eigen_values)[::-1]
+        sorted_indices = np.argsort(-eigen_values)
 
         # Sort the values
         sorted_values = eigen_values[sorted_indices]

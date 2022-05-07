@@ -23,9 +23,15 @@ def pca(filename, num_components):
     X, y = load_wildfaces(filename)
 
     pca = PCA()
-    projections = pca.compute_pca(X, num_components)
+    
+    # Compute Principal Components
+    nonwhitened_projection, whitened_projection = pca.compute_pca(X, num_components)
 
-    plot.plot_pca_scatterplot(y=y, projections=projections)
+    # Plot Non-Whitened Data
+    plot.plot_pca_scatterplot(title="Non-Whitened PCA", y=y, pcas=nonwhitened_projection)
+    
+    # Plot Whitened Data
+    plot.plot_pca_scatterplot(title="Whitened PCA", y=y, pcas=whitened_projection)
 
 
 pca(filename="lfw20.csv", num_components=2)
