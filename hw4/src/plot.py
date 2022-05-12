@@ -18,7 +18,8 @@ def plot_pca_scatterplot(title, y, pcas):
         [pcas_df, pd.DataFrame(y, columns=['ID'])], axis=1)
 
     plt.figure(figsize=(10, 8))
-    plt.title(title, "- Labeled Faces in the Wild")
+    title = title + " - Labeled Faces in the Wild"
+    plt.title(title)
 
     sp = sns.scatterplot(x='PC1', y='PC2', hue='ID', s=100,
                          data=pcas_df, palette='colorblind', legend='auto')

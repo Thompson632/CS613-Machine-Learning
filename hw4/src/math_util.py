@@ -33,70 +33,23 @@ def calculate_std(X, axis=None):
     return np.std(X, axis=axis, ddof=1)
 
 
-def calculate_prior_probability(class_observations, total_observations):
-    '''
-    Calculates the prior probability for a given class by dividing the observations for
-    this particular classifier by the total observations in the data set:
-
-    :param class_observations: The number of observations in
-    this class
-    :param total_observations: The number of observations in 
-    this dataset
-
-    :return the prior probability for a given class
-    '''
-    return class_observations / total_observations    
-    
-def calculate_mean_std_of_features(X):
-    '''
-    Calculates the mean and standard deviation for each feature.
-
-    :param X: The feature data
-
-    :return the vector of means and stds
-    '''
-    num_features = np.shape(X)[1]
-
-    means = []
-    stds = []
-
-    for i in range(num_features):
-        current_feature = X[:, i]
-
-        mean = calculate_mean(current_feature)
-        std = calculate_std(current_feature)
-
-        means.append(mean)
-        stds.append(std)
-
-    return means, stds
-
-
-def zscore_data(X, means, stds):
+def zscore_data(X):
     '''
     Z-scores the data by subtracting the mean of the current column
     from the current column and dividing by the standard deviation
     of the current column
 
     :param X: The features data
-    :param means: The means vector for the training data
-    :param stds: The standard deviation vector for the training data
 
-    :return the z-scored data
+    :return the z-scored data, the mean of each column, and the
+    standard deviation of each column
     '''
-    num_features = np.shape(X)[1]
+    means = calculate_mean(X=X, axis=0)
+    stds = calculate_std(X=X, axis=0)
 
-    for i in range(num_features):
-        current_feature = X[:, i]
+    zscored_data = X - means / stds
+    return zscored_data, means, stds
 
-        numerator = current_feature - means[i]
-        denominator = stds[i]
-
-        zscore = numerator / denominator
-
-        X[:, i] = zscore
-
-    return X
 
 def un_zscore_data(X, means, stds):
     '''
@@ -119,13 +72,14 @@ def un_zscore_data(X, means, stds):
 
     return X
 
+
 def stabilize_data(X):
     '''
     Helper function that stabilizes the pixel data by dividing each columns
     values by 255 for numeric stability purposes.
-    
+
     :param X: The features data
-    
+
     :return the stabilized data
     '''
     num_features = np.shape(X)[1]
@@ -139,13 +93,14 @@ def stabilize_data(X):
 
     return X
 
+
 def unstablize_data(X):
     '''
     Helper function that unstabilizes the pixel data by multiplying each columns
     values by 255.
-    
+
     :param X: The features data
-    
+
     :return the stabilized data
     '''
     num_features = np.shape(X)[1]

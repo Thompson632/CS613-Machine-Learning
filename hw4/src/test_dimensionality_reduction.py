@@ -11,8 +11,7 @@ def load_wildfaces(filename):
     X, y = data_util.get_features_actuals(data)
     x_stabilized = math_util.stabilize_data(X)
 
-    means, stds = math_util.calculate_mean_std_of_features(x_stabilized)
-    x_train_zscored = math_util.zscore_data(x_stabilized, means, stds)
+    x_train_zscored, _, _ = math_util.zscore_data(x_stabilized)
 
     return x_train_zscored, y
 
