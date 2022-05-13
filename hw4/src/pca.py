@@ -1,95 +1,82 @@
+import math_util
 import numpy as np
 
 
 class PCA:
-
     def compute_pca(self, X, num_components=2):
         '''
-        Computes the Principal Component Analysis of our feature data to find the 
-        most relevant features. First we calculate the covariance matrix to remove
-        un-needed features. Then with our covariance matrix, we use compute eigen-
-        decomposition to get the eigen values and vectors that will be used to
-        determine our most relevant feature. With the eigen vectors, we can return
-        the number of features we want based on the num_components parameter
-        (default to 2 components). Finally, we want to project our data based on
-        the found principal components and return that output.
+        Compute the principal components by first pre-processing the input data in order to get our 
+        zero centered features, our eigen values, and eigen vectors. From there, we sort the eigen
+        values in descending order and then sort our eigen vectors based on the eigen values. With 
+        our now sorted eigen vectors, we select the top N-components based on the input value to
+        return the eigen vectors with the largest eigen value. Finally, we project the data 
+        onto the largest vectors.
 
         :param X: The features data
-        :param num_components: The number of components (or features)
+        :param num_components: The number of components to reduce our features too
 
-        :return the data projected to the principal components
+        :return the projected data onto the largest eigen vectors 
         '''
-        # Set our number of components
-        self.num_components = num_components
-
-        # Calculate the Covariance Matrix of our Features
-        cov_matrix = np.cov(X, rowvar=False)
-
-        # Compute Eigendecomposition
-        eigen_values, eigen_vectors = self.compute_eigendecomposition(
-            cov_matrix)
-
-        # Largest eigen values
-        largest_values = eigen_values[:num_components]
-
-        # Largest eigen vectors
-        largest_vectors = eigen_vectors[:, :num_components]
-
-        # Project the data based on the number of components
-        nonwhitened_projection = self.project_data(X, largest_vectors)
-
-        # Whiten our Eigen Vectors
-        whitened_vectors = self.whitened_vectors(eigen_values, eigen_vectors)
-
-        # Largest eigen values
-        largest_whitened_values = eigen_values[:num_components]
-
-        # Largest eigen vectors
-        largest_whitened_vectors = eigen_vectors[:, :num_components]
-
-        # Whiten the data
-        whitened_projection = self.project_data(X, largest_whitened_vectors)
-        return nonwhitened_projection, whitened_projection
-
-    def compute_eigendecomposition(self, covariance_matrix):
-        '''
-        Computes the eigen values and vectors based on the calculated
-        covariance matrix of our original data. It then sorts our data
-        in descending order and returns the sorted eigen values and 
-        vectors.
-
-        :param covariance_matrix: The calculated covariance matrix from our 
-        original data
-
-        :return the sorted eigen values and vectors
-        '''
-        # Compute Eigendecomposition
-        eigen_values, eigen_vectors = np.linalg.eig(covariance_matrix)
+        # Pre-Process data to remove duplicate code
+        X_centered_T, eigen_values, eigen_vectors = self.preprocess_data(X)
 
         # Get the indices to sort in decreasing order
         sorted_indices = np.argsort(-eigen_values)
 
-        # Sort the values
-        sorted_values = eigen_values[sorted_indices]
-
         # Sort the Vectors
         sorted_vectors = eigen_vectors[:, sorted_indices]
 
-        return sorted_values, sorted_vectors
+        # With our sorted vectors, select the top N-components
+        largest_vectors = sorted_vectors[:, :num_components]
 
-    def project_data(self, X, eigen_vectors):
-        projection = np.dot(eigen_vectors.T, X.T).T
+        # Project the data onto the top N-components
+        projection = np.dot(largest_vectors.T, X_centered_T).T
         return projection
 
-    def whitened_vectors(self, eigen_values, eigen_vectors):
-        num_features = np.shape(eigen_vectors)[1]
+    def whiten_data(self, X):
+        '''
+        Whitens our principal component(s) by first pre-processing the input data in order to get our 
+        zero centered features, our eigen values, and eigen vectors. From there, we can 
+        "whiten" our vectors by dividing them by the square-root of their eigen values. 
+        Finally, we project the data onto the whitened eigen vectors.
 
-        for i in range(num_features):
-            current_value = eigen_values[i]
-            current_vector = eigen_vectors[:, i]
+        :param X: The features (principal components at this point) data
 
-            whitened_vector = current_vector / current_value
+        :return the projected data onto the whitened eigen vectors
+        '''
+        # Pre-Process data to remove duplicate code
+        X_centered_T, eigen_values, eigen_vectors = self.preprocess_data(X)
 
-            eigen_vectors[:, i] = whitened_vector
+        # Whiten our Eigen Vectors
+        whitened_eigen_vectors = eigen_vectors / np.sqrt(eigen_values)
 
-        return eigen_vectors
+        # Project the data onto the whitened vectors
+        projection = np.dot(np.dot(whitened_eigen_vectors,
+                            eigen_vectors.T), X_centered_T).T
+        return projection
+
+    def preprocess_data(self, X):
+        '''
+        Helper function that pre-processes the feature data by performing the following:
+        1) Zero center our data by subtracting the mean
+        2) Transpose our so our features are now our rows
+        3) Calculate the covariance matrix of our data
+        4) Compute the Eigen Values and Eigen Vectors of our covariance matrix
+
+        :param X: The current feature data
+
+        :return The zero centered features, eigen values, and eigen vectors
+        '''
+        # Center our features
+        X_centered = X - math_util.calculate_mean(X=X, axis=0)
+
+        # Transpose our data
+        X_centered_T = X_centered.T
+
+        # Calculate the Covariance Matrix with our features as rows
+        cov_matrix = np.cov(X_centered_T, rowvar=True)
+
+        # Compute Eigen values and vectors
+        eigen_values, eigen_vectors = np.linalg.eig(cov_matrix)
+
+        return X_centered_T, eigen_values, eigen_vectors

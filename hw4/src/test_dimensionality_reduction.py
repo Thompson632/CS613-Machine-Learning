@@ -17,20 +17,22 @@ def load_wildfaces(filename):
 
 
 def pca(filename, num_components):
-    print("DIMENSIONALITY REDUCTION FOR VISUALIZATION")
+    X, _ = load_wildfaces(filename)
 
-    X, y = load_wildfaces(filename)
+    model = PCA()
 
-    pca = PCA()
-    
     # Compute Principal Components
-    nonwhitened_projection, whitened_projection = pca.compute_pca(X, num_components)
+    pca = model.compute_pca(X, num_components)
+    wpca = model.whiten_data(pca)
 
     # Plot Non-Whitened Data
-    plot.plot_pca_scatterplot(title="Non-Whitened PCA", y=y, pcas=nonwhitened_projection)
-    
+    plot.plot_pca_scatterplot(title="Non-Whitened PCA", data=pca)
+
     # Plot Whitened Data
-    plot.plot_pca_scatterplot(title="Whitened PCA", y=y, pcas=whitened_projection)
+    plot.plot_pca_scatterplot(title="Whitened PCA", data=wpca)
+    
+    # Plot Non-Whited and Whitened Data
+    plot.plot_pca_scatterplot_overlay(title="Non-Whitened and Whitened PCA", pca=pca, wpca=wpca)
 
 
 pca(filename="lfw20.csv", num_components=2)
