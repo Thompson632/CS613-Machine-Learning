@@ -3,6 +3,7 @@ import math_util
 import plot
 from pca import PCA
 from knn import KNN
+from eigen_faces import Eigenfaces
 from evaluator import Evaluator
 import numpy as np
 
@@ -17,7 +18,7 @@ def load_wildfaces_pca(filename):
     means, stds = math_util.calculate_feature_mean_std(x_stabilized)
     x_zscored = math_util.z_score_data(x_stabilized, means, stds)
 
-    return x_zscored, y
+    return x_zscored, y, means, stds
 
 
 def load_wildfaces_knn(filename):
@@ -39,7 +40,7 @@ def load_wildfaces_knn(filename):
 
 
 def pca(filename, num_components):
-    X, _ = load_wildfaces_pca(filename)
+    X, _, _, _ = load_wildfaces_pca(filename)
 
     pca = PCA()
     _, non_whitened = pca.compute_pca(X, num_components)
@@ -100,6 +101,14 @@ def knn_pca(filename, k, num_components):
     print("K =", k, "D =", num_components, "\nAccuracy:", valid_accuracy)
 
 
+def eigen_faces_compression(filename, num_components):
+    X, _, means, stds = load_wildfaces_pca(filename)
+
+    ef = Eigenfaces()
+    ef.build_eigenfaces(X, means, stds, num_components=num_components)
+
+
 pca(filename="lfw20.csv", num_components=2)
 knn(filename="lfw20.csv", k=1)
 knn_pca(filename="lfw20.csv", k=1, num_components=100)
+eigen_faces_compression(filename="lfw20.csv", num_components=1)

@@ -64,3 +64,28 @@ def plot_pca_scatterplot_overlay(title, pca, wpca):
     plt.legend()
     plt.savefig(filename)
     plt.show()
+    
+def plot_eigen_faces(title, eigen_vectors):
+    '''
+    Plots the eigen faces of our eigen vectors.
+    
+    :param title: The title to be added to the plot and used
+    as the filename when saving the image.
+    :param eigen_vectors: The eigen vectors needed to reconstruct
+    the image
+    
+    :return None
+    '''
+    # Name of File 
+    filename = title.lower().replace(" ", "_") + ".png"
+
+    # Title of the Plot
+    title = title + " - Labeled Faces in the Wild"
+    plt.title(title)
+    
+    # Plot the Image
+    plt.imshow(eigen_vectors.real, interpolation='none', cmap='gray')
+    
+    # Save and show our image
+    plt.savefig(filename)
+    plt.show()
