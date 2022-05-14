@@ -3,7 +3,7 @@ import numpy as np
 
 
 class PCA:
-    def compute_pca(self, X, num_components=2):
+    def compute_pca(self, X, D=2):
         '''
         Compute the principal components by first pre-processing the input data in order to get our 
         zero centered features, our eigen values, and eigen vectors. From there, we sort the eigen
@@ -13,7 +13,7 @@ class PCA:
         onto the largest vectors.
 
         :param X: The features data
-        :param num_components: The number of components to reduce our features too
+        :param D: The number of components to reduce our features too
 
         :return the projected data onto the largest eigen vectors 
         '''
@@ -27,7 +27,7 @@ class PCA:
         sorted_vectors = eigen_vectors[:, sorted_indices]
 
         # With our sorted vectors, select the top N-components
-        largest_vectors = sorted_vectors[:, :num_components]
+        largest_vectors = sorted_vectors[:, :D]
 
         # Project the data onto the top N-components
         projection = np.dot(largest_vectors.T, X_centered_T).T
