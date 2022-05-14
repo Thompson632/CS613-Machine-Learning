@@ -14,6 +14,8 @@ The purpose of this repository is to hold the assignment deliverables for CS613 
 - [Multi-Class Logistic Regression](hw2/src/multi_class_logistic_regression.py)
 - [Binary vs. Multi-Class Logistic Regression](hw2/src/test_logistic_regression.py)
 - [Report](hw2/report/CS613_HW2_RobertThompson_rt598.pdf)
+    - [Training vs. Validation Mean Log Loss Plot](hw2/images/training_validation_mean_log_loss.png)
+    - [Training vs. Validation Precision-Recall Plot](hw2/images/training_validation_precision_recall_graph.png)
 
 ## Homework 3: Classification
 - [Assignment](hw3/HW3.pdf)
@@ -24,7 +26,12 @@ The purpose of this repository is to hold the assignment deliverables for CS613 
 
 ## Homework 4: Dimensionality Reduction
 - [Assignment](hw4/HW4.pdf)
+- [PCA](hw4/src/pca.py)
+- [KNN](hw4/src/knn.py)
 - [Report](hw4/report/CS613_HW4_RobertThompson_rt598.pdf)
+    - [Non-Whitened PCA Scatterplot](hw4/images/non-whitened_pca.png)
+    - [Whitened PCA Scatterplot](hw4/images/whitened_pca.png)
+    - [Non-Whitened and Whitened PCA Overlay Scatterplot](hw4/images/non-whitened_and_whitened_pca.png)
 
 ## Authors
 [Robert Thompson](rt598@drexel.edu)

@@ -3,7 +3,7 @@ import numpy as np
 
 
 class PCA:
-    def compute_pca(self, X, D=2):
+    def compute_pca(self, X, num_components=2):
         '''
         Compute the principal components by first pre-processing the input data in order to get our 
         zero centered features, our eigen values, and eigen vectors. From there, we sort the eigen
@@ -13,12 +13,12 @@ class PCA:
         onto the largest vectors.
 
         :param X: The features data
-        :param D: The number of components to reduce our features too
+        :param num_components: The number of components to reduce our features too
 
         :return the projected data onto the largest eigen vectors 
         '''
         # Pre-Process data to remove duplicate code
-        X_centered_T, eigen_values, eigen_vectors = self.preprocess_data(X)
+        X_centered, eigen_values, eigen_vectors = self.preprocess_data(X)
 
         # Get the indices to sort in decreasing order
         sorted_indices = np.argsort(-eigen_values)
@@ -27,10 +27,10 @@ class PCA:
         sorted_vectors = eigen_vectors[:, sorted_indices]
 
         # With our sorted vectors, select the top N-components
-        largest_vectors = sorted_vectors[:, :D]
+        largest_vectors = sorted_vectors[:, :num_components]
 
         # Project the data onto the top N-components
-        projection = np.dot(largest_vectors.T, X_centered_T).T
+        projection = np.dot(largest_vectors.T, X_centered.T).T
         return projection
 
     def whiten_data(self, X):
@@ -45,14 +45,14 @@ class PCA:
         :return the projected data onto the whitened eigen vectors
         '''
         # Pre-Process data to remove duplicate code
-        X_centered_T, eigen_values, eigen_vectors = self.preprocess_data(X)
+        X_centered, eigen_values, eigen_vectors = self.preprocess_data(X)
 
         # Whiten our Eigen Vectors
         whitened_eigen_vectors = eigen_vectors / np.sqrt(eigen_values)
 
         # Project the data onto the whitened vectors
         projection = np.dot(np.dot(whitened_eigen_vectors,
-                            eigen_vectors.T), X_centered_T).T
+                            eigen_vectors.T), X_centered.T).T
         return projection
 
     def preprocess_data(self, X):
@@ -67,16 +67,13 @@ class PCA:
 
         :return The zero centered features, eigen values, and eigen vectors
         '''
-        # Center our features
+        # Center our features around zero
         X_centered = X - math_util.calculate_mean(X=X, axis=0)
 
-        # Transpose our data
-        X_centered_T = X_centered.T
-
-        # Calculate the Covariance Matrix with our features as rows
-        cov_matrix = np.cov(X_centered_T, rowvar=True)
+        # Calculate the Covariance Matrix
+        cov_matrix = np.cov(X_centered, rowvar=False)
 
         # Compute Eigen values and vectors
         eigen_values, eigen_vectors = np.linalg.eig(cov_matrix)
 
-        return X_centered_T, eigen_values, eigen_vectors
+        return X_centered, eigen_values, eigen_vectors

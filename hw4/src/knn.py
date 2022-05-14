@@ -28,9 +28,8 @@ class KNN:
         most_common = Counter(k_neighbor_labels).most_common(1)
         return most_common[0][0]
     
-    def calculate_euclidean_distance(self, x1, x2):
+    def calculate_euclidean_distance(self, x1, x2):    
         square_val = np.square(x1 - x2)
         sum_val = np.sum(square_val)
         distance = np.sqrt(sum_val)
         return distance
-

@@ -42,7 +42,7 @@ def pca(filename, num_components):
 
     pca = PCA()
     non_whitened = pca.compute_pca(X, num_components)
-    whitened = pca.whiten_data(pca)
+    whitened = pca.whiten_data(non_whitened)
 
     # Plot Non-Whitened Data
     plot.plot_pca_scatterplot(title="Non-Whitened PCA", data=non_whitened)
@@ -61,7 +61,7 @@ def knn(filename, k):
     # Number of dimensions
     D = np.shape(X_train)[1]
 
-    knn = KNN(k=k)
+    knn = KNN(k)
     knn.train_model(X_train, y_train)
     valid_preds = knn.evaluate_model(X_valid)
 
@@ -73,27 +73,21 @@ def knn(filename, k):
 def knn_pca(filename, k, num_components):
     X_train, y_train, X_valid, y_valid = load_wildfaces_knn(filename)
 
-    # Number of dimensions
-    D = num_components
-
     pca = PCA()
     pca_train = pca.compute_pca(X_train, num_components)
     pca_valid = pca.compute_pca(X_valid, num_components)
 
-    knn = KNN(k=k)
+    knn = KNN(k)
     knn.train_model(pca_train, y_train)
     valid_preds = knn.evaluate_model(pca_valid)
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
-    print("K =", k, "D =", D, "Accuracy:", valid_accuracy)
+    print("K =", k, "D =", num_components, "Accuracy:", valid_accuracy)
 
 
 def knn_pca_whiten(filename, k, num_components=None):
     X_train, y_train, X_valid, y_valid = load_wildfaces_knn(filename)
-
-    # Number of dimensions
-    D = num_components
 
     pca = PCA()
     pca_train = pca.compute_pca(X_train, num_components)
@@ -101,16 +95,16 @@ def knn_pca_whiten(filename, k, num_components=None):
     pca_valid = pca.compute_pca(X_valid, num_components)
     pca_whiten_valid = pca.whiten_data(pca_valid)
 
-    knn = KNN(k=k)
+    knn = KNN(k)
     knn.train_model(pca_train_whiten, y_train)
     valid_preds = knn.evaluate_model(pca_whiten_valid)
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
-    print("K =", k, "D =", D, "Accuracy:", valid_accuracy)
+    print("K =", k, "D =", num_components, "Accuracy:", valid_accuracy)
 
 
 pca(filename="lfw20.csv", num_components=2)
-knn(filename="lfw20.csv", k=5)
-knn_pca(filename="lfw20.csv", k=5, num_components=100)
-knn_pca_whiten(filename="lfw20.csv", k=5, num_components=100)
+knn(filename="lfw20.csv", k=1)
+knn_pca(filename="lfw20.csv", k=1, num_components=100)
+knn_pca_whiten(filename="lfw20.csv", k=1, num_components=100)
