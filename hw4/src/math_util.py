@@ -32,37 +32,56 @@ def calculate_std(X, axis=None):
 
     return np.std(X, axis=axis, ddof=1)
 
+def calculate_feature_mean_std(X):
+    '''
+    Calculates the mean and standard deviation for each feature.
+    
+    :param X: The feature data
+    
+    :return the vector of means and stds
+    '''
+    num_features = np.shape(X)[1]
 
-def zscore_data(X, means_train=None, stds_train=None):
+    means = []
+    stds = []
+
+    for i in range(num_features):
+        current_feature = X[:, i]
+
+        mean = calculate_mean(current_feature)
+        std = calculate_std(current_feature)
+
+        means.append(mean)
+        stds.append(std)
+
+    return means, stds
+
+
+def z_score_data(X, means, stds):
     '''
     Z-scores the data by subtracting the mean of the current column
     from the current column and dividing by the standard deviation
-    of the current column
-
+    of the current column.
+    
     :param X: The features data
-    :param means_train: The mean of the training data. Optional because
-    we want to calculate the mean of the training data to be used when
-    we zscore the validation data
-    :param stds_train: The standard deviation of the training data.
-    Optional becauase we want to calculate the standard deviation 
-    of the training data to be used when we zscore the validation
-    data
-
-    :return the z-scored data, the mean of each column, and the
-    standard deviation of each column
+    :param means: The means vector for the training data
+    :param stds: The standard deviation vector for the training data
+    
+    :return the z-scored data
     '''
-    means = None
-    stds = None
+    num_features = np.shape(X)[1]
 
-    if means_train is None and stds_train is None:
-        means = calculate_mean(X=X, axis=0)
-        stds = calculate_std(X=X, axis=0)
-    else:
-        means = means_train
-        stds = stds_train
+    for i in range(num_features):
+        current_feature = X[:, i]
 
-    zscored = X - means / stds
-    return zscored, means, stds
+        numerator = current_feature - means[i]
+        denominator = stds[i]
+
+        zscore = numerator / denominator
+
+        X[:, i] = zscore
+
+    return X
 
 
 def un_zscore_data(X, means, stds):

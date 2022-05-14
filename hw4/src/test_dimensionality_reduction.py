@@ -14,9 +14,10 @@ def load_wildfaces_pca(filename):
     X, y = data_util.get_features_actuals(data)
     x_stabilized = math_util.stabilize_data(X)
 
-    x_train_zscored, _, _ = math_util.zscore_data(x_stabilized)
+    means, stds = math_util.calculate_feature_mean_std(x_stabilized)
+    x_zscored = math_util.z_score_data(x_stabilized, means, stds)
 
-    return x_train_zscored, y
+    return x_zscored, y
 
 
 def load_wildfaces_knn(filename):
@@ -30,9 +31,9 @@ def load_wildfaces_knn(filename):
     x_train_stabilized = math_util.stabilize_data(x_train)
     x_valid_stabilized = math_util.stabilize_data(x_valid)
 
-    x_train_zscored, means, stds = math_util.zscore_data(x_train_stabilized)
-    x_valid_zscored, _, _ = math_util.zscore_data(
-        x_valid_stabilized, means_train=means, stds_train=stds)
+    means, stds = math_util.calculate_feature_mean_std(x_train_stabilized)
+    x_train_zscored = math_util.z_score_data(x_train_stabilized, means, stds)
+    x_valid_zscored = math_util.z_score_data(x_valid_stabilized, means, stds)
 
     return x_train_zscored, y_train, x_valid_zscored, y_valid
 
@@ -41,7 +42,7 @@ def pca(filename, num_components):
     X, _ = load_wildfaces_pca(filename)
 
     pca = PCA()
-    non_whitened = pca.compute_pca(X, num_components)
+    _, non_whitened = pca.compute_pca(X, num_components)
     whitened = pca.whiten_data(non_whitened)
 
     # Plot Non-Whitened Data
@@ -58,8 +59,7 @@ def pca(filename, num_components):
 def knn(filename, k):
     X_train, y_train, X_valid, y_valid = load_wildfaces_knn(filename)
 
-    # Number of dimensions
-    D = np.shape(X_train)[1]
+    num_components = np.shape(X_train)[1]
 
     knn = KNN(k)
     knn.train_model(X_train, y_train)
@@ -67,15 +67,17 @@ def knn(filename, k):
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
-    print("K =", k, "D =", D, "(Original) \nAccuracy:", valid_accuracy)
+    print("K =", k, "D =", num_components,
+          "(Original) \nAccuracy:", valid_accuracy)
 
 
 def knn_pca(filename, k, num_components):
+    print("\nK-NEAREST NEIGHBORS (KNN) WITH PCA")
     X_train, y_train, X_valid, y_valid = load_wildfaces_knn(filename)
 
     pca = PCA()
-    pca_train = pca.compute_pca(X_train, num_components)
-    pca_valid = pca.compute_pca(X_valid, num_components)
+    _, pca_train = pca.compute_pca(X_train, num_components)
+    _, pca_valid = pca.compute_pca(X_valid, num_components)
 
     knn = KNN(k)
     knn.train_model(pca_train, y_train)
@@ -83,16 +85,10 @@ def knn_pca(filename, k, num_components):
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
-    print("K =", k, "D =", num_components, "Accuracy:", valid_accuracy)
+    print("K =", k, "D =", num_components, "\nAccuracy:", valid_accuracy)
 
-
-def knn_pca_whiten(filename, k, num_components=None):
-    X_train, y_train, X_valid, y_valid = load_wildfaces_knn(filename)
-
-    pca = PCA()
-    pca_train = pca.compute_pca(X_train, num_components)
+    print("\nK-NEAREST NEIGHBORS (KNN) WITH PCA WHITENED")
     pca_train_whiten = pca.whiten_data(pca_train)
-    pca_valid = pca.compute_pca(X_valid, num_components)
     pca_whiten_valid = pca.whiten_data(pca_valid)
 
     knn = KNN(k)
@@ -101,10 +97,9 @@ def knn_pca_whiten(filename, k, num_components=None):
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
-    print("K =", k, "D =", num_components, "Accuracy:", valid_accuracy)
+    print("K =", k, "D =", num_components, "\nAccuracy:", valid_accuracy)
 
 
 pca(filename="lfw20.csv", num_components=2)
 knn(filename="lfw20.csv", k=1)
 knn_pca(filename="lfw20.csv", k=1, num_components=100)
-knn_pca_whiten(filename="lfw20.csv", k=1, num_components=100)

@@ -15,9 +15,10 @@ class PCA:
         :param X: The features data
         :param num_components: The number of components to reduce our features too
 
-        :return the projected data onto the largest eigen vectors 
+        :return the largest eigen vectors and the project data onto the
+        largest eigen vectors
         '''
-        # Pre-Process data to remove duplicate code
+        # Pre-process data to remove duplicate code
         X_centered, eigen_values, eigen_vectors = self.preprocess_data(X)
 
         # Get the indices to sort in decreasing order
@@ -30,8 +31,9 @@ class PCA:
         largest_vectors = sorted_vectors[:, :num_components]
 
         # Project the data onto the top N-components
-        projection = np.dot(largest_vectors.T, X_centered.T).T
-        return projection
+        projection = np.dot(X_centered, largest_vectors)
+
+        return largest_vectors, projection
 
     def whiten_data(self, X):
         '''
@@ -51,17 +53,17 @@ class PCA:
         whitened_eigen_vectors = eigen_vectors / np.sqrt(eigen_values)
 
         # Project the data onto the whitened vectors
-        projection = np.dot(np.dot(whitened_eigen_vectors,
-                            eigen_vectors.T), X_centered.T).T
+        projection = np.dot(X_centered, np.dot(
+            whitened_eigen_vectors, eigen_vectors))
+
         return projection
 
     def preprocess_data(self, X):
         '''
         Helper function that pre-processes the feature data by performing the following:
         1) Zero center our data by subtracting the mean
-        2) Transpose our so our features are now our rows
-        3) Calculate the covariance matrix of our data
-        4) Compute the Eigen Values and Eigen Vectors of our covariance matrix
+        2) Calculate the covariance matrix of our data
+        3) Compute the Eigen Values and Eigen Vectors of our covariance matrix
 
         :param X: The current feature data
 
@@ -71,7 +73,7 @@ class PCA:
         X_centered = X - math_util.calculate_mean(X=X, axis=0)
 
         # Calculate the Covariance Matrix
-        cov_matrix = np.cov(X_centered, rowvar=False)
+        cov_matrix = np.cov(X_centered.T)
 
         # Compute Eigen values and vectors
         eigen_values, eigen_vectors = np.linalg.eig(cov_matrix)
