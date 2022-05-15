@@ -38,6 +38,7 @@ class PCA:
 
         # With our sorted vectors, select the top N-components
         largest_eigenvectors = sorted_vectors[:, :self.num_components]
+        
         return largest_eigenvectors
 
     def whiten_data(self, X):
@@ -57,6 +58,7 @@ class PCA:
 
         # Whiten our eigenvectors
         whitened_eigenvectors = eigenvectors / np.sqrt(eigenvalues)
+        
         return whitened_eigenvectors
 
     def evaluate_model(self, X, projection):
@@ -131,24 +133,31 @@ class PCA:
 
         # Calculate the sum of our eigenvalues to be used when determining
         # the threshold
-        sorted_values_sum = np.sum(sorted_values)
+        sorted_abs_values = np.abs(sorted_values)
+        sorted_abs_values_sum = np.sum(sorted_abs_values)
 
-        # Determine our minimum components
-        for index in range(len(sorted_values)):
+        for index, _, in enumerate(sorted_values):
             # Get our eigenvalue at this index
             eigenvalue = sorted_values[:index]
-            # Calculate the sum of our eigenvalue at this index
-            eigenvalue_sum = np.sum(eigenvalue)
+            # Take the absolute value of our eigenvalue
+            eigenvalue_abs = np.abs(eigenvalue)
+            # Calculate the sum of our eigenvalue
+            eigenvalue_abs_sum = np.sum(eigenvalue_abs)
 
-            # Divide the sum of this eigenvalue by the sum of all eigenvalues
-            # If the quotient of this is greater than or equal to the threshold,
-            # then this index represents the minimum number of components 
-            # required to achieve 95% reconstruction of the image
-            if eigenvalue_sum / sorted_values_sum >= threshold:
-                min_components = index
+            # Divide the sum of the absolute value of this eigenvalue by the 
+            # sum of the absolute value of all eigenvalues. If the quotient of 
+            # this is greater than or equal to the threshold, then this index 
+            # represents the minimum number of components required to achieve 
+            # 95% reconstruction of the image
+            if eigenvalue_abs_sum / sorted_abs_values_sum >= threshold:
+                # Adding a one here because our arrays begin at index 0.
+                # Therefore, the minimum number of components will be the index
+                # that meets the threshold + one
+                min_components = index + 1
                 break
 
         # With our sorted vectors, select the minimum number of components
         # to achieve 95% image reconstruction
         largest_eigenvectors = sorted_vectors[:, :min_components]
+        
         return min_components, largest_eigenvectors
