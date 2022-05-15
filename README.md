@@ -19,6 +19,7 @@ The purpose of this repository is to hold the assignment deliverables for CS613 
 
 ## Homework 3: Classification
 - [Assignment](hw3/HW3.pdf)
+- [Theory](hw3/src/theory.csv)
 - [Naive Bayes](hw3/src/naive_bayes.py)
 - [Decision Trees](hw3/src/decision_tree.py)
 - [Naive Bayes vs. Decision Tree Classification](hw3/src/test_classification.py)
@@ -26,6 +27,10 @@ The purpose of this repository is to hold the assignment deliverables for CS613 
 
 ## Homework 4: Dimensionality Reduction
 - [Assignment](hw4/HW4.pdf)
+- [Theory](hw4/src/theory.py)
+    - [2D Class 1 vs. Class 2](hw4/images/theory_class1_vs._class2.png)
+    - [1D PCA](hw4/images/theory_pca_1d.png)
+    - [1D LDA](hw4/images/theory_lda_1d.png)
 - [PCA](hw4/src/pca.py)
 - [KNN](hw4/src/knn.py)
 - [EigenFaces](hw4/src/eigenfaces.py)

@@ -70,7 +70,7 @@ class PCA:
         :param projection: The projection matrix (or eigenvectors) to project 
         our features data into
 
-        :return the features data projected into the eigenvectors spsace
+        :return the features data projected into the eigenvectors space
         '''
         return np.dot(X, projection)
 
@@ -120,19 +120,44 @@ class PCA:
         return sorted_values, sorted_vectors
 
     def determine_min_components(self, X, threshold=0.95):
+        '''
+        Determines the minimum number of components required in 
+        order to reconstruct an image based on a default threshold
+        of 95%. We achieve this by doing the following:
+        (1) Eigenvalues and vectors of our features data
+        (2) Sort our eigenvalues and eigenvectors in descending order
+        (3) Calculate the absolute value of all eigenvalues and then
+        we take the sum of them
+        (4) Iterate over each sorted eigenvalue and do the following:
+          (a) Get the eigenvalue at the given index
+          (b) Calculate the absolute value of the eigvenvalue
+          and then we take the sum of it
+          (c) Divide our sum of the given eigenvalue by the the sum of
+          all the eigenvalues
+          (d) If our quotient is greater than or equal to 0.95, this
+          is the minimum number of components we need
+        (5) Get the minimum number of components from our eigenvectors
+        and return them
+        
+        :param X: The features data
+        :param threshold: The threshold for determing the minimum
+        number of components
+        
+        :return the eigenvectors for the minimum number of components
+        '''
         # Minimum components required for the default threshold
         # set to 95%
         min_components = 0
 
-        # Pre-Process data to remove duplicate code
+        # Pre-process data to remove duplicate code
         eigenvalues, eigenvectors = self.preprocess_data(X)
 
         # Sort the values and vectors
         sorted_values, sorted_vectors = self.sort_eigen(
             eigenvalues, eigenvectors)
 
-        # Calculate the sum of our eigenvalues to be used when determining
-        # the threshold
+        # Calculates the absolute value of our eigen values to be used when
+        # determing the threshold
         sorted_abs_values = np.abs(sorted_values)
         sorted_abs_values_sum = np.sum(sorted_abs_values)
 
