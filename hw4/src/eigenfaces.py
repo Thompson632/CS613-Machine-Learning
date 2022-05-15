@@ -5,20 +5,25 @@ import math_util
 
 
 class Eigenfaces:
-    def __init__(self, X, means, stds):
+    def __init__(self, X, means, stds, person_index):
         '''
         Constructor that takes in the stabilized and zscored features data
-        along with the features mean and standard deviation values.
+        along with the features mean and standard deviation values. The
+        constructor also takes in an index for the person we want to 
+        reconstuct.
 
         :param X: The features data
         :param means: The features mean values
         :param stds: The features standard deviation values
+        :param person_index: The index of the person we want to reconstruct
 
         :return None
         '''
         self.X = X
         self.means = means
         self.stds = stds
+
+        self.person_index = person_index
 
     def build_eigenfaces(self, num_components=1):
         '''
@@ -43,7 +48,7 @@ class Eigenfaces:
                              eigenvectors=reshaped_eigenvectors)
 
         # Reconstructed Image One Component
-        person_row = self.X[224]
+        person_row = self.X[self.person_index]
         one_component = self.reconstruct(model, eigenvectors, person_row)
         plot.plot_eigenfaces(title="Reconstructed Image Using One Component",
                              eigenvectors=one_component)
@@ -52,7 +57,7 @@ class Eigenfaces:
         num_features = np.shape(self.X)[1]
         model = PCA(num_features)
         eigenvectors = model.train_model(self.X)
-        person_row = self.X[224]
+        person_row = self.X[self.person_index]
         all_components = self.reconstruct(model, eigenvectors, person_row)
         plot.plot_eigenfaces(title="Original Image",
                              eigenvectors=all_components)
@@ -66,7 +71,7 @@ class Eigenfaces:
         # 95% Reconstructed Image with Min-Components
         model = PCA(min_num_components)
         eigenvectors = model.train_model(self.X)
-        person_row = self.X[224]
+        person_row = self.X[self.person_index]
         min_components = self.reconstruct(model, min_eigenvectors, person_row)
         plot.plot_eigenfaces(
             title="95% Reconstruction Image", eigenvectors=min_components)
@@ -80,7 +85,7 @@ class Eigenfaces:
         # 100% Reconstructed Image with Min-Components
         model = PCA(min_num_components)
         eigenvectors = model.train_model(self.X)
-        person_row = self.X[224]
+        person_row = self.X[self.person_index]
         min_components = self.reconstruct(model, min_eigenvectors, person_row)
         plot.plot_eigenfaces(
             title="100% Reconstruction Image", eigenvectors=min_components)

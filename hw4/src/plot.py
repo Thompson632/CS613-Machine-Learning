@@ -78,7 +78,7 @@ def plot_eigenfaces(title, eigenvectors):
     :return None
     '''
     # Name of File
-    filename = title.lower().replace(" ", "_") + ".png"
+    filename = title.lower().replace(" ", "_").replace("%", "") + ".png"
 
     # Title of the Plot
     plt.title(title)

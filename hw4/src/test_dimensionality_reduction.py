@@ -3,7 +3,7 @@ import math_util
 import plot
 from pca import PCA
 from knn import KNN
-from eigen_faces import Eigenfaces
+from eigenfaces import Eigenfaces
 from evaluator import Evaluator
 import numpy as np
 
@@ -105,14 +105,14 @@ def knn_pca(filename, k, num_components):
     print("K =", k, "D =", num_components, "\nAccuracy:", valid_accuracy)
 
 
-def eigenfaces_compression(filename, num_components):
+def eigenfaces_compression(filename, num_components, person_index):
     X, _, means, stds = load_wildfaces_pca(filename)
 
-    ef = Eigenfaces(X, means, stds)
+    ef = Eigenfaces(X, means, stds, person_index)
     ef.build_eigenfaces(num_components)
 
 
 pca(filename="lfw20.csv", num_components=2)
 knn(filename="lfw20.csv", k=1)
 knn_pca(filename="lfw20.csv", k=1, num_components=100)
-eigenfaces_compression(filename="lfw20.csv", num_components=1)
+eigenfaces_compression(filename="lfw20.csv", num_components=1, person_index=224)
