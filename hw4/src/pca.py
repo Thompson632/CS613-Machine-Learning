@@ -136,7 +136,7 @@ class PCA:
         # Determine our minimum components
         for index in range(len(sorted_values)):
             # Get our eigenvalue at this index
-            eigenvalue = sorted_vectors[:index]
+            eigenvalue = sorted_values[:index]
             # Calculate the sum of our eigenvalue at this index
             eigenvalue_sum = np.sum(eigenvalue)
 

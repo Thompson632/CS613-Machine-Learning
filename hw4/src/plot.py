@@ -17,7 +17,6 @@ def plot_pca_scatterplot(title, data):
     filename = title.lower().replace(" ", "_") + ".png"
 
     # Title of the Plot
-    title = title + " - Labeled Faces in the Wild"
     plt.title(title)
 
     # Set our X and Y Labels
@@ -50,7 +49,6 @@ def plot_pca_scatterplot_overlay(title, pca, wpca):
     filename = title.lower().replace(" ", "_") + ".png"
 
     # Title of the Plot
-    title = title + " - Labeled Faces in the Wild"
     plt.title(title)
 
     # Set our X and Y Labels
@@ -83,7 +81,6 @@ def plot_eigenfaces(title, eigenvectors):
     filename = title.lower().replace(" ", "_") + ".png"
 
     # Title of the Plot
-    title = title + " - Labeled Faces in the Wild"
     plt.title(title)
 
     # Plot the Image
