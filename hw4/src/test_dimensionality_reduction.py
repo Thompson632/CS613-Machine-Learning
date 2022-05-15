@@ -44,16 +44,16 @@ def pca(filename, num_components):
 
     model = PCA(num_components)
 
-    eigen_vectors = model.train_model(X)
-    non_whitened = model.evaluate_model(X, eigen_vectors)
+    eigenvectors = model.train_model(X)
+    z = model.evaluate_model(X, eigenvectors)
 
-    whitned_eigen_vectors = model.whiten_data(non_whitened)
-    whitened = model.evaluate_model(non_whitened, whitned_eigen_vectors)
+    whitened_eigenvectors = model.whiten_data(z)
+    z_whitened = model.evaluate_model(z, whitened_eigenvectors)
 
-    plot.plot_pca_scatterplot(title="Non-Whitened PCA", data=non_whitened)
-    plot.plot_pca_scatterplot(title="Whitened PCA", data=whitened)
+    plot.plot_pca_scatterplot(title="Non-Whitened PCA", data=z)
+    plot.plot_pca_scatterplot(title="Whitened PCA", data=z_whitened)
     plot.plot_pca_scatterplot_overlay(
-        title="Non-Whitened and Whitened PCA", pca=non_whitened, wpca=whitened)
+        title="Non-Whitened and Whitened PCA", pca=z, wpca=z_whitened)
 
 
 def knn(filename, k):
@@ -77,42 +77,42 @@ def knn_pca(filename, k, num_components):
 
     pca_model = PCA(num_components)
 
-    eigen_vectors = pca_model.train_model(X_train)
-    pca_train = pca_model.evaluate_model(X_train, eigen_vectors)
-    pca_valid = pca_model.evaluate_model(X_valid, eigen_vectors)
+    eigenvectors = pca_model.train_model(X_train)
+    z_train = pca_model.evaluate_model(X_train, eigenvectors)
+    z_valid = pca_model.evaluate_model(X_valid, eigenvectors)
 
     knn_model = KNN(k)
-    knn_model.train_model(pca_train, y_train)
-    valid_preds = knn_model.evaluate_model(pca_valid)
+    knn_model.train_model(z_train, y_train)
+    valid_preds = knn_model.evaluate_model(z_valid)
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
     print("K =", k, "D =", num_components, "\nAccuracy:", valid_accuracy)
 
     print("\nK-NEAREST NEIGHBORS (KNN) WITH PCA WHITENED")
-    whitened_eigen_vectors = pca_model.whiten_data(pca_train)
-    pca_train_whiten = pca_model.evaluate_model(
-        pca_train, whitened_eigen_vectors)
-    pca_whiten_valid = pca_model.evaluate_model(
-        pca_valid, whitened_eigen_vectors)
+    whitened_eigenvectors = pca_model.whiten_data(z_train)
+    z_train_whiten = pca_model.evaluate_model(
+        z_train, whitened_eigenvectors)
+    z_valid_whiten = pca_model.evaluate_model(
+        z_valid, whitened_eigenvectors)
 
     knn_model = KNN(k)
-    knn_model.train_model(pca_train_whiten, y_train)
-    valid_preds = knn_model.evaluate_model(pca_whiten_valid)
+    knn_model.train_model(z_train_whiten, y_train)
+    valid_preds = knn_model.evaluate_model(z_valid_whiten)
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
     print("K =", k, "D =", num_components, "\nAccuracy:", valid_accuracy)
 
 
-def eigen_faces_compression(filename, num_components):
+def eigenfaces_compression(filename, num_components):
     X, _, means, stds = load_wildfaces_pca(filename)
 
-    ef = Eigenfaces()
-    ef.build_eigenfaces(X, means, stds, num_components=num_components)
+    ef = Eigenfaces(X, means, stds)
+    ef.build_eigenfaces(num_components)
 
 
 pca(filename="lfw20.csv", num_components=2)
 knn(filename="lfw20.csv", k=1)
 knn_pca(filename="lfw20.csv", k=1, num_components=100)
-eigen_faces_compression(filename="lfw20.csv", num_components=1)
+eigenfaces_compression(filename="lfw20.csv", num_components=1)

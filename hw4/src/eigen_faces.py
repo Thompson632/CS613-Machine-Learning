@@ -5,25 +5,104 @@ import math_util
 
 
 class Eigenfaces:
-    def build_eigenfaces(self, X, means, stds, num_components=1):
+    def __init__(self, X, means, stds):
+        '''
+        Constructor that takes in the stabilized and zscored features data
+        along with the features mean and standard deviation values.
+
+        :param X: The features data
+        :param means: The features mean values
+        :param stds: The features standard deviation values
+
+        :return None
+        '''
+        self.X = X
+        self.means = means
+        self.stds = stds
+
+    def build_eigenfaces(self, num_components=1):
+        '''
+        Build all of the required images based on the proposed requirements. 
+        We build the following:
+        (1) The image based on the primary principal component of the data
+        (2) The reconstructed image based on the primary principal component 
+        of the data
+        (3) The original image we plan to used for compression / reconstruction
+        (4) The 95% reconstructed original image
+
+        :param num_components: The default number of components we are to train 
+        our PCA model with
+
+        :return None
+        '''
+        # Primary Component as Image
         model = PCA(num_components)
+        eigenvectors = model.train_model(self.X)
+        reshaped_eigenvectors = np.reshape(eigenvectors, (87, 65))
+        plot.plot_eigenfaces(title="Primary Component as Image",
+                             eigenvectors=reshaped_eigenvectors)
 
-        # Z-Scored Plot
-        eigen_vectors = model.train_model(X)
-        reshaped_largest_eigen_vector = np.reshape(eigen_vectors, (87, 65))
-        plot.plot_eigen_faces(
-            title="Z-Scored", eigen_vectors=reshaped_largest_eigen_vector)
+        # Reconstructed Image One Component
+        person_row = self.X[224]
+        one_component = self.reconstruct(model, eigenvectors, person_row)
+        plot.plot_eigenfaces(title="Reconstructed Image Using One Component", 
+            eigenvectors=one_component)
 
-        # Un-zscored Plot
-        x_unzscored = math_util.un_zscore_data(X, means, stds)
-        eigen_vectors = model.train_model(x_unzscored)
-        reshaped_eigen_vectors = np.reshape(eigen_vectors, (87, 65))
-        plot.plot_eigen_faces(
-            title="Unzscored", eigen_vectors=reshaped_eigen_vectors)
+        # Image Used for Compression/Reconstruction
+        num_features = np.shape(self.X)[1]
+        model = PCA(num_features)
+        eigenvectors = model.train_model(self.X)
+        person_row = self.X[224]
+        all_components = self.reconstruct(model, eigenvectors, person_row)
+        plot.plot_eigenfaces(title="Original Image",
+                             eigenvectors=all_components)
 
-        # Unstabilized
-        x_unstabilized = math_util.unstablize_data(x_unzscored)
-        eigen_vectors = model.train_model(x_unstabilized)
-        reshaped_eigen_vectors = np.reshape(eigen_vectors, (87, 65))
-        plot.plot_eigen_faces(title="Unstabilized",
-                              eigen_vectors=reshaped_eigen_vectors)
+        # Determine Minimum Components for 95% Reconstruction
+        min_num_components, min_eigenvectors = model.determine_min_components(
+            self.X)
+        print("Minimum Number of Components Necessary to Perform 95% Reconstruction:",
+              min_num_components)
+
+        # 95% Reconstructed Image with Min-Components
+        model = PCA(min_num_components)
+        eigenvectors = model.train_model(self.X)
+        person_row = self.X[224]
+        min_components = self.reconstruct(model, min_eigenvectors, person_row)
+        plot.plot_eigenfaces(
+            title="95% Reconstruction Image", eigenvectors=min_components)
+
+    def reconstruct(self, model, eigenvectors, person_row):
+        '''
+        Method that helps us reconstruct our image based on our trained model, 
+        eigenvectors, and the desired row to be projected onto the eigenvectors. 
+        In order to do this, we need to perform the following:
+        (1) Projected the person onto the eigenvectors
+        (2) Calculate x_hat by taking the dot product of the eigenvectors 
+        and our transposed Z
+        (3) Un-zscore the data
+        (4) Unstabilize the data
+        (5) Reshape the data into an 87 x 65 image
+
+        :param model: The PCA model we have trained
+        :param eigenvectors: The learned eigenvectors based on the features data
+        :param person_row: The person's image row that we want to reconstruct
+
+        :return the reconstructed and reshape x_hat
+        '''
+        # Project the person onto the eigen vectors
+        z = model.evaluate_model(person_row, eigenvectors)
+
+        # With our project data, we want to calculate x_hat
+        x_hat = np.dot(eigenvectors, z.T)
+
+        # Un-zscore our data
+        x_hat = math_util.un_zscore_data(x_hat, self.means, self.stds)
+
+        # Unstabilize our data
+        x_hat = math_util.unstablize_data(x_hat)
+
+        # Reshape our x_hat to 87 x 65
+        x_hat_reshape = np.reshape(x_hat, (87, 65))
+
+        # Return our x_hat_reshape to be displayed as an image
+        return x_hat_reshape
