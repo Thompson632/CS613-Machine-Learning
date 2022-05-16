@@ -50,10 +50,11 @@ def plot():
     X_2 = X[y == 2]
 
     # Plot our data
-    plt.scatter(X_1[:, 0], X_1[:, 1], marker="s")
-    plt.scatter(X_2[:, 0], X_2[:, 1], marker="o")
+    plt.scatter(X_1[:, 0], X_1[:, 1], marker="s", label='Class1')
+    plt.scatter(X_2[:, 0], X_2[:, 1], marker="o", label='Class2')
 
     # Save and show our plot
+    plt.legend()
     plt.savefig(filename)
     plt.show()
 
@@ -86,10 +87,11 @@ def pca():
 
     # Plot our data
     zero_y = np.zeros((z.shape))
-    plt.scatter(z[y == 1], zero_y[y == 1], marker="s")
-    plt.scatter(z[y == 2], zero_y[y == 2], marker="o")
+    plt.scatter(z[y == 1], zero_y[y == 1], marker="s", label='Class1')
+    plt.scatter(z[y == 2], zero_y[y == 2], marker="o", label='Class2')
 
     # Save and show our plot
+    plt.legend()
     plt.savefig(filename)
     plt.show()
 
@@ -122,10 +124,11 @@ def lda():
 
     # Plot our data
     zero_y = np.zeros((z.shape))
-    plt.scatter(z[y == 1], zero_y[y == 1], marker="s")
-    plt.scatter(z[y == 2], zero_y[y == 2], marker="o")
+    plt.scatter(z[y == 1], zero_y[y == 1], marker="s", label='Class1')
+    plt.scatter(z[y == 2], zero_y[y == 2], marker="o", label='Class2')
 
     # Save and show our plot
+    plt.legend()
     plt.savefig(filename)
     plt.show()
 
