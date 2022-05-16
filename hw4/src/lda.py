@@ -57,13 +57,13 @@ class LDA:
             
             # Update the within class scatter matrix
             SW += np.dot(class_mean_centered.T, class_mean_centered)
-            print("\nClass Centered Transposed:\n", class_mean_centered.T)
-            print("Class Centered Transposed:\n", class_mean_centered)
+            print("\nClass Mean Centered Transposed:\n", class_mean_centered.T)
+            print("Class Mean Centered:\n", class_mean_centered)
             print("SW:\n", SW)
             
             # Calculate the difference between the class mean and the overall mean
             mean_diff = (class_mean - overall_feature_mean)
-            print("Class Mean:\n", class_mean)
+            print("\nClass Mean:\n", class_mean)
             print("Overall Feature Mean:\n", overall_feature_mean)
             print("Class Mean - Overall Mean\n:", mean_diff)
             # Reshape our difference
@@ -72,7 +72,7 @@ class LDA:
             
             # Update the class scatter difference
             SB += num_class_observations * np.dot(mean_diff, mean_diff.T)
-            print("Num Class Observations:\n", num_class_observations)
+            print("\nNum Class Observations:\n", num_class_observations)
             print("Mean Diff:\n", mean_diff)
             print("Mean Diff Transposed:\n", mean_diff.T)
             print("SB:\n", SB)
