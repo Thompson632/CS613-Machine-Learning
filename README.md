@@ -19,7 +19,7 @@ The purpose of this repository is to hold the assignment deliverables for CS613 
 
 ## Homework 3: Classification
 - [Assignment](hw3/HW3.pdf)
-- [Theory](hw3/src/theory.csv)
+- [Theory](hw3/src/theory.py)
 - [Naive Bayes](hw3/src/naive_bayes.py)
 - [Decision Trees](hw3/src/decision_tree.py)
 - [Naive Bayes vs. Decision Tree Classification](hw3/src/test_classification.py)

@@ -32,9 +32,12 @@ class PCA:
         '''
         # Pre-process data to remove duplicate code
         eigenvalues, eigenvectors = self.preprocess_data(X)
+        print("\nEigenvalues:\n", eigenvalues)
+        print("Eigenvectors:\n", eigenvectors)
 
         # Sort the values and vectors
         _, sorted_vectors = self.sort_eigen(eigenvalues, eigenvectors)
+        print("Sorted Eigen Vectors:\n", sorted_vectors)
 
         # With our sorted vectors, select the top N-components
         largest_eigenvectors = sorted_vectors[:, :self.num_components]
@@ -86,11 +89,14 @@ class PCA:
 
         :return the eigenvalues and eigenvectors
         '''
+        print("Mean X:\n", math_util.calculate_mean(X, axis=0))
         # Center our features around zero
         X_centered = X - math_util.calculate_mean(X, axis=0)
-
+        print("X Centered:\n", X_centered)
+        print("X Centered Transposed:\n", X_centered.T)
         # Calculate the Covariance Matrix
         cov_matrix = np.cov(X_centered.T)
+        print("Covariance Matrix:\n", cov_matrix)
 
         # Compute eigenvalues and vectors
         eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
