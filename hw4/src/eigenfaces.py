@@ -40,6 +40,21 @@ class Eigenfaces:
 
         :return None
         '''
+        self.build_primary_component(num_components)
+        self.build_original_image()
+        self.reconstruct_ninety_five_percent_image_min_components()
+        self.reconstruct_full_image_min_components()
+
+    def build_primary_component(self, num_components=1):
+        '''
+        Builds our image using the primary component and then reconstructs
+        the image.
+
+        :param num_components: The default number of components we are to train 
+        our PCA model with
+
+        :return None
+        '''
         # Primary Component as Image
         model = PCA(num_components)
         eigenvectors = model.train_model(self.X)
@@ -53,7 +68,14 @@ class Eigenfaces:
         plot.plot_eigenfaces(title="Reconstructed Image Using One Component",
                              eigenvectors=one_component)
 
-        # Image Used for Compression/Reconstruction
+    def build_original_image(self):
+        '''
+        Builds our original image that we will be attempting to reconstruct.
+
+        :param None
+
+        :return None
+        '''
         num_features = np.shape(self.X)[1]
         model = PCA(num_features)
         eigenvectors = model.train_model(self.X)
@@ -62,29 +84,47 @@ class Eigenfaces:
         plot.plot_eigenfaces(title="Original Image",
                              eigenvectors=all_components)
 
-        # Determine Minimum Components for 95% Reconstruction
+    def reconstruct_ninety_five_percent_image_min_components(self):
+        '''
+        Computes the minimum number of components necessary to perform
+        95% reconstruction of our image. Then reconstructs the image
+        using the minimum number of components
+
+        :param None
+
+        :return None
+        '''
+        model = PCA()
         min_num_components, min_eigenvectors = model.determine_min_components(
             self.X)
         print("\nMinimum Number of Components Necessary to Perform 95% Reconstruction:",
               min_num_components)
 
-        # 95% Reconstructed Image with Min-Components
         model = PCA(min_num_components)
-        eigenvectors = model.train_model(self.X)
+        _ = model.train_model(self.X)
         person_row = self.X[self.person_index]
         min_components = self.reconstruct(model, min_eigenvectors, person_row)
         plot.plot_eigenfaces(
             title="95% Reconstruction Image", eigenvectors=min_components)
 
-        # Determine Minimum Components for 100% Reconstruction
+    def reconstruct_full_image_min_components(self):
+        '''
+        Computes the minimum number of components necessary to perform
+        100% reconstruction of our image. Then reconstructs the image
+        using the minimum number of components
+
+        :param None
+
+        :return None
+        '''
+        model = PCA()
         min_num_components, min_eigenvectors = model.determine_min_components(
             self.X, threshold=1)
         print("\nMinimum Number of Components Necessary to Perform 100% Reconstruction:",
               min_num_components)
 
-        # 100% Reconstructed Image with Min-Components
         model = PCA(min_num_components)
-        eigenvectors = model.train_model(self.X)
+        _ = model.train_model(self.X)
         person_row = self.X[self.person_index]
         min_components = self.reconstruct(model, min_eigenvectors, person_row)
         plot.plot_eigenfaces(
