@@ -44,6 +44,10 @@ The purpose of this repository is to hold the assignment deliverables for CS613 
     - [95% Reconstructed Image Using the Minimum Number of Components (180)](hw4/images/95_reconstruction_image.png)
     - [100% Reconstructed Image Using the Minimum Number of Components (180)](hw4/images/100_reconstruction_image.png)
 
+## Final Project: Predicting NCAA Men's March Madness
+- [PCA](project/src/pca.py)
+- [Logistic Regression](project/src/logistic_regression.py)
+- [Decision Tress](project/src/decision_tree.py)
 
 ## Authors
 [Robert Thompson](rt598@drexel.edu)
