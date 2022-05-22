@@ -1,70 +1,40 @@
 
 LOGISTIC REGRESSION CLASSIFIER:
 
-Data Shape: (32426, 80)
-Total Empty Values: 59403
-Training Shape: (21617, 80)
-Validation Shape: (10809, 80)
-Training x_train Shape: (21617, 79)
+Data Shape: (32426, 19)
+Training Shape: (21617, 19)
+Validation Shape: (10809, 19)
+Training x_train Shape: (21617, 18)
 Training y_train Shape: (21617,)
-Validation x_train Shape: (10809, 79)
+Validation x_train Shape: (10809, 18)
 Validation y_train Shape: (10809,)
-Training x_train_bias Shape: (21617, 80)
-Validation x_valid_bias Shape: (10809, 80)
+Training x_train_bias Shape: (21617, 19)
+Validation x_valid_bias Shape: (10809, 19)
 
 Learning Rate: 0.1
-Epochs: 10000
+Epochs: 1000
 
-Training Precision: 0.9988461815821735
-Training Recall: 0.9982702702702703
-Training F-Measure: 0.9985581428880398
-Training Accuracy: 0.9981496044779572
+Training Precision: 1
+Training Recall: 0.0
+Training F-Measure: 0.0
+Training Accuracy: 0.35814405329139104
 
-Validation Precision: 0.9989888776541962
-Validation Recall: 0.9984120109715605
-Validation F-Measure: 0.9987003610108303
-Validation Accuracy: 0.9983347210657785
-
-LOGISTIC REGRESSION CLASSIFIER WITH PCA:
-
-Data Shape: (32426, 80)
-Total Empty Values: 59403
-Training Shape: (21617, 80)
-Validation Shape: (10809, 80)
-Training x_train Shape: (21617, 79)
-Training y_train Shape: (21617,)
-Validation x_train Shape: (10809, 79)
-Validation y_train Shape: (10809,)
-Training x_train_bias Shape: (21617, 80)
-Validation x_valid_bias Shape: (10809, 80)
-
-Num Components: 100
-
-Learning Rate: 0.1
-Epochs: 10000
-
-Training Precision: 0.9988461815821735
-Training Recall: 0.9982702702702703
-Training F-Measure: 0.9985581428880398
-Training Accuracy: 0.9981496044779572
-
-Validation Precision: 0.9989888776541962
-Validation Recall: 0.9984120109715605
-Validation F-Measure: 0.9987003610108303
-Validation Accuracy: 0.9983347210657785
+Validation Precision: 1
+Validation Recall: 0.0
+Validation F-Measure: 0.0
+Validation Accuracy: 0.3591451568137663
 
 DECISION TREE CLASSIFIER:
 
-Data Shape: (32426, 80)
-Total Empty Values: 59403
-Training Shape: (21617, 80)
-Validation Shape: (10809, 80)
-Training x_train Shape: (21617, 79)
+Data Shape: (32426, 19)
+Training Shape: (21617, 19)
+Validation Shape: (10809, 19)
+Training x_train Shape: (21617, 18)
 Training y_train Shape: (21617,)
-Validation x_train Shape: (10809, 79)
+Validation x_train Shape: (10809, 18)
 Validation y_train Shape: (10809,)
-Training x_train_bias Shape: (21617, 80)
-Validation x_valid_bias Shape: (10809, 80)
+Training x_train_bias Shape: (21617, 19)
+Validation x_valid_bias Shape: (10809, 19)
 
 Min Observation Split: 2
 Min Information Gain: 0
@@ -74,35 +44,7 @@ Training Recall: 1.0
 Training F-Measure: 1.0
 Training Accuracy: 1.0
 
-Validation Precision: 0.9979812545061283
-Validation Recall: 0.9991338241663058
-Validation F-Measure: 0.9985572067522724
-Validation Accuracy: 0.9981496900730873
-
-DECISION TREE CLASSIFIER WITH PCA:
-
-Data Shape: (32426, 80)
-Total Empty Values: 59403
-Training Shape: (21617, 80)
-Validation Shape: (10809, 80)
-Training x_train Shape: (21617, 79)
-Training y_train Shape: (21617,)
-Validation x_train Shape: (10809, 79)
-Validation y_train Shape: (10809,)
-Training x_train_bias Shape: (21617, 80)
-Validation x_valid_bias Shape: (10809, 80)
-
-Num Components: 100
-
-Min Observation Split: 2
-Min Information Gain: 0
-
-Training Precision: 1.0
-Training Recall: 1.0
-Training F-Measure: 1.0
-Training Accuracy: 1.0
-
-Validation Precision: 0.9357256088773599
-Validation Recall: 0.9373466146961167
-Validation F-Measure: 0.9365354103562671
-Validation Accuracy: 0.9185863632158386
+Validation Precision: 0.9987018606663782
+Validation Recall: 0.9995669120831528
+Validation F-Measure: 0.9991341991341992
+Validation Accuracy: 0.9988898140438524

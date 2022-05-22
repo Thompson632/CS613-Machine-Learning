@@ -1,7 +1,8 @@
 import numpy as np
+import pandas as pd
 
 
-def load_data(filename, rows_to_skip=None):
+def load_data(filename, columns=None):
     '''
     Reads in a file as a numpy ndarray and returns the data. 
     Added a flag for skipping rows if it value is provided.
@@ -12,10 +13,10 @@ def load_data(filename, rows_to_skip=None):
 
     :return the numpy ndarray of data
     '''
-    if rows_to_skip is not None:
-        return np.loadtxt(filename, delimiter=',', skiprows=rows_to_skip, dtype=str)
-
-    return np.loadtxt(filename, delimiter=',', dtype=str)
+    data = pd.read_csv(filename, usecols=columns)
+    data = data.reindex(columns=columns)
+    data = data.to_numpy()
+    return data
 
 
 def shuffle_data(data, reseed_val):
@@ -31,7 +32,6 @@ def shuffle_data(data, reseed_val):
     np.random.seed(reseed_val)
     np.random.shuffle(data)
     return data
-
 
 def get_train_valid_data(data):
     '''
@@ -64,9 +64,10 @@ def get_features_actuals(data):
     :return the features data as X
     :return the actual data as y
     '''
-    X = data[:, : -1] # Every Column Except Last
-    y = data[:, -1] # Last Column is our Target
+    X = data[:, : -1]  # Every Column Except Last
+    y = data[:, -1]  # Last Column is our Target
     return X.astype(float), y.astype(float)
+
 
 def add_bias_feature(X):
     '''
@@ -83,6 +84,7 @@ def add_bias_feature(X):
     ones = np.ones((num_observations, 1))
     X = np.concatenate((ones, X), axis=1)
     return X
+
 
 def merge_arrays(X, y):
     '''
