@@ -169,5 +169,29 @@ class LogisticRegression():
         y_hat = self.compute_y_hat(X)
 
         # Compute sigmoid (or logistic function)
-        probability = self.compute_sigmoid(y_hat)
-        return probability.flatten()
+        probabilities = self.compute_sigmoid(y_hat).flatten()
+        prob_threshold = self.evaluate_with_threshold(probabilities)
+
+        return prob_threshold
+
+    def evaluate_with_threshold(self, y_hat, threshold=0.5):
+        '''
+        Iterates through the y_hat values sets the values to 1 if there
+        value is greater than the threshold (0.5) provided or to 0
+        if the value is less than the threshold provided.
+
+        :param y_hat: The predicted values
+        :param threshold: The static threshold value
+
+        :return the predictions evaluated with a threshold value
+        '''
+        y_hat_with_threshold = []
+
+        # Add threshold for computing the classifiers
+        # If the current y_hat_val is greater than or equal to the threshold, set to 1. Otherwise, set to 0.
+        y_hat_t = [1 if y_hat_val >= threshold else 0 for y_hat_val in y_hat]
+        y_hat_with_threshold.append(y_hat_t)
+
+        # Flatten to one dimension
+        y_hat_with_threshold = np.array(y_hat_with_threshold).flatten()
+        return y_hat_with_threshold

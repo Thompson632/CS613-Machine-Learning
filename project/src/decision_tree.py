@@ -300,15 +300,7 @@ class DecisionTree:
 
         :return the predicted classes
         '''
-        class_preds = []
-
-        # For each observation...
-        for x in X:
-            # Get the class to assign to this observation
-            class_to_assign = self.search_tree(x, self.root)
-
-            # Assign the class
-            class_preds.append(class_to_assign)
+        class_preds = ([self.search_tree(x, self.root) for x in X])
 
         return np.array(class_preds)
 
