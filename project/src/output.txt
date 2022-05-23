@@ -1,40 +1,22 @@
 
 LOGISTIC REGRESSION CLASSIFIER:
 
-Data Shape: (32426, 19)
-Training Shape: (21617, 19)
-Validation Shape: (10809, 19)
-Training x_train Shape: (21617, 18)
-Training y_train Shape: (21617,)
-Validation x_train Shape: (10809, 18)
-Validation y_train Shape: (10809,)
-Training x_train_bias Shape: (21617, 19)
-Validation x_valid_bias Shape: (10809, 19)
 
 Learning Rate: 0.1
 Epochs: 1000
 
-Training Precision: 1
-Training Recall: 0.0
-Training F-Measure: 0.0
-Training Accuracy: 0.35814405329139104
+Training Precision: 0.983064283655232
+Training Recall: 0.9831351351351352
+Training F-Measure: 0.9830997081186262
+Training Accuracy: 0.9783041125040478
 
-Validation Precision: 1
-Validation Recall: 0.0
-Validation F-Measure: 0.0
-Validation Accuracy: 0.3591451568137663
+Validation Precision: 0.9842462783639254
+Validation Recall: 0.9831095712429623
+Validation F-Measure: 0.9836775964177379
+Validation Accuracy: 0.9790914978258858
 
 DECISION TREE CLASSIFIER:
 
-Data Shape: (32426, 19)
-Training Shape: (21617, 19)
-Validation Shape: (10809, 19)
-Training x_train Shape: (21617, 18)
-Training y_train Shape: (21617,)
-Validation x_train Shape: (10809, 18)
-Validation y_train Shape: (10809,)
-Training x_train_bias Shape: (21617, 19)
-Validation x_valid_bias Shape: (10809, 19)
 
 Min Observation Split: 2
 Min Information Gain: 0
@@ -44,7 +26,7 @@ Training Recall: 1.0
 Training F-Measure: 1.0
 Training Accuracy: 1.0
 
-Validation Precision: 0.9987018606663782
-Validation Recall: 0.9995669120831528
-Validation F-Measure: 0.9991341991341992
-Validation Accuracy: 0.9988898140438524
+Validation Precision: 0.9985576229626424
+Validation Recall: 0.9994225494442038
+Validation F-Measure: 0.998989898989899
+Validation Accuracy: 0.9987047830511611

@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from pyparsing import col
 
 
 def load_data(filename, columns=None):
@@ -13,9 +14,15 @@ def load_data(filename, columns=None):
 
     :return the numpy ndarray of data
     '''
-    data = pd.read_csv(filename, usecols=columns)
-    data = data.reindex(columns=columns)
+    data = None
+    
+    if columns is not None:
+        data = pd.read_csv(filename, usecols=columns)
+    else:
+        data = pd.read_csv(filename)
+
     data = data.to_numpy()
+    data[np.isnan(data)] = 0
     return data
 
 

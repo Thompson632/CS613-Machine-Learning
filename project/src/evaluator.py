@@ -250,15 +250,20 @@ class Evaluator():
 
         :return none
         '''
+        title = "Training vs Validation Log Loss"
+        filename = title.lower().replace(" ", "_") + ".png"
+        
         fig = plt.figure(figsize=(8, 6))
-        plt.title("Training vs. Validation Loss")
+        plt.title(title)
         plt.xlabel('Epochs')
         plt.ylabel('Mean Log Loss')
         plt.plot([i for i in range(epochs)], train_log_loss, label="Training")
         plt.plot([i for i in range(epochs)],
                  valid_log_loss, label="Validation")
         plt.legend()
+        plt.savefig(filename)
         plt.show()
+        
 
     def plot_precision_recall(self, train_precisions, train_recalls, valid_precisions, valid_recalls):
         '''
@@ -271,11 +276,14 @@ class Evaluator():
 
         :return none
         '''
+        title = "Training vs Validation Precision-Recall"
+        filename = title.lower().replace(" ", "_") + ".png"
+        
         fig, ax = plt.subplots()
         ax.plot(train_recalls, train_precisions, label="Training")
         ax.plot(valid_recalls, valid_precisions, label="Validation")
 
-        ax.set_title("Training vs. Validation Precision-Recall")
+        ax.set_title(title)
         ax.set_ylabel('Precision')
         ax.set_xlabel('Recall')
 
@@ -285,4 +293,5 @@ class Evaluator():
         ax.yaxis.set_ticks(np.arange(0, 1, 0.1))
 
         plt.legend()
+        plt.savefig(filename)
         plt.show()

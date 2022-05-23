@@ -3,6 +3,8 @@ import data_util
 from evaluator import Evaluator
 from logistic_regression import LogisticRegression
 from decision_tree import DecisionTree
+import numpy as np
+
 
 def generate_game_fields(fields, target):
     away_columns = []
@@ -19,30 +21,21 @@ def generate_game_fields(fields, target):
 def load_data(filename, columns):
     data = data_util.load_data(filename, columns=columns)
     data = data_util.shuffle_data(data, 0)
-    print("Data Shape:", data.shape)
 
     training, validation = data_util.get_train_valid_data(data)
-    print("Training Shape:", training.shape)
-    print("Validation Shape:", validation.shape)
 
     x_train, y_train = data_util.get_features_actuals(training)
-    print("Training x_train Shape:", x_train.shape)
-    print("Training y_train Shape:", y_train.shape)
-
     x_valid, y_valid = data_util.get_features_actuals(validation)
-    print("Validation x_train Shape:", x_valid.shape)
-    print("Validation y_train Shape:", y_valid.shape)
 
     means, stds = math_util.calculate_feature_mean_std(x_train)
     x_train_zscored = math_util.z_score_data(x_train, means, stds)
     x_valid_zscored = math_util.z_score_data(x_valid, means, stds)
 
     x_train_bias = data_util.add_bias_feature(x_train_zscored)
-    print("Training x_train_bias Shape:", x_train_bias.shape)
     x_valid_bias = data_util.add_bias_feature(x_valid_zscored)
-    print("Validation x_valid_bias Shape:", x_valid_bias.shape)
 
     return x_train_bias, y_train, x_valid_bias, y_valid
+
 
 def logistic_regression(filename, learning_rate, epochs, stability, columns):
     print("\nLOGISTIC REGRESSION CLASSIFIER:\n")
@@ -54,7 +47,8 @@ def logistic_regression(filename, learning_rate, epochs, stability, columns):
     print("\nLearning Rate:", learning_rate)
     print("Epochs:", epochs)
 
-    _, _ = model.train_model(X_train, y_train, X_valid, y_valid)
+    train_losses, valid_losses = model.train_model(X_train, y_train, X_valid, y_valid)
+    eval.plot_mean_log_loss(train_losses, valid_losses, epochs)
 
     train_preds = model.evaluate_model(X_train)
     valid_preds = model.evaluate_model(X_valid)
@@ -72,6 +66,7 @@ def logistic_regression(filename, learning_rate, epochs, stability, columns):
     print("Validation Recall:", valid_recall)
     print("Validation F-Measure:", valid_f_measure)
     print("Validation Accuracy:", valid_accuracy)
+
 
 def decision_tree(filename, min_observation_split, min_information_gain, columns):
     print("\nDECISION TREE CLASSIFIER:\n")
@@ -110,7 +105,7 @@ fields = ['offensive_rating', 'effective_field_goal_percentage', 'total_rebound_
           'free_throw_percentage', 'three_point_attempt_rate', 'three_point_field_goal_percentage', 'turnover_percentage', 'true_shooting_percentage']
 
 # Prepend away and home to each field
-game_fields = generate_game_fields(fields,"home_win")
+game_fields = generate_game_fields(fields, "home_win")
 
 logistic_regression(filename="games.csv", learning_rate=0.1,
                     epochs=1000, stability=10e-7, columns=game_fields)
