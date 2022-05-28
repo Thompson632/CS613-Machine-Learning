@@ -3,7 +3,6 @@ import numpy as np
 
 
 class PCA:
-
     def __init__(self, num_components=2):
         '''
         Constructor that takes in the number of components to be selected when 
