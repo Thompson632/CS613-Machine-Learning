@@ -108,7 +108,24 @@ def random_forest(filename, forest_size, game_fields):
 
     X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
 
+    # TODO: Fit and Predict with RF Model
+    model = None
+
     eval = Evaluator()
+
+    # train_precision, train_recall, train_f_measure, train_accuracy = eval.evaluate_classifier(
+    #     y_train, train_preds)
+    # print("\nTraining Precision:", train_precision)
+    # print("Training Recall:", train_recall)
+    # print("Training F-Measure:", train_f_measure)
+    # print("Training Accuracy:", train_accuracy)
+
+    # valid_precision, valid_recall, valid_f_measure, valid_accuracy = eval.evaluate_classifier(
+    #     y_valid, valid_preds)
+    # print("\nValidation Precision:", valid_precision)
+    # print("Validation Recall:", valid_recall)
+    # print("Validation F-Measure:", valid_f_measure)
+    # print("Validation Accuracy:", valid_accuracy)
 
 
 def pca_logistic_regression(filename, learning_rate, epochs, stability, game_fields):

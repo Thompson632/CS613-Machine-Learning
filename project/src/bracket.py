@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import re
 
 
-class Bracket():
+class Bracket:
     def __init__(self, year, model, fields, game_fields):
         self.year = year
         self.bracket, self.winners_bracket = self.get_bracket()
