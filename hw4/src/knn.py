@@ -19,7 +19,7 @@ class KNN:
         self.X_train = None
         self.y_train = None
 
-    def train_model(self, X, y):
+    def fit(self, X, y):
         '''
         Training method that sets our X and y training data to be
         used when we evaluate our model.
@@ -32,7 +32,7 @@ class KNN:
         self.X_train = X
         self.y_train = y
 
-    def evaluate_model(self, X):
+    def predict(self, X):
         '''
         Evaluates our model by iterating through each validation point to 
         assigned a class to the observation.
@@ -46,12 +46,12 @@ class KNN:
         # For each validation observation...
         for x in X:
             # Determine the class to assign
-            class_to_assign = self.evaluate(x)
+            class_to_assign = self._predict(x)
             class_preds.append(class_to_assign)
 
         return np.array(class_preds)
 
-    def evaluate(self, x):
+    def _predict(self, x):
         '''
         Evaluates our model by doing the following:
         (1) Computing the distance between the validation point and all points 

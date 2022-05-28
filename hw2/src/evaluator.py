@@ -2,8 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class Evaluator():
-
+class Evaluator:
     def compute_classification_error_types(self, y, y_hat):
         '''
         Computes the classification error types between the actual and predicted data.

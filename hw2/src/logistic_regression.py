@@ -1,8 +1,8 @@
 import numpy as np
 
 
-class LogisticRegression():
-    def __init__(self, lr, epochs, stability_constant):
+class LogisticRegression:
+    def __init__(self, lr=0.1, epochs=1000, stability_constant=10e-7):
         '''
         Constructor that takes in a learning rate value
         and the number of epochs to be ran in our 
@@ -37,7 +37,7 @@ class LogisticRegression():
         '''
         Computes our y_hat based on the features, weights, and bias
 
-        :param X: The features
+        :param X: The features data
 
         :return the predicted value
         '''
@@ -47,8 +47,8 @@ class LogisticRegression():
         '''
         Computes the mean log loss of the data
 
-        :param y: Actual value
-        :param y_hat: Predicted value
+        :param y: The target data
+        :param y_hat: The predictions
 
         :return the mean log loss of the data
         '''
@@ -64,9 +64,9 @@ class LogisticRegression():
         Computes the partial derivatives of weights and bias
         with respect to the loss.
 
-        :param X: Features
-        :param y: Actual values
-        :param y_hat: Predicted values
+        :param X: The features data
+        :param y: The target data
+        :param y_hat: The predictions
 
         :return the derivative of weights
         :return the derivative of bias
@@ -81,16 +81,16 @@ class LogisticRegression():
 
         return dw, db
 
-    def train_model(self, x_train, y_train, x_valid, y_valid):
+    def fit(self, x_train, y_train, x_valid, y_valid):
         '''
         Trains a logistic regression model using gradient descent
         and sigmoid (or the logistic function). The eventual output will
         be the training and validation data mean log loss.
 
-        :param x_train: Training features
-        :param y_train: Training actuals
-        :param x_valid: Validation features
-        :param y_valid: Validation actuals
+        :param x_train: The training features data
+        :param y_train: the training target data 
+        :param x_valid: The validation features data
+        :param y_valid: The validation target data 
 
         :return training mean log loss
         :return validation mean log loss
@@ -126,13 +126,14 @@ class LogisticRegression():
     def compute_gradients(self, x_train, y_train, x_valid):
         '''
         Computes the gradients by first calculating the y_hat for the 
-        training and validation data. Next, it compute the sigmoid (or logistic function)
-        in order to get the probably values for each training set. Once that is done,
-        we are able to calculate the derivates of the weights and bias'.
+        training and validation data. Next, it compute the sigmoid (or logistic 
+        function) in order to get the probably values for each training set. 
+        Once that is done, we are able to calculate the derivates of the weights
+        and bias'.
 
-        :param x_train: Training features
-        :param y_train: Training actuals
-        :param x_valid: Validation features
+        :param x_train: The training features data
+        :param y_train: The training target data 
+        :param x_valid: The validation features data
 
         :return derivative of weights with respect to loss
         :return derivative of bias with respect to bias
@@ -153,7 +154,7 @@ class LogisticRegression():
 
         return dw, db, train_probability, valid_probability
 
-    def evaluate_model(self, X):
+    def predict(self, X):
         '''
         Evaluates the model for the provided data by computing
         the gradient descent and sigmoid. Once evaluated, we
@@ -161,13 +162,13 @@ class LogisticRegression():
         the current value in y_hat is greater than 0.5, we set that
         value to 1. Otherwise, we will set it to 0.
 
-        :param X: The training or validation data
+        :param X: The features data
 
-        :return the predicted values
+        :return the classifier predictions
         '''
         # Compute y_hat
         y_hat = self.compute_y_hat(X)
 
         # Compute sigmoid (or logistic function)
-        probability = self.compute_sigmoid(y_hat)
-        return probability.flatten()
+        probabilities = self.compute_sigmoid(y_hat).flatten()
+        return probabilities

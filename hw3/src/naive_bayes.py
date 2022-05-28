@@ -25,7 +25,7 @@ class NaiveBayes:
 
         self.stability_constant = stability_constant
 
-    def train_model(self, X, y):
+    def fit(self, X, y):
         '''
         Trains our model by computing the mean and standard devation for each
         column associated with the specific class we are training on
@@ -67,7 +67,7 @@ class NaiveBayes:
             self.class_stds[i, :] = math_util.calculate_std(
                 class_observations, 0)
 
-    def evaluate_model(self, X):
+    def predict(self, X):
         '''
         Evaluates our models by iterating through each observation
         in the validation data, assigning the class with the highest
@@ -77,26 +77,11 @@ class NaiveBayes:
 
         :return the predicted classes 
         '''
-        class_preds = []
-
-        # For each observation...
-        for x in X:
-            # Calculate the probabilities for each class for
-            # this observation
-            class_probabilities = self.compute_class_probabilities(x)
-
-            # Get the index of the max class probability
-            max_probability_index = np.argmax(class_probabilities)
-
-            # Get the class associated with this index
-            class_to_assign = self.classes[max_probability_index]
-
-            # Assign the class
-            class_preds.append(class_to_assign)
+        class_preds = ([self._predict(x) for x in X])
 
         return np.array(class_preds)
 
-    def compute_class_probabilities(self, x):
+    def _predict(self, x):
         '''
         Computes the probabilities of each classes being assigned to
         the given observation. We compute the probability for each class
@@ -134,7 +119,13 @@ class NaiveBayes:
             posterior = prior + sum_gpdf
             posteriors.append(posterior)
 
-        return posteriors
+        # Get the index of the max class probability
+        max_probability_index = np.argmax(posteriors)
+
+        # Get the class associated with this index
+        class_to_assign = self.classes[max_probability_index]
+
+        return class_to_assign
 
     def compute_gaussian_pdf(self, x, means, stds):
         '''

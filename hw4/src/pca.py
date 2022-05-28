@@ -3,7 +3,6 @@ import numpy as np
 
 
 class PCA:
-
     def __init__(self, num_components=2):
         '''
         Constructor that takes in the number of components to be selected when 
@@ -16,7 +15,7 @@ class PCA:
         '''
         self.num_components = num_components
 
-    def train_model(self, X):
+    def fit(self, X):
         '''
         Compute the principal components by first pre-processing the input data 
         in order to get our zero centered features, our eigenvalues, and eigen
@@ -31,7 +30,7 @@ class PCA:
         :return the eigenvectors of the largest principal components
         '''
         # Pre-process data to remove duplicate code
-        eigenvalues, eigenvectors = self.preprocess_data(X)
+        eigenvalues, eigenvectors = self.preprocess(X)
 
         # Sort the values and vectors
         _, sorted_vectors = self.sort_eigen(eigenvalues, eigenvectors)
@@ -41,7 +40,7 @@ class PCA:
         
         return largest_eigenvectors
 
-    def whiten_data(self, X):
+    def whiten(self, X):
         '''
         Whitens our principal component(s) by first pre-processing the input 
         data in order to get our zero centered features, our eigenvalues, and 
@@ -54,14 +53,14 @@ class PCA:
         :return the whitened eigenvectors of the principal components
         '''
         # Pre-process data to remove duplicate code
-        eigenvalues, eigenvectors = self.preprocess_data(X)
+        eigenvalues, eigenvectors = self.preprocess(X)
 
         # Whiten our eigenvectors
         whitened_eigenvectors = eigenvectors / np.sqrt(eigenvalues)
         
         return whitened_eigenvectors
 
-    def evaluate_model(self, X, projection):
+    def predict(self, X, projection):
         '''
         Evaluates our model by projecting our features data into the 
         eigenvectors space passed in as a parameter.
@@ -74,7 +73,7 @@ class PCA:
         '''
         return np.dot(X, projection)
 
-    def preprocess_data(self, X):
+    def preprocess(self, X):
         '''
         Helper function that pre-processes the feature data by performing the 
         following:
@@ -150,7 +149,7 @@ class PCA:
         min_components = 0
 
         # Pre-process data to remove duplicate code
-        eigenvalues, eigenvectors = self.preprocess_data(X)
+        eigenvalues, eigenvectors = self.preprocess(X)
 
         # Sort the values and vectors
         sorted_values, sorted_vectors = self.sort_eigen(

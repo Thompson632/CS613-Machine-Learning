@@ -15,7 +15,7 @@ class LDA:
         '''
         self.num_components = num_components
 
-    def train_model(self, X, y):
+    def fit(self, X, y):
         '''
         Trains our model for Linear Disciminant Analysis
         
@@ -98,7 +98,7 @@ class LDA:
         
         return largest_eigenvectors
 
-    def evaluate_model(self, X, projection):
+    def predict(self, X, projection):
         '''
         Evaluates our model by projecting our features data into the 
         eigenvectors space passed in as a parameter.

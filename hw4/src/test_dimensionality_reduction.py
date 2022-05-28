@@ -44,11 +44,11 @@ def pca(filename, num_components):
 
     model = PCA(num_components)
 
-    eigenvectors = model.train_model(X)
-    z = model.evaluate_model(X, eigenvectors)
+    eigenvectors = model.fit(X)
+    z = model.predict(X, eigenvectors)
 
-    whitened_eigenvectors = model.whiten_data(z)
-    z_whitened = model.evaluate_model(z, whitened_eigenvectors)
+    whitened_eigenvectors = model.whiten(z)
+    z_whitened = model.predict(z, whitened_eigenvectors)
 
     plot.plot_pca_scatterplot(title="Non-Whitened PCA", data=z)
     plot.plot_pca_scatterplot(title="Whitened PCA", data=z_whitened)
@@ -62,8 +62,8 @@ def knn(filename, k):
     num_components = np.shape(X_train)[1]
 
     knn = KNN(k)
-    knn.train_model(X_train, y_train)
-    valid_preds = knn.evaluate_model(X_valid)
+    knn.fit(X_train, y_train)
+    valid_preds = knn.predict(X_valid)
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
@@ -77,28 +77,28 @@ def knn_pca(filename, k, num_components):
 
     pca_model = PCA(num_components)
 
-    eigenvectors = pca_model.train_model(X_train)
-    z_train = pca_model.evaluate_model(X_train, eigenvectors)
-    z_valid = pca_model.evaluate_model(X_valid, eigenvectors)
+    eigenvectors = pca_model.fit(X_train)
+    z_train = pca_model.predict(X_train, eigenvectors)
+    z_valid = pca_model.predict(X_valid, eigenvectors)
 
     knn_model = KNN(k)
-    knn_model.train_model(z_train, y_train)
-    valid_preds = knn_model.evaluate_model(z_valid)
+    knn_model.fit(z_train, y_train)
+    valid_preds = knn_model.predict(z_valid)
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
     print("K =", k, "D =", num_components, "\nAccuracy:", valid_accuracy)
 
     print("\nK-NEAREST NEIGHBORS (KNN) WITH PCA WHITENED")
-    whitened_eigenvectors = pca_model.whiten_data(z_train)
-    z_train_whiten = pca_model.evaluate_model(
+    whitened_eigenvectors = pca_model.whiten(z_train)
+    z_train_whiten = pca_model.predict(
         z_train, whitened_eigenvectors)
-    z_valid_whiten = pca_model.evaluate_model(
+    z_valid_whiten = pca_model.predict(
         z_valid, whitened_eigenvectors)
 
     knn_model = KNN(k)
-    knn_model.train_model(z_train_whiten, y_train)
-    valid_preds = knn_model.evaluate_model(z_valid_whiten)
+    knn_model.fit(z_train_whiten, y_train)
+    valid_preds = knn_model.predict(z_valid_whiten)
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)

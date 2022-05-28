@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from pyparsing import col
 
 
 def load_data(filename, columns=None):
@@ -9,13 +8,13 @@ def load_data(filename, columns=None):
     Added a flag for skipping rows if it value is provided.
 
     :param filename: The name of the filename to be loaded
-    :param rows_to_skip: Optional parameter that if set will
-    skip the specified rows in the file            
+    :param columns: Optional parameter that if set will
+    only read the specified columns      
 
     :return the numpy ndarray of data
     '''
     data = None
-    
+
     if columns is not None:
         data = pd.read_csv(filename, usecols=columns)
     else:
@@ -40,6 +39,7 @@ def shuffle_data(data, reseed_val):
     np.random.shuffle(data)
     return data
 
+
 def get_train_valid_data(data):
     '''
     Gets the training and validation data by first calculating the index of the 
@@ -51,12 +51,10 @@ def get_train_valid_data(data):
 
     :return training, validation data
     '''
-    # Get the index value of the 2/3 data
     training_index = round(len(data) * (2/3))
 
-    # Set our training and validation data sets based on the 2/3 index
-    training = data[:training_index]  # begin-training_index
-    validation = data[training_index:]  # training_index-end
+    training = data[:training_index]
+    validation = data[training_index:]
 
     return training, validation
 
@@ -163,3 +161,19 @@ def get_observation_counts(X=None, y=None, c=None):
 
     count = np.shape(observations)[0]
     return observations, count
+
+
+def convert_list_to_2d_array(list_to_be_converted):
+    '''
+    Helper function that converts a list of arrays to a numpy 2D array
+    by swapping the axis. For example, if we execute len(list), it will
+    only return the number of elements that are in the list but will not
+    provide the shape (or length) of the elements in the list. If we convert
+    this list to a 2D numpy array, it will have the following shape: 
+    (n-elements-in-array, 20)
+
+    :param list_to_be_converted: The list to be converted to a numpy 2D array
+
+    :return the list convert to a numpy 2D array
+    '''
+    return np.swapaxes(a=list_to_be_converted, axis1=0, axis2=1)

@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def load_data(filename, should_read_as_strings):
+def load_data(filename, should_read_as_strings=False):
     '''
     Reads in a file as a numpy ndarray and returns the data. 
     Added a flag to read in the data as strings in the case
@@ -55,7 +55,7 @@ def get_train_valid_data(data):
     return training, validation
 
 
-def get_features_actuals(data, should_convert_to_float):
+def get_features_actuals(data, should_convert_to_float=False):
     '''
     Helper function that retrieves the features and
     actual values from the data. 

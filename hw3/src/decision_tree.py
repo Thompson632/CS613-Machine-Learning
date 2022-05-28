@@ -1,12 +1,40 @@
-from node import Node
 import math_util
 import data_util
 
 import numpy as np
 
 
+class Node:
+    def __init__(self, feature_index=None, threshold=None, left_subtree=None, right_subtree=None, leaf_value=None):
+        '''
+        Constructor that creates either a decision node or a leaf node based on whether or not a given
+        feature value meets the required threshold for the given feature. If this class is a decision
+        node, all attributes will be set except for the leaf_value attribute. If this class is a leaf
+        node, the only attribute that will be set is the leaf_value attribute.
+
+        :param feature_index: The index of the feature in the dataset
+        :param threshold: The minimum threshold value for this given feature. In our case,
+        we are taking the threshold to be the mean of the entire feature
+        :param left_subtree: The left sub-tree where feature values were less than
+        or equal to the threshold value
+        :param right_subtree: The right sub-tree where feature values were greater
+        than the threshold value
+        :param leaf_value: The value (or classification) of this node if it is a leaf
+
+        return this node
+        '''
+        # For decision node
+        self.feature_index = feature_index
+        self.threshold = threshold
+        self.left_subtree = left_subtree
+        self.right_subtree = right_subtree
+
+        # For leaf node
+        self.leaf_value = leaf_value
+
+
 class DecisionTree:
-    def __init__(self, min_observation_split, min_information_gain):
+    def __init__(self, min_observation_split=2, min_information_gain=0):
         '''
         Constructor that creates our decision tree classifier. The construction takes in
         a value for the minimum observations required to continue splitting the feature data, 
@@ -26,7 +54,7 @@ class DecisionTree:
         self.min_observation_split = min_observation_split
         self.min_information_gain = min_information_gain
 
-    def train_model(self, X, y):
+    def fit(self, X, y):
         '''
         Method that is used to train our model or in this case, we are building
         a decision tree to be used in order to classify an observation.
@@ -263,7 +291,7 @@ class DecisionTree:
 
         return class_to_assign
 
-    def evaluate_model(self, X):
+    def predict(self, X):
         '''
         Evaluates our model (or tree) by iterating through each observation in the validation
         data, recursively search our model (or tree) until we reach a leaf node, return the 
@@ -274,19 +302,11 @@ class DecisionTree:
 
         :return the predicted classes
         '''
-        class_preds = []
-
-        # For each observation...
-        for x in X:
-            # Get the class to assign to this observation
-            class_to_assign = self.search_tree(x, self.root)
-
-            # Assign the class
-            class_preds.append(class_to_assign)
+        class_preds = ([self._predict(x, self.root) for x in X])
 
         return np.array(class_preds)
 
-    def search_tree(self, x, tree):
+    def _predict(self, x, tree):
         '''
         Recursive function that searches our decision tree by using our 
         current decision node's threhold value to determine what branch (left or right)
@@ -313,6 +333,6 @@ class DecisionTree:
         # We can do this by comparing our feature value against the current
         # node's threshold value similar to what we did when we built the tree
         if feature_value <= tree.threshold:
-            return self.search_tree(x, tree.left_subtree)
+            return self._predict(x, tree.left_subtree)
         else:
-            return self.search_tree(x, tree.right_subtree)
+            return self._predict(x, tree.right_subtree)

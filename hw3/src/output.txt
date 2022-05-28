@@ -1,17 +1,22 @@
+
+======================================================
 NAIVES BAYES CLASSIFIER:
 Validation Precision: 0.655373831775701
 Validation Recall: 0.9739583333333334
 Validation F-Measure: 0.7835195530726258
 Validation Accuracy: 0.7979139504563233
 
+======================================================
 DECISION TREE CLASSIFIER:
 Validation Precision: 0.8317307692307693
 Validation Recall: 0.9010416666666666
 Validation F-Measure: 0.8650000000000001
 Validation Accuracy: 0.894393741851369
 
+======================================================
 MULTI-CLASS NAIVE BAYES CLASSIFIER:
 Validation Accuracy: 0.8166431593794076
 
+======================================================
 MULTI-CLASS DECISION TREE CLASSIFIER:
 Validation Accuracy: 0.8998589562764456

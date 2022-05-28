@@ -1,5 +1,6 @@
-Binary Logistic Regression:
 
+======================================================
+BINARY LOGISTIC REGRESSION
 Training Precision: 0.9267676767676768
 Training Recall: 0.8900565885206144
 Training F-Measure: 0.9080412371134021
@@ -12,8 +13,8 @@ Validation Accuracy: 0.9302477183833116
 
 
 
-Multi-Class Logistic Regression:
-
+======================================================
+MULTI-CLASS LOGISTIC REGRESSION:
 Validation Accuracy: 0.96
 Confusion Matrix:
  [[19.  0.  0.]

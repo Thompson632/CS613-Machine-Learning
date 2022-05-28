@@ -41,13 +41,14 @@ def load_ctg(filename):
 
 
 def naive_bayes(stability_constant, filename):
+    print("\n======================================================")
     print("NAIVES BAYES CLASSIFIER:")
 
     x_train, y_train, x_valid, y_valid = load_spambase(filename)
 
     nb = NaiveBayes(stability_constant=stability_constant)
-    nb.train_model(x_train, y_train)
-    valid_preds = nb.evaluate_model(x_valid)
+    nb.fit(x_train, y_train)
+    valid_preds = nb.predict(x_valid)
 
     eval = Evaluator()
     valid_precision, valid_recall, valid_f_measure, valid_accuracy = eval.evaluate_classifier(
@@ -60,13 +61,14 @@ def naive_bayes(stability_constant, filename):
 
 
 def multi_class_naive_bayes(stability_constant, filename):
-    print("\nMULTI-CLASS NAIVE BAYES CLASSIFIER:")
+    print("\n======================================================")
+    print("MULTI-CLASS NAIVE BAYES CLASSIFIER:")
 
     x_train, y_train, x_valid, y_valid = load_ctg(filename)
 
     nb = NaiveBayes(stability_constant=stability_constant)
-    nb.train_model(x_train, y_train)
-    valid_preds = nb.evaluate_model(x_valid)
+    nb.fit(x_train, y_train)
+    valid_preds = nb.predict(x_valid)
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)
@@ -74,15 +76,16 @@ def multi_class_naive_bayes(stability_constant, filename):
 
 
 def decision_tree(filename, min_observation_split, min_information_gain):
-    print("\nDECISION TREE CLASSIFIER:")
+    print("\n======================================================")
+    print("DECISION TREE CLASSIFIER:")
 
     x_train, y_train, x_valid, y_valid = load_spambase(
         filename)
 
     dt = DecisionTree(min_observation_split=min_observation_split,
                       min_information_gain=min_information_gain)
-    dt.train_model(x_train, y_train)
-    valid_preds = dt.evaluate_model(x_valid)
+    dt.fit(x_train, y_train)
+    valid_preds = dt.predict(x_valid)
 
     eval = Evaluator()
     valid_precision, valid_recall, valid_f_measure, valid_accuracy = eval.evaluate_classifier(
@@ -95,14 +98,15 @@ def decision_tree(filename, min_observation_split, min_information_gain):
 
 
 def multi_class_decision_tree(filename, min_observation_split, min_information_gain):
-    print("\nMULTI-CLASS DECISION TREE CLASSIFIER:")
+    print("\n======================================================")
+    print("MULTI-CLASS DECISION TREE CLASSIFIER:")
 
     x_train, y_train, x_valid, y_valid = load_ctg(filename)
 
     dt = DecisionTree(min_observation_split=min_observation_split,
                       min_information_gain=min_information_gain)
-    dt.train_model(x_train, y_train)
-    valid_preds = dt.evaluate_model(x_valid)
+    dt.fit(x_train, y_train)
+    valid_preds = dt.predict(x_valid)
 
     eval = Evaluator()
     valid_accuracy = eval.evaluate_accuracy(y_valid, valid_preds)

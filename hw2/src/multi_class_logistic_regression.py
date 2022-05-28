@@ -1,6 +1,6 @@
 import numpy as np
 from logistic_regression import LogisticRegression
-import util
+import data_util
 
 
 class MultiClassLogisticRegression:
@@ -27,7 +27,7 @@ class MultiClassLogisticRegression:
         self.unique_classes = unique_classes
         self.class_models = []
 
-    def train_model(self, x_train, y_train, x_valid, y_valid):
+    def fit(self, x_train, y_train, x_valid, y_valid):
         '''
         Trains a logistic regression model using gradient descent
         and sigmoid (or the logistic function) for each of the classes.
@@ -42,20 +42,21 @@ class MultiClassLogisticRegression:
         :return none
         '''
         for c in self.unique_classes:
-            x_train_sorted, y_train_sorted_binary = util.convert_data_to_binary(
+            x_train_sorted, y_train_sorted_binary = data_util.convert_data_to_binary(
                 x_train, y_train, c)
-            x_valid_sorted, y_valid_sorted_binary = util.convert_data_to_binary(
+            x_valid_sorted, y_valid_sorted_binary = data_util.convert_data_to_binary(
                 x_valid, y_valid, c)
 
             model = LogisticRegression(
                 self.lr, self.epochs, self.stability_constant)
 
             # Not storing returned training and validation loss as not needed for assigning a class
-            model.train_model(x_train_sorted, y_train_sorted_binary, x_valid_sorted, y_valid_sorted_binary)
+            model.fit(x_train_sorted, y_train_sorted_binary,
+                      x_valid_sorted, y_valid_sorted_binary)
 
             self.class_models.append([c, model])
 
-    def evaluate_model(self, X):
+    def predict(self, X):
         '''
         Evaluates the data on for each of the learned models. Once computed,
         we compute the largest mean likelihood for each class and assign the 
@@ -71,7 +72,7 @@ class MultiClassLogisticRegression:
         # Evaluate the validation data for each of our learned models
         for class_model in self.class_models:
             label, lr = class_model
-            probability = lr.evaluate_model(X)
+            probability = lr.predict(X)
             probabilities.append([label, probability])
 
         num_observations = np.shape(X)[0]
