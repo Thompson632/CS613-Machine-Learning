@@ -2,7 +2,7 @@ import numpy as np
 
 
 class LogisticRegression():
-    def __init__(self, lr, epochs, stability_constant):
+    def __init__(self, lr=0.1, epochs=1000, stability_constant=10e-7):
         '''
         Constructor that takes in a learning rate value
         and the number of epochs to be ran in our 
@@ -81,7 +81,7 @@ class LogisticRegression():
 
         return dw, db
 
-    def train_model(self, x_train, y_train, x_valid, y_valid):
+    def fit(self, x_train, y_train, x_valid, y_valid):
         '''
         Trains a logistic regression model using gradient descent
         and sigmoid (or the logistic function). The eventual output will
@@ -153,7 +153,7 @@ class LogisticRegression():
 
         return dw, db, train_probability, valid_probability
 
-    def evaluate_model(self, X):
+    def predict(self, X):
         '''
         Evaluates the model for the provided data by computing
         the gradient descent and sigmoid. Once evaluated, we

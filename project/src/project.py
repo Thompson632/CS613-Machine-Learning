@@ -4,7 +4,7 @@ from evaluator import Evaluator
 from logistic_regression import LogisticRegression
 from decision_tree import DecisionTree
 from bracket import Bracket
-import numpy as np
+from random_forest import RandomForest
 
 
 def generate_game_fields(fields, target):
@@ -38,19 +38,21 @@ def load_data(filename, columns):
 def logistic_regression(filename, learning_rate, epochs, stability, game_fields):
     print("\nLOGISTIC REGRESSION CLASSIFIER:\n")
 
-    X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
-
-    eval = Evaluator()
-    model = LogisticRegression(learning_rate, epochs, stability)
     print("\nLearning Rate:", learning_rate)
     print("Epochs:", epochs)
 
-    train_losses, valid_losses = model.train_model(
+    X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
+
+    eval = Evaluator()
+
+    model = LogisticRegression(learning_rate, epochs, stability)
+    train_losses, valid_losses = model.fit(
         X_train, y_train, X_valid, y_valid)
+
     eval.plot_mean_log_loss(train_losses, valid_losses, epochs)
 
-    train_preds = model.evaluate_model(X_train)
-    valid_preds = model.evaluate_model(X_valid)
+    train_preds = model.predict(X_train)
+    valid_preds = model.predict(X_valid)
 
     train_precision, train_recall, train_f_measure, train_accuracy = eval.evaluate_classifier(
         y_train, train_preds)
@@ -70,19 +72,46 @@ def logistic_regression(filename, learning_rate, epochs, stability, game_fields)
 def decision_tree(filename, min_observation_split, min_information_gain, game_fields):
     print("\nDECISION TREE CLASSIFIER:\n")
 
-    X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
-
-    eval = Evaluator()
-    model = DecisionTree(min_observation_split=min_observation_split,
-                         min_information_gain=min_information_gain)
-
     print("\nMin Observation Split:", min_observation_split)
     print("Min Information Gain:", min_information_gain)
 
-    model.train_model(X_train, y_train)
+    X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
 
-    train_preds = model.evaluate_model(X_train)
-    valid_preds = model.evaluate_model(X_valid)
+    eval = Evaluator()
+
+    model = DecisionTree()
+    model.fit(X_train, y_train)
+
+    train_preds = model.predict(X_train)
+    valid_preds = model.predict(X_valid)
+
+    train_precision, train_recall, train_f_measure, train_accuracy = eval.evaluate_classifier(
+        y_train, train_preds)
+    print("\nTraining Precision:", train_precision)
+    print("Training Recall:", train_recall)
+    print("Training F-Measure:", train_f_measure)
+    print("Training Accuracy:", train_accuracy)
+
+    valid_precision, valid_recall, valid_f_measure, valid_accuracy = eval.evaluate_classifier(
+        y_valid, valid_preds)
+    print("\nValidation Precision:", valid_precision)
+    print("Validation Recall:", valid_recall)
+    print("Validation F-Measure:", valid_f_measure)
+    print("Validation Accuracy:", valid_accuracy)
+
+
+def random_forest(filename, forest_size, game_fields):
+    print("\nRANDOM FOREST CLASSIFIER:\n")
+
+    X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
+
+    eval = Evaluator()
+
+    model = RandomForest(forest_size)
+    model.fit(X_train, y_train)
+
+    train_preds = model.predict(X_train)
+    valid_preds = model.predict(X_valid)
 
     train_precision, train_recall, train_f_measure, train_accuracy = eval.evaluate_classifier(
         y_train, train_preds)
@@ -100,15 +129,15 @@ def decision_tree(filename, min_observation_split, min_information_gain, game_fi
 
 
 def bracket_logistic_regression(filename, learning_rate, epochs, stability, fields, game_fields, year):
-    print(year, "BRACKET PREDICTION:\n")
+    print(year, "LOGISTIC REGRESSION BRACKET PREDICTION:\n")
+
+    print("\nLearning Rate:", learning_rate)
+    print("Epochs:", epochs)
 
     X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
 
     model = LogisticRegression(learning_rate, epochs, stability)
-    print("\nLearning Rate:", learning_rate)
-    print("Epochs:", epochs)
-
-    _, _ = model.train_model(
+    _, _ = model.fit(
         X_train, y_train, X_valid, y_valid)
 
     bracket = Bracket(year, model, fields, game_fields)
@@ -116,17 +145,16 @@ def bracket_logistic_regression(filename, learning_rate, epochs, stability, fiel
 
 
 def bracket_decision_tree(filename, min_observation_split, min_information_gain, fields, game_fields, year):
-    print(year, "BRACKET PREDICTION:\n")
+    print(year, "DECISION TREE BRACKET PREDICTION:\n")
+
+    print("\nMin Observation Split:", min_observation_split)
+    print("Min Information Gain:", min_information_gain)
 
     X_train, y_train, _, _ = load_data(filename, game_fields)
 
     model = DecisionTree(min_observation_split=min_observation_split,
                          min_information_gain=min_information_gain)
-
-    print("\nMin Observation Split:", min_observation_split)
-    print("Min Information Gain:", min_information_gain)
-
-    model.train_model(X_train, y_train)
+    model.fit(X_train, y_train)
 
     bracket = Bracket(year, model, fields, game_fields)
     bracket.run_bracket()
@@ -139,13 +167,16 @@ fields = ['offensive_rating', 'effective_field_goal_percentage', 'total_rebound_
 # Prepend away and home to each field
 game_fields = generate_game_fields(fields, "home_win")
 
-# Game Winner Predictions
+# Manual Feature Selection Classifiers
 logistic_regression(filename="games.csv", learning_rate=0.1,
                     epochs=1000, stability=10e-7, game_fields=game_fields)
 decision_tree(filename="games.csv", min_observation_split=2,
               min_information_gain=0, game_fields=game_fields)
+random_forest(filename="games.csv", forest_size=2, game_fields=game_fields)
 
-# Bracket Predictions
+# PCA Feature Selection Classifiers
+
+# Manual Feature Selection Bracket Logic
 bracket_logistic_regression(filename="games.csv", learning_rate=0.1,
                             epochs=1000, stability=10e-7, fields=fields, game_fields=game_fields, year=2018)
 bracket_decision_tree(filename="games.csv", min_observation_split=2,

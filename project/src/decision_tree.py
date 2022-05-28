@@ -3,6 +3,7 @@ import data_util
 
 import numpy as np
 
+
 class Node:
     def __init__(self, feature_index=None, threshold=None, left_subtree=None, right_subtree=None, leaf_value=None):
         '''
@@ -31,8 +32,9 @@ class Node:
         # For leaf node
         self.leaf_value = leaf_value
 
+
 class DecisionTree:
-    def __init__(self, min_observation_split, min_information_gain):
+    def __init__(self, min_observation_split=2, min_information_gain=0):
         '''
         Constructor that creates our decision tree classifier. The construction takes in
         a value for the minimum observations required to continue splitting the feature data, 
@@ -52,7 +54,7 @@ class DecisionTree:
         self.min_observation_split = min_observation_split
         self.min_information_gain = min_information_gain
 
-    def train_model(self, X, y):
+    def fit(self, X, y):
         '''
         Method that is used to train our model or in this case, we are building
         a decision tree to be used in order to classify an observation.
@@ -289,7 +291,7 @@ class DecisionTree:
 
         return class_to_assign
 
-    def evaluate_model(self, X):
+    def predict(self, X):
         '''
         Evaluates our model (or tree) by iterating through each observation in the validation
         data, recursively search our model (or tree) until we reach a leaf node, return the 
