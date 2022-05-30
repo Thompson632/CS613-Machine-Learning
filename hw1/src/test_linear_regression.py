@@ -1,92 +1,75 @@
-from linear_regression import LinearRegression
-import numpy as np
+import data_util
+from closed_form import LinearRegressionClosedForm
+from sfolds import LinearRegressionSFolds
+from locally_weighted import LinearRegressionLocallyWeighted
+from evaluator import Evaluator
 
-def print_results(lr, y, preds, type):
-    print(type, "Actuals:", y)
-    print(type, "Preds:", preds)
-    print("")
+def load_data(filename, columns):
+    data = data_util.load_data(filename, columns)
+    data = data_util.shuffle_data(data, 0)
 
-    rmse = lr.compute_rmse(y, preds)
-    print(type, "RMSE:", rmse)
+    training, validation = data_util.get_train_valid_data(data)
 
-    mape = lr.compute_mape(y, preds)
-    print(type, "MAPE:", mape)
+    x_train, y_train = data_util.get_features_actuals(training)
+    x_valid, y_valid = data_util.get_features_actuals(validation)
+    
+    x_train_bias = data_util.add_bias_feature(x_train)
+    x_valid_bias = data_util.add_bias_feature(x_valid)
+    
+    return x_train_bias, y_train, x_valid_bias, y_valid
 
+def closed_form(filename, columns):
+    print("\n======================================================")
+    print("CLOSED FORM LINEAR REGRESSION:")
+    
+    X_train, y_train, X_valid, y_valid = load_data(filename, columns)
+    
+    model = LinearRegressionClosedForm()
+    model.fit(X_train, y_train)
+    
+    train_preds = model.predict(X_train)
+    valid_preds = model.predict(X_valid)
+    
+    eval = Evaluator()
+    
+    print("Training RMSE:", eval.compute_rmse(y_train, train_preds))
+    print("Training MAPE:", eval.compute_mape(y_train, train_preds))
+    print("\nValidation RMSE:", eval.compute_rmse(y_valid, valid_preds))
+    print("Validation MAPE:", eval.compute_mape(y_valid, valid_preds))
 
-def test_closed_form(lr):
-    print("Closed Form (Direct) Linear Regression\n")
+def s_folds(filename, columns):
+    print("\n======================================================")
+    print("S-FOLDS LINEAR REGRESSION:")
+    
+    data = data_util.load_data(filename, columns)
+    
+    folds = [4, 11, 22]
 
-    # 1. Reads in the data, ignorning the first row (header) and first column (index)
-    columns = [1, 2, 3]
-    data = lr.load_data("x06Simple.csv", columns)
+    model = LinearRegressionSFolds(folds)
+    model.fit(data)
+    
+def locally_weighted(filename, columns):
+    print("\n======================================================")
+    print("LOCALLY WEIGHTED LINEAR REGRESSION:")
+    
+    X_train, y_train, X_valid, y_valid = load_data(filename, columns)
+    
+    model = LinearRegressionLocallyWeighted()
+    model.fit(X_train, y_train)
+    
+    train_preds = model.predict(X_train)
+    valid_preds = model.predict(X_valid)
+    
+    eval = Evaluator()
+    
+    print("Training RMSE:", eval.compute_rmse(y_train, train_preds))
+    print("Training MAPE:", eval.compute_mape(y_train, train_preds))
+    print("\nValidation RMSE:", eval.compute_rmse(y_valid, valid_preds))
+    print("Validation MAPE:", eval.compute_mape(y_valid, valid_preds))
+    
 
-    # 2. Shuffle the rows of data
-    data = lr.shuffle_data(data, 0)
+columns = [1, 2, 3]
 
-    # 3. Selects the first 2/3 (round up) of the data for training and the remaining
-    # for validation
-    training, validation = lr.get_train_valid_data(data)
-
-    # 4. Computes the linear regression model using the direct solution
-    # 5. Applies the learned model to the validation samples
-    yTrain, train_preds, yValid, valid_preds = lr.compute_model_using_direct_solution_and_apply(
-        training, validation, True)
-
-    # 6. Computes the root mean squared error (RMSE) and mean absolute
-    # percent error (MAPE) for the training and validation sets
-    print_results(lr, yTrain, train_preds, "Training")
-    print("")
-    print_results(lr, yValid, valid_preds, "Validation")
-
-
-def test_s_folds_cross_validation(lr):
-    print("S-Folds Cross-Validation")
-
-    # 1. Reads in the data, ignorning the first row (header) and first column (index)
-    columns = [1, 2, 3]
-    data = lr.load_data("x06Simple.csv", columns)
-
-    s_fold_list = [4, 11, 22]
-
-    N = len(data)
-
-    for s_fold in s_fold_list:
-        print("\nS-Fold:", s_fold)
-        lr.compute_s_folds_cross_validation(data, s_fold)
-
-    print("\nS-Fold (N):", N)
-    lr.compute_s_folds_cross_validation(data, N)
-
-
-def test_locally_weighted(lr):
-    print("Locally-Weighted Linear Regression\n")
-
-    # 1. Reads in the data, ignorning the first row (header) and first column (index)
-    columns = [1, 2, 3]
-    data = lr.load_data("x06Simple.csv", columns)
-
-    # 2. Shuffle the rows of data
-    data = lr.shuffle_data(data, 0)
-
-    # 3. Selects the first 2/3 (round up) of the data for training and the remaining
-    # for validation
-    training, validation = lr.get_train_valid_data(data)
-
-    yValid, valid_preds = lr.compute_locally_weighted(training, validation, 1)
-
-    # 6. Computes the RMSE and MAPE over the validation data
-    print_results(lr, yValid, valid_preds, "Validation")
-
-
-def main():
-    lr = LinearRegression()
-
-    test_closed_form(lr)
-    print("\n-------------------------------------")
-    test_s_folds_cross_validation(lr)
-    print("\n-------------------------------------")
-    test_locally_weighted(lr)
-
-
-if __name__ == '__main__':
-    main()
+closed_form(filename="x06Simple.csv", columns=columns)
+s_folds(filename="x06Simple.csv", columns=columns)
+locally_weighted(filename="x06Simple.csv", columns=columns)

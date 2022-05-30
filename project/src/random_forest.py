@@ -1,11 +1,13 @@
 import numpy as np
+import pandas as pd
 from collections import Counter
 from decision_tree import DecisionTree
 import data_util
+import math
 
 
 class RandomForest:
-    def __init__(self, forest_size, min_observation_split, min_information_gain):
+    def __init__(self, forest_size, min_observation_split=2, min_information_gain=0):
         '''
         Constructor that creates our random forest classifier. The constructor 
         takes in a value for the number of trees that will be in our forest. 
@@ -20,7 +22,7 @@ class RandomForest:
         :return none
         '''
         self.forest_size = forest_size
-
+        
         self.min_observation_split = min_observation_split
         self.min_information_gain = min_information_gain
 
@@ -39,7 +41,7 @@ class RandomForest:
         :return none
         '''
         for i in range(self.forest_size):
-            random_X, random_y = self.random_sample_data(X, y)
+            random_X, random_y = self.random_data(X, y)
 
             model = DecisionTree(min_observation_split=self.min_observation_split,
                                  min_information_gain=self.min_information_gain)
@@ -47,7 +49,7 @@ class RandomForest:
 
             self.trees.append(model)
 
-    def random_sample_data(self, X, y):
+    def random_data(self, X, y):
         '''
         Method that is used to randomly split our features and target data. Based 
         on the number of observations, we randomly return n-number of indices,
@@ -59,15 +61,26 @@ class RandomForest:
 
         :return random X and y data
         '''
-        num_observations = np.shape(X)[0]
+        # Get the number of features in the training data
+        num_features = np.shape(X)[1]
 
-        random_sample_indices = np.random.choice(
-            a=num_observations, size=num_observations, replace=True)
+        # Split our features
+        num_feature_split = round(math.sqrt(num_feature_split))
 
-        random_X = X[random_sample_indices]
-        random_y = y[random_sample_indices]
+        # Generate random feature indices
+        random_feature_indices = np.random.choice(
+            a=num_features, size=num_feature_split, replace=True).tolist()
 
-        return random_X, random_y
+        # Create a list from 0 to n-features
+        col_range = list(range(0, num_features))
+
+        # Create a pandas dataframe with our features data
+        x_df = pd.DataFrame(X, columns=col_range)
+        # Select a subset of random features
+        x_subset = x_df.iloc[:, random_feature_indices]
+        x_subset = x_subset.to_numpy()
+
+        return x_subset, y
 
     def predict(self, X):
         '''
@@ -105,15 +118,15 @@ class RandomForest:
         Method that utilizes majority voting to determine the most common class 
         predicted amongst all of the decision trees in our forest.
         We determine the most common class to assign by doing the following:
-        (1) Loop through all the decision tree predictions
-          (a) Create a Counter dictionary of class predictions to number of 
-          class prediction occurrences
+        (1) Loop through all the decision tree predicitions
+          (a) Create a Counter dictionary of class predicition to number of 
+          class predicition occurrences
           (b) Get the most common class predicition
           (c) Extract the most common class prediction
           (d) Add it to our list of class predictions
         (2) Return the list of classifier predictions
 
-        :param class_tree_preds: The 2D numpy array of all predictions amongst 
+        :param class_tree_preds: The 2D numpy array of all predicitions amongst 
         the decision trees
 
         :return the list of classifier predictions

@@ -3,9 +3,10 @@ The purpose of this repository is to hold the assignment deliverables for CS613 
 
 ## Homework 1: Linear Regression
 - [Assignment](hw1/HW1.pdf)
-- [Closed Form (Direct) Linear Regression](hw1/src/linear_regression.py)
-- [S-Folds Cross-Validation](hw1/src/linear_regression.py)
-- [Locally-Weighted Linear Regression](hw1/src/linear_regression.py)
+- [Theory](hw1/src/theory.py)
+- [Closed Form Linear Regression](hw1/src/closed_form.py)
+- [S-Folds Cross-Validation](hw1/src/sfolds.py)
+- [Locally-Weighted Linear Regression](hw1/src/locally_weighted.py)
 - [Report](hw1/report//CS613_HW1_RobertThompson_rt598.pdf)
 
 ## Homework 2: Logistic Regression
@@ -45,12 +46,17 @@ The purpose of this repository is to hold the assignment deliverables for CS613 
     - [100% Reconstructed Image Using the Minimum Number of Components (180)](hw4/images/100_reconstruction_image.png)
 
 ## Final Project: Predicting NCAA Men's March Madness
-- [PCA](project/src/pca.py)
 - [Logistic Regression](project/src/logistic_regression.py)
 - [Decision Trees](project/src/decision_tree.py)
 - [Random Forest](project/src/random_forest.py)
 - [Jupter Notebook](https://colab.research.google.com/drive/1BEbpVO7Ndp9e-EB_KQlehA2cXWBG81dJ#scrollTo=xc0ldZZRHuSP)
 - [Report](project/report/CS613_Group3.pdf)
+- **Authors**
+    - [Kyle Coughlin](kc3697@drexel.edu)
+    - [Brendan Goldsmith](bg623@drexel.edu)
+    - [Josh Geller](jg3768@drexel.edu)
+    - [Robert Thompson](rt598@drexel.edu)
+    
 
 ## Authors
 [Robert Thompson](rt598@drexel.edu)

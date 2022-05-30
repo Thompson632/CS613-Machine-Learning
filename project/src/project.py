@@ -103,12 +103,14 @@ def decision_tree(filename, min_observation_split, min_information_gain, game_fi
     print("Validation Accuracy:", valid_accuracy)
 
 
-def random_forest(filename, forest_size, min_observation_split,
+def random_forest(filename, forest_size, min_observation_split, 
                   min_information_gain, game_fields):
     print("\n======================================================")
     print("RANDOM FOREST CLASSIFIER:")
 
     print("Forest Size:", forest_size)
+    print("Min Observation Split:", min_observation_split)
+    print("Min Information Gain:", min_information_gain)
 
     X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
 
@@ -173,12 +175,14 @@ def bracket_decision_tree(filename, min_observation_split, min_information_gain,
     bracket.run_bracket()
 
 
-def bracket_random_forest(filename, forest_size, min_observation_split,
+def bracket_random_forest(filename, forest_size, min_observation_split, 
                           min_information_gain, fields, game_fields, year):
     print("\n======================================================")
     print(year, "RANDOM FOREST BRACKET PREDICTION:")
 
     print("Forest Size:", forest_size)
+    print("Min Observation Split:", min_observation_split)
+    print("Min Information Gain:", min_information_gain)
 
     X_train, y_train, _, _ = load_data(filename, game_fields)
 
@@ -196,7 +200,7 @@ def run_classifiers(file_path, game_fields):
                         epochs=1000, stability=10e-7, game_fields=game_fields)
     decision_tree(filename=file_path, min_observation_split=2,
                   min_information_gain=0, game_fields=game_fields)
-    random_forest(filename=file_path, forest_size=20, min_observation_split=2,
+    random_forest(filename=file_path, forest_size=25, min_observation_split=2, 
                   min_information_gain=0, game_fields=game_fields)
 
 
@@ -208,10 +212,9 @@ def run_brackets(file_path, fields, game_fields, years):
         bracket_decision_tree(filename=file_path, min_observation_split=2,
                               min_information_gain=0, fields=fields,
                               game_fields=game_fields, year=year)
-        bracket_random_forest(filename=file_path, forest_size=20,
-                              min_observation_split=2,
-                              min_information_gain=0, fields=fields,
-                              game_fields=game_fields, year=year)
+        bracket_random_forest(filename=file_path, forest_size=25, 
+                              min_observation_split=2, min_information_gain=0, 
+                              fields=fields, game_fields=game_fields, year=year)
 
 
 # File Path
@@ -225,7 +228,7 @@ fields = ['offensive_rating', 'effective_field_goal_percentage', 'total_rebound_
 game_fields = generate_game_fields(fields, "home_win")
 
 # Years to Predict
-years = [2015, 2018, 2019, 2021, 2022]
+years = [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2021, 2022]
 
 run_classifiers(file_path=file_path, game_fields=game_fields)
 run_brackets(file_path=file_path, fields=fields,
