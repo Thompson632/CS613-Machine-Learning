@@ -41,13 +41,8 @@ class KNN:
 
         :return the array of classification predictions
         '''
-        class_preds = []
-
         # For each validation observation...
-        for x in X:
-            # Determine the class to assign
-            class_to_assign = self._predict(x)
-            class_preds.append(class_to_assign)
+        class_preds = ([self._predict(x) for x in X])
 
         return np.array(class_preds)
 

@@ -5,6 +5,7 @@ from logistic_regression import LogisticRegression
 from decision_tree import DecisionTree
 from bracket import Bracket
 from pca import PCA
+from random_forest import RandomForest
 
 
 def generate_game_fields(fields, target):
@@ -79,13 +80,14 @@ def decision_tree(filename, min_observation_split, min_information_gain, game_fi
 
     X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
 
-    eval = Evaluator()
-
-    model = DecisionTree()
+    model = DecisionTree(min_observation_split=min_observation_split,
+                         min_information_gain=min_information_gain)
     model.fit(X_train, y_train)
 
     train_preds = model.predict(X_train)
     valid_preds = model.predict(X_valid)
+
+    eval = Evaluator()
 
     train_precision, train_recall, train_f_measure, train_accuracy = eval.evaluate_classifier(
         y_train, train_preds)
@@ -102,30 +104,38 @@ def decision_tree(filename, min_observation_split, min_information_gain, game_fi
     print("Validation Accuracy:", valid_accuracy)
 
 
-def random_forest(filename, forest_size, game_fields):
+def random_forest(filename, forest_size, min_observation_split,
+                  min_information_gain, game_fields):
     print("\n======================================================")
     print("RANDOM FOREST CLASSIFIER:")
 
+    print("Forest Size:", forest_size)
+
     X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
 
-    # TODO: Fit and Predict with RF Model
-    model = None
+    model = RandomForest(forest_size=forest_size,
+                         min_observation_split=min_observation_split,
+                         min_information_gain=min_information_gain)
+    model.fit(X_train, y_train)
+
+    train_preds = model.predict(X_train)
+    valid_preds = model.predict(X_valid)
 
     eval = Evaluator()
 
-    # train_precision, train_recall, train_f_measure, train_accuracy = eval.evaluate_classifier(
-    #     y_train, train_preds)
-    # print("\nTraining Precision:", train_precision)
-    # print("Training Recall:", train_recall)
-    # print("Training F-Measure:", train_f_measure)
-    # print("Training Accuracy:", train_accuracy)
+    train_precision, train_recall, train_f_measure, train_accuracy = eval.evaluate_classifier(
+        y_train, train_preds)
+    print("\nTraining Precision:", train_precision)
+    print("Training Recall:", train_recall)
+    print("Training F-Measure:", train_f_measure)
+    print("Training Accuracy:", train_accuracy)
 
-    # valid_precision, valid_recall, valid_f_measure, valid_accuracy = eval.evaluate_classifier(
-    #     y_valid, valid_preds)
-    # print("\nValidation Precision:", valid_precision)
-    # print("Validation Recall:", valid_recall)
-    # print("Validation F-Measure:", valid_f_measure)
-    # print("Validation Accuracy:", valid_accuracy)
+    valid_precision, valid_recall, valid_f_measure, valid_accuracy = eval.evaluate_classifier(
+        y_valid, valid_preds)
+    print("\nValidation Precision:", valid_precision)
+    print("Validation Recall:", valid_recall)
+    print("Validation F-Measure:", valid_f_measure)
+    print("Validation Accuracy:", valid_accuracy)
 
 
 def pca_logistic_regression(filename, learning_rate, epochs, stability, game_fields):
@@ -175,7 +185,8 @@ def pca_logistic_regression(filename, learning_rate, epochs, stability, game_fie
     print("Validation Accuracy:", valid_accuracy)
 
 
-def pca_decision_tree(filename, min_observation_split, min_information_gain, game_fields):
+def pca_decision_tree(filename, min_observation_split, min_information_gain,
+                      game_fields):
     print("\n======================================================")
     print("PCA DECISION TREE CLASSIFIER:")
 
@@ -196,7 +207,8 @@ def pca_decision_tree(filename, min_observation_split, min_information_gain, gam
     z_train = pca_model.predict(X_train, eigenvectors)
     z_valid = pca_model.predict(X_valid, eigenvectors)
 
-    dt_model = DecisionTree()
+    dt_model = DecisionTree(min_observation_split=min_observation_split,
+                            min_information_gain=min_information_gain)
     dt_model.fit(z_train, y_train)
 
     train_preds = dt_model.predict(z_train)
@@ -219,9 +231,12 @@ def pca_decision_tree(filename, min_observation_split, min_information_gain, gam
     print("Validation Accuracy:", valid_accuracy)
 
 
-def pca_random_forest(filename, forest_size, game_fields):
+def pca_random_forest(filename, forest_size, min_observation_split,
+                      min_information_gain, game_fields):
     print("\n======================================================")
     print("PCA RANDOM FOREST CLASSIFIER:")
+
+    print("Forest Size:", forest_size)
 
     X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
 
@@ -237,27 +252,33 @@ def pca_random_forest(filename, forest_size, game_fields):
     z_train = pca_model.predict(X_train, eigenvectors)
     z_valid = pca_model.predict(X_valid, eigenvectors)
 
-    # TODO: Fit and Predict with RF Model
-    rf_model = None
+    rf_model = RandomForest(forest_size=forest_size,
+                            min_observation_split=min_observation_split,
+                            min_information_gain=min_information_gain)
+    rf_model.fit(z_train, y_train)
+
+    train_preds = rf_model.predict(z_train)
+    valid_preds = rf_model.predict(z_valid)
 
     eval = Evaluator()
 
-    # train_precision, train_recall, train_f_measure, train_accuracy = eval.evaluate_classifier(
-    #     y_train, train_preds)
-    # print("\nTraining Precision:", train_precision)
-    # print("Training Recall:", train_recall)
-    # print("Training F-Measure:", train_f_measure)
-    # print("Training Accuracy:", train_accuracy)
+    train_precision, train_recall, train_f_measure, train_accuracy = eval.evaluate_classifier(
+        y_train, train_preds)
+    print("\nTraining Precision:", train_precision)
+    print("Training Recall:", train_recall)
+    print("Training F-Measure:", train_f_measure)
+    print("Training Accuracy:", train_accuracy)
 
-    # valid_precision, valid_recall, valid_f_measure, valid_accuracy = eval.evaluate_classifier(
-    #     y_valid, valid_preds)
-    # print("\nValidation Precision:", valid_precision)
-    # print("Validation Recall:", valid_recall)
-    # print("Validation F-Measure:", valid_f_measure)
-    # print("Validation Accuracy:", valid_accuracy)
+    valid_precision, valid_recall, valid_f_measure, valid_accuracy = eval.evaluate_classifier(
+        y_valid, valid_preds)
+    print("\nValidation Precision:", valid_precision)
+    print("Validation Recall:", valid_recall)
+    print("Validation F-Measure:", valid_f_measure)
+    print("Validation Accuracy:", valid_accuracy)
 
 
-def bracket_logistic_regression(filename, learning_rate, epochs, stability, fields, game_fields, year):
+def bracket_logistic_regression(filename, learning_rate, epochs, stability,
+                                fields, game_fields, year):
     print("\n======================================================")
     print(year, "LOGISTIC REGRESSION BRACKET PREDICTION:")
 
@@ -274,7 +295,8 @@ def bracket_logistic_regression(filename, learning_rate, epochs, stability, fiel
     bracket.run_bracket()
 
 
-def bracket_decision_tree(filename, min_observation_split, min_information_gain, fields, game_fields, year):
+def bracket_decision_tree(filename, min_observation_split, min_information_gain,
+                          fields, game_fields, year):
     print("\n======================================================")
     print(year, "DECISION TREE BRACKET PREDICTION:")
 
@@ -291,24 +313,30 @@ def bracket_decision_tree(filename, min_observation_split, min_information_gain,
     bracket.run_bracket()
 
 
-def bracket_random_forest(filename, fields, game_fields, year):
+def bracket_random_forest(filename, forest_size, min_observation_split,
+                          min_information_gain, fields, game_fields, year):
     print("\n======================================================")
     print(year, "RANDOM FOREST BRACKET PREDICTION:")
 
-    X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
+    print("Forest Size:", forest_size)
 
-    # TODO: Fit and Predict with RF Model
-    model = None
+    X_train, y_train, _, _ = load_data(filename, game_fields)
+
+    model = RandomForest(forest_size=forest_size,
+                         min_observation_split=min_observation_split,
+                         min_information_gain=min_information_gain)
+    model.fit(X_train, y_train)
 
     bracket = Bracket(year, model, fields, game_fields)
     bracket.run_bracket()
 
 
-def bracket_pca_logistic_regression(filename, learning_rate, epochs, stability, fields, game_fields, year):
+def bracket_pca_logistic_regression(filename, learning_rate, epochs, stability,
+                                    fields, game_fields, year):
     print("\n======================================================")
     print(year, "PCA LOGISTIC REGRESSION BRACKET PREDICTION:")
 
-    print("\nLearning Rate:", learning_rate)
+    print("Learning Rate:", learning_rate)
     print("Epochs:", epochs)
 
     X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
@@ -333,7 +361,8 @@ def bracket_pca_logistic_regression(filename, learning_rate, epochs, stability, 
     bracket.run_bracket()
 
 
-def bracket_pca_decision_tree(filename, min_observation_split, min_information_gain, fields, game_fields, year):
+def bracket_pca_decision_tree(filename, min_observation_split,
+                              min_information_gain, fields, game_fields, year):
     print("\n======================================================")
     print(year, "PCA DECISION TREE BRACKET PREDICTION:")
 
@@ -361,11 +390,14 @@ def bracket_pca_decision_tree(filename, min_observation_split, min_information_g
     bracket.run_bracket()
 
 
-def bracket_pca_random_forest(filename, fields, game_fields, year):
+def bracket_pca_random_forest(filename, forest_size, min_observation_split,
+                              min_information_gain, fields, game_fields, year):
     print("\n======================================================")
     print(year, "PCA RANDOM FOREST BRACKET PREDICTION:")
 
-    X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
+    print("Forest Size:", forest_size)
+
+    X_train, y_train, _, _ = load_data(filename, game_fields)
 
     pca_model = PCA()
     min_components, _ = pca_model.determine_min_components(X_train)
@@ -377,10 +409,11 @@ def bracket_pca_random_forest(filename, fields, game_fields, year):
     eigenvectors = pca_model.fit(X_train)
 
     z_train = pca_model.predict(X_train, eigenvectors)
-    z_valid = pca_model.predict(X_valid, eigenvectors)
 
-    # TODO: Fit and Predict with RF Model
-    rf_model = None
+    rf_model = RandomForest(forest_size=forest_size,
+                            min_observation_split=min_observation_split,
+                            min_information_gain=min_information_gain)
+    rf_model.fit(z_train, y_train)
 
     bracket = Bracket(year, rf_model, fields, game_fields)
     bracket.run_bracket()
@@ -391,8 +424,8 @@ def run_manual_feature_selection_classifiers(file_path, game_fields):
                         epochs=1000, stability=10e-7, game_fields=game_fields)
     decision_tree(filename=file_path, min_observation_split=2,
                   min_information_gain=0, game_fields=game_fields)
-    # TODO: Implement Random Forest
-    random_forest(filename=file_path, forest_size=2, game_fields=game_fields)
+    random_forest(filename=file_path, forest_size=20, min_observation_split=2,
+                  min_information_gain=0, game_fields=game_fields)
 
 
 def run_pca_feature_selection_classifiers(file_path, game_fields):
@@ -400,8 +433,8 @@ def run_pca_feature_selection_classifiers(file_path, game_fields):
                             epochs=1000, stability=10e-7, game_fields=game_fields)
     pca_decision_tree(filename=file_path, min_observation_split=2,
                       min_information_gain=0, game_fields=game_fields)
-    # TODO: Implement Random Forest
-    pca_random_forest(filename=file_path, forest_size=2,
+    pca_random_forest(filename=file_path, forest_size=20, min_observation_split=2,
+                      min_information_gain=0,
                       game_fields=game_fields)
 
 
@@ -410,8 +443,8 @@ def run_manual_feature_selection_bracket(file_path, fields, game_fields, year):
                                 epochs=1000, stability=10e-7, fields=fields, game_fields=game_fields, year=year)
     bracket_decision_tree(filename=file_path, min_observation_split=2,
                           min_information_gain=0, fields=fields, game_fields=game_fields, year=year)
-    # TODO: Implement Random Forest
-    bracket_random_forest(filename=file_path, fields=fields,
+    bracket_random_forest(filename=file_path, forest_size=20, min_observation_split=2,
+                          min_information_gain=0, fields=fields,
                           game_fields=game_fields, year=year)
 
 
@@ -420,9 +453,9 @@ def run_pca_feature_selection_bracket(file_path, fields, game_fields, year):
                                     epochs=1000, stability=10e-7, fields=fields, game_fields=game_fields, year=year)
     bracket_pca_decision_tree(filename=file_path, min_observation_split=2,
                               min_information_gain=0, fields=fields, game_fields=game_fields, year=year)
-    # TODO: Implement Random Forest
     bracket_pca_random_forest(
-        filename=file_path, fields=fields, game_fields=game_fields, year=year)
+        filename=file_path, forest_size=20, min_observation_split=2,
+        min_information_gain=0, fields=fields, game_fields=game_fields, year=year)
 
 
 # File Path
@@ -441,5 +474,5 @@ run_pca_feature_selection_classifiers(
     file_path=file_path, game_fields=game_fields)
 run_manual_feature_selection_bracket(
     file_path=file_path, fields=fields, game_fields=game_fields, year=2018)
-run_pca_feature_selection_bracket(
-    file_path=file_path, fields=fields, game_fields=game_fields, year=2018)
+# run_pca_feature_selection_bracket(
+#     file_path=file_path, fields=fields, game_fields=game_fields, year=2018)

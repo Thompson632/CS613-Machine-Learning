@@ -47,7 +47,9 @@ The purpose of this repository is to hold the assignment deliverables for CS613 
 ## Final Project: Predicting NCAA Men's March Madness
 - [PCA](project/src/pca.py)
 - [Logistic Regression](project/src/logistic_regression.py)
-- [Decision Tress](project/src/decision_tree.py)
+- [Decision Trees](project/src/decision_tree.py)
+- [Random Forest](project/src/random_forest.py)
+- [Report](project/report/CS613_Group3.pdf)
 
 ## Authors
 [Robert Thompson](rt598@drexel.edu)

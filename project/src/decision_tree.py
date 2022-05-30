@@ -302,11 +302,11 @@ class DecisionTree:
 
         :return the predicted classes
         '''
-        class_preds = ([self.search_tree(x, self.root) for x in X])
+        class_preds = ([self._predict(x, self.root) for x in X])
 
         return np.array(class_preds)
 
-    def search_tree(self, x, tree):
+    def _predict(self, x, tree):
         '''
         Recursive function that searches our decision tree by using our 
         current decision node's threhold value to determine what branch (left or right)
@@ -333,6 +333,6 @@ class DecisionTree:
         # We can do this by comparing our feature value against the current
         # node's threshold value similar to what we did when we built the tree
         if feature_value <= tree.threshold:
-            return self.search_tree(x, tree.left_subtree)
+            return self._predict(x, tree.left_subtree)
         else:
-            return self.search_tree(x, tree.right_subtree)
+            return self._predict(x, tree.right_subtree)
