@@ -103,18 +103,20 @@ def decision_tree(filename, min_observation_split, min_information_gain, game_fi
     print("Validation Accuracy:", valid_accuracy)
 
 
-def random_forest(filename, forest_size, min_observation_split, 
+def random_forest(filename, forest_size, num_observations_per_tree, min_observation_split,
                   min_information_gain, game_fields):
     print("\n======================================================")
     print("RANDOM FOREST CLASSIFIER:")
 
     print("Forest Size:", forest_size)
+    print("Percentage Observations Per Tree: {}%".format(
+        num_observations_per_tree * 100))
     print("Min Observation Split:", min_observation_split)
     print("Min Information Gain:", min_information_gain)
 
     X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
 
-    model = RandomForest(forest_size=forest_size,
+    model = RandomForest(forest_size=forest_size, num_observations_per_tree=num_observations_per_tree,
                          min_observation_split=min_observation_split,
                          min_information_gain=min_information_gain)
     model.fit(X_train, y_train)
@@ -175,18 +177,21 @@ def bracket_decision_tree(filename, min_observation_split, min_information_gain,
     bracket.run_bracket()
 
 
-def bracket_random_forest(filename, forest_size, min_observation_split, 
-                          min_information_gain, fields, game_fields, year):
+def bracket_random_forest(filename, forest_size, num_observations_per_tree,
+                          min_observation_split, min_information_gain,
+                          fields, game_fields, year):
     print("\n======================================================")
     print(year, "RANDOM FOREST BRACKET PREDICTION:")
 
     print("Forest Size:", forest_size)
+    print("Percentage Observations Per Tree: {}%".format(
+        num_observations_per_tree * 100))
     print("Min Observation Split:", min_observation_split)
     print("Min Information Gain:", min_information_gain)
 
     X_train, y_train, _, _ = load_data(filename, game_fields)
 
-    model = RandomForest(forest_size=forest_size,
+    model = RandomForest(forest_size=forest_size, num_observations_per_tree=num_observations_per_tree,
                          min_observation_split=min_observation_split,
                          min_information_gain=min_information_gain)
     model.fit(X_train, y_train)
@@ -200,8 +205,8 @@ def run_classifiers(file_path, game_fields):
                         epochs=1000, stability=10e-7, game_fields=game_fields)
     decision_tree(filename=file_path, min_observation_split=2,
                   min_information_gain=0, game_fields=game_fields)
-    random_forest(filename=file_path, forest_size=25, min_observation_split=2, 
-                  min_information_gain=0, game_fields=game_fields)
+    random_forest(filename=file_path, forest_size=100, num_observations_per_tree=0.25,
+                  min_observation_split=2, min_information_gain=0, game_fields=game_fields)
 
 
 def run_brackets(file_path, fields, game_fields, years):
@@ -212,8 +217,8 @@ def run_brackets(file_path, fields, game_fields, years):
         bracket_decision_tree(filename=file_path, min_observation_split=2,
                               min_information_gain=0, fields=fields,
                               game_fields=game_fields, year=year)
-        bracket_random_forest(filename=file_path, forest_size=25, 
-                              min_observation_split=2, min_information_gain=0, 
+        bracket_random_forest(filename=file_path, forest_size=100, num_observations_per_tree=0.25,
+                              min_observation_split=2, min_information_gain=0,
                               fields=fields, game_fields=game_fields, year=year)
 
 

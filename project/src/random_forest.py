@@ -3,17 +3,19 @@ import pandas as pd
 from collections import Counter
 from decision_tree import DecisionTree
 import data_util
-import math
 
 
 class RandomForest:
-    def __init__(self, forest_size, min_observation_split=2, min_information_gain=0):
+    def __init__(self, forest_size, num_observations_per_tree=0.5,
+                 min_observation_split=2, min_information_gain=0):
         '''
         Constructor that creates our random forest classifier. The constructor 
         takes in a value for the number of trees that will be in our forest. 
         The constructor also initializes a list to store our decision tree models.
 
         :param forest_size: The number of trees in our forest
+        :param num_observations_per_tree: Percentage of observations that will be used
+        to build each tree. Default is 50% of the observation size
         :param min_observation_split: The minimum number of observations required 
         to continue splitting the feature data for the decision tree
         :param min_information_gain: The minimum information gain value required 
@@ -22,7 +24,8 @@ class RandomForest:
         :return none
         '''
         self.forest_size = forest_size
-        
+        self.num_observations_per_tree = num_observations_per_tree
+
         self.min_observation_split = min_observation_split
         self.min_information_gain = min_information_gain
 
@@ -40,8 +43,8 @@ class RandomForest:
 
         :return none
         '''
-        for i in range(self.forest_size):
-            random_X, random_y = self.random_data(X, y)
+        for _ in range(self.forest_size):
+            random_X, random_y = self.random_observations(X, y)
 
             model = DecisionTree(min_observation_split=self.min_observation_split,
                                  min_information_gain=self.min_information_gain)
@@ -49,7 +52,7 @@ class RandomForest:
 
             self.trees.append(model)
 
-    def random_data(self, X, y):
+    def random_observations(self, X, y):
         '''
         Method that is used to randomly split our features and target data. Based 
         on the number of observations, we randomly return n-number of indices,
@@ -61,26 +64,21 @@ class RandomForest:
 
         :return random X and y data
         '''
-        # Get the number of features in the training data
-        num_features = np.shape(X)[1]
+        # Get the number of observatios in the training data
+        num_observations = np.shape(X)[0]
 
-        # Split our features
-        num_feature_split = round(math.sqrt(num_feature_split))
+        # Split our observations
+        num_observation_split = round(
+            num_observations * self.num_observations_per_tree)
 
-        # Generate random feature indices
-        random_feature_indices = np.random.choice(
-            a=num_features, size=num_feature_split, replace=True).tolist()
+        # Generate random observation indices
+        random_observation_indices = np.random.choice(
+            a=num_observations, size=num_observation_split, replace=False)
 
-        # Create a list from 0 to n-features
-        col_range = list(range(0, num_features))
+        x_subset = X[random_observation_indices, :]
+        y_subset = y[random_observation_indices]
 
-        # Create a pandas dataframe with our features data
-        x_df = pd.DataFrame(X, columns=col_range)
-        # Select a subset of random features
-        x_subset = x_df.iloc[:, random_feature_indices]
-        x_subset = x_subset.to_numpy()
-
-        return x_subset, y
+        return x_subset, y_subset
 
     def predict(self, X):
         '''
@@ -126,7 +124,7 @@ class RandomForest:
           (d) Add it to our list of class predictions
         (2) Return the list of classifier predictions
 
-        :param class_tree_preds: The 2D numpy array of all predicitions amongst 
+        :param class_tree_preds: The 2D numpy array of all predictions amongst 
         the decision trees
 
         :return the list of classifier predictions
