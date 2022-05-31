@@ -1,0 +1,35 @@
+
+======================================================
+CLOSED FORM LINEAR REGRESSION:
+Training RMSE: 19.86256862907285
+Training MAPE: 21.397596050628863
+
+Validation RMSE: 20.067704981328184
+Validation MAPE: 30.47810152100226
+
+======================================================
+S-FOLDS LINEAR REGRESSION:
+
+S-Fold: 4
+Mean RMSE: 20.48257322072606
+Standard Deviation RMSE: 1.9936615675839842
+
+S-Fold: 11
+Mean RMSE: 20.94480089793625
+Standard Deviation RMSE: 2.3455187587855115
+
+S-Fold: 22
+Mean RMSE: 20.653292091590096
+Standard Deviation RMSE: 2.154945774490174
+
+S-Fold (N): 44
+Mean RMSE: 21.497375581122196
+Standard Deviation RMSE: 2.2198259652537957
+
+======================================================
+LOCALLY WEIGHTED LINEAR REGRESSION:
+Training RMSE: 5.899097312030325e-07
+Training MAPE: 9.508476665919014e-08
+
+Validation RMSE: 26.396286898865213
+Validation MAPE: 28.76650617672107

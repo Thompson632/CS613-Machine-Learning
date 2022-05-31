@@ -20,14 +20,15 @@ def preprocess():
     x_zscored = math_util.z_score_data(X, means, stds)
 
     print("\nMeans:", means)
-    print("\nStd:", stds)
-    print("\nX-Zscored:\n", x_zscored)
+    print("Std:", stds)
+    print("X-Zscored:\n", x_zscored)
 
     return x_zscored, y
 
 
 def plot():
-    print("\nTHEORY - DATA")
+    print("\n======================================================")
+    print("THEORY - DATA")
 
     # Load and Zscore Data
     X, y = preprocess()
@@ -60,17 +61,18 @@ def plot():
 
 
 def pca():
-    print("\nTHEORY - PCA")
+    print("\n======================================================")
+    print("THEORY - PCA")
 
     # Load and Zscore Data
     X, y = preprocess()
 
-    model = PCA(num_components=1)
-    eigenvectors = model.train_model(X)
-    print("\nEigenvectors:\n", eigenvectors)
+    model = PCA(num_components=1, log_verbose=True)
+    eigenvectors = model.fit(X)
+    print("\nlargest_eigenvectors:\n", eigenvectors)
 
-    z = model.evaluate_model(X, eigenvectors)
-    print("\nZ:\n", z)
+    z = model.predict(X, eigenvectors)
+    print("\nz:\n", z)
 
     # Title
     title = "PCA 1D"
@@ -97,17 +99,18 @@ def pca():
 
 
 def lda():
-    print("\nTHEORY - LDA")
+    print("\n======================================================")
+    print("THEORY - LDA")
 
     # Load and Zscore Data
     X, y = preprocess()
 
-    model = LDA(num_components=1)
-    eigenvectors = model.train_model(X, y)
-    print("\nEigenvectors:\n", eigenvectors)
+    model = LDA(num_components=1, log_verbose=True)
+    eigenvectors = model.fit(X, y)
+    print("\nlargest_eigenvectors:\n", eigenvectors)
 
-    z = model.evaluate_model(X, eigenvectors)
-    print("\nZ:\n", z)
+    z = model.predict(X, eigenvectors)
+    print("\nz:\n", z)
 
     # Title
     title = "LDA 1D"

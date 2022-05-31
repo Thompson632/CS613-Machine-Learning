@@ -3,17 +3,19 @@ import numpy as np
 
 
 class PCA:
-    def __init__(self, num_components=2):
+    def __init__(self, num_components=2, log_verbose=False):
         '''
         Constructor that takes in the number of components to be selected when 
         we are training our model. Default number of components is set to two.
 
         :param num_components: Number of components to select from our computed
         eigenvectors
+        :param log_verbose: Flag to have extra logging for output. Default is false
 
         :return None
         '''
         self.num_components = num_components
+        self.log_verbose = log_verbose
 
     def fit(self, X):
         '''
@@ -93,6 +95,12 @@ class PCA:
 
         # Compute eigenvalues and vectors
         eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
+        
+        if self.log_verbose:
+            print("\nX_centerd:\n", X_centered)
+            print("cov_matrix:\n", cov_matrix)
+            print("eigenvalues:n", eigenvalues)
+            print("eigenvectors:\n", eigenvectors)
 
         return eigenvalues, eigenvectors
 
@@ -115,6 +123,11 @@ class PCA:
 
         # Sort the vectors
         sorted_vectors = eigenvectors[:, sorted_indices]
+        
+        if self.log_verbose:
+            print("\nsorted_indices:\n", sorted_indices)
+            print("sorted_values:\n", sorted_values)
+            print("sorted_vectors:\n", sorted_vectors)
 
         return sorted_values, sorted_vectors
 

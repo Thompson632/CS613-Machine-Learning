@@ -12,8 +12,10 @@ def load_data(filename, columns=None):
 
     :return numpy ndarray
     '''
-    return np.loadtxt(filename, delimiter=',', skiprows=1, dtype='int', usecols=columns)
+    if columns is not None:
+        return np.loadtxt(filename, delimiter=',', skiprows=1, dtype='int', usecols=columns)
 
+    return np.loadtxt(filename, delimiter=',')
 
 def shuffle_data(data, reseed_val):
     '''

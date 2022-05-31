@@ -33,7 +33,8 @@ def binary_logistic_regression(filename, learning_rate, epochs, stability):
 
     X_train, y_train, X_valid, y_valid = load_data(filename)
 
-    model = LogisticRegression(learning_rate, epochs, stability)
+    model = LogisticRegression(
+        lr=learning_rate, epochs=epochs, stability_constant=stability, log_verbose=False)
     train_losses, valid_losses = model.fit(
         X_train, y_train, X_valid, y_valid)
 
@@ -69,13 +70,14 @@ def binary_logistic_regression(filename, learning_rate, epochs, stability):
 def multi_class_logistic_regression(filename, learning_rate, epochs, stability):
     print("\n======================================================")
     print("MULTI-CLASS LOGISTIC REGRESSION:")
-    
-    X_train, y_train, X_valid, y_valid = load_data(filename, should_read_as_strings=True, should_convert_to_float=True)
+
+    X_train, y_train, X_valid, y_valid = load_data(
+        filename, should_read_as_strings=True, should_convert_to_float=True)
 
     unique_classes = np.unique(y_train)
-    
+
     model = MultiClassLogisticRegression(
-        learning_rate, epochs, stability, unique_classes)
+        lr=learning_rate, epochs=epochs, stability_constant=stability, log_verbose=False, unique_classes=unique_classes)
     model.fit(X_train, y_train, X_valid, y_valid)
 
     valid_preds = model.predict(X_valid)
@@ -91,6 +93,5 @@ def multi_class_logistic_regression(filename, learning_rate, epochs, stability):
 
 binary_logistic_regression(filename="spambase.data",
                            learning_rate=0.1, epochs=10000, stability=10e-7)
-print("\n")
 multi_class_logistic_regression(filename="iris.data",
                                 learning_rate=0.1, epochs=10000, stability=10e-7)

@@ -3,17 +3,19 @@ import math_util
 
 
 class LDA:
-    def __init__(self, num_components=2):
+    def __init__(self, num_components=2, log_verbose=False):
         '''
         Constructor that takes in the number of components to be selected when 
         we are training our model. Default number of components is set to two.
 
         :param num_components: Number of components to select from our computed
         eigenvectors
+        :param log_verbose: Flag to have extra logging for output. Default is false
 
         :return None
         '''
         self.num_components = num_components
+        self.log_verbose = log_verbose
 
     def fit(self, X, y):
         '''
@@ -39,7 +41,7 @@ class LDA:
         
         # For each class...
         for c in unique_classes:
-            print("\n\nClass C:", c)
+            print("\nc:", c)
             
             # Get the classes data
             class_data = X[y == c]
@@ -51,50 +53,49 @@ class LDA:
             
             # Center our features around zero
             class_mean_centered = class_data - class_mean
-            print("\nClass Data:\n", class_data)
-            print("Class Mean:\n", class_mean)
-            print("Class Data - Class Mean:\n", class_mean_centered)
+            print("\nclass_data:\n", class_data)
+            print("class_mean:\n", class_mean)
+            print("class_data - class_mean:\n", class_mean_centered)
             
             # Update the within class scatter matrix
             SW += np.dot(class_mean_centered.T, class_mean_centered)
-            print("\nClass Mean Centered Transposed:\n", class_mean_centered.T)
-            print("Class Mean Centered:\n", class_mean_centered)
+            print("\nclass_mean_centered.T:\n", class_mean_centered.T)
+            print("class_mean_centered:\n", class_mean_centered)
             print("SW:\n", SW)
             
             # Calculate the difference between the class mean and the overall mean
             mean_diff = (class_mean - overall_feature_mean)
-            print("\nClass Mean:\n", class_mean)
-            print("Overall Feature Mean:\n", overall_feature_mean)
-            print("Class Mean - Overall Mean\n:", mean_diff)
+            print("\nclass_mean:\n", class_mean)
+            print("overall_feature_mean:\n", overall_feature_mean)
+            print("class_data - overall_feature_mean:\n", mean_diff)
             # Reshape our difference
             mean_diff = np.reshape(mean_diff, (num_features, 1))
-            print("Mean Diff Reshaped:\n", mean_diff)
+            print("mean_diff reshaped:\n", mean_diff)
             
             # Update the class scatter difference
             SB += num_class_observations * np.dot(mean_diff, mean_diff.T)
-            print("\nNum Class Observations:\n", num_class_observations)
-            print("Mean Diff:\n", mean_diff)
-            print("Mean Diff Transposed:\n", mean_diff.T)
+            print("\nnum_class_observations:\n", num_class_observations)
+            print("mean_diff:\n", mean_diff)
+            print("mean_diff.T:\n", mean_diff.T)
             print("SB:\n", SB)
 
         # Compute SW^-1 * SB
         A = np.linalg.inv(SW).dot(SB)
         print("\n\nSW:\n", SW)
-        print("SW Inverse\n:", np.linalg.inv(SW))
+        print("inv(SW):\n", np.linalg.inv(SW))
         print("SB\n", SB)
         print("A:\n", A)
         
         # Compute the eigenvalues and eigenvectors
         eigenvalues, eigenvectors = np.linalg.eig(A)
-        print("\nEigenvalues:\n", eigenvalues)
-        print("Eigenvectors:\n", eigenvectors)
+        print("\neigenvalues:\n", eigenvalues)
+        print("eigenvectors:\n", eigenvectors)
         
         # Sort the values and vectors
         _, sorted_vectors = self.sort_eigen(eigenvalues, eigenvectors)
 
         # With our sorted vectors, select the top N-components
         largest_eigenvectors = sorted_vectors[:, :self.num_components]
-        print("\nLargest Eigenvectors:\n", largest_eigenvectors)
         
         return largest_eigenvectors
 
@@ -131,7 +132,9 @@ class LDA:
         # Sort the vectors
         sorted_vectors = eigenvectors[:, sorted_indices]
         
-        print("\nSorted Eigenvalues:\n", sorted_values)
-        print("\nSorted Eigenvectors:\n", sorted_vectors)
+        if self.log_verbose:
+            print("\nsorted_indices:\n", sorted_indices)
+            print("sorted_values:\n", sorted_values)
+            print("sorted_vectors:\n", sorted_vectors)
 
         return sorted_values, sorted_vectors

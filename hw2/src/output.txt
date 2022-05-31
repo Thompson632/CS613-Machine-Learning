@@ -11,8 +11,6 @@ Validation Recall: 0.9045138888888888
 Validation F-Measure: 0.9068755439512619
 Validation Accuracy: 0.9302477183833116
 
-
-
 ======================================================
 MULTI-CLASS LOGISTIC REGRESSION:
 Validation Accuracy: 0.96

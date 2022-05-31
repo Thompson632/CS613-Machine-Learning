@@ -2,22 +2,24 @@ import numpy as np
 
 
 class LogisticRegression:
-    def __init__(self, lr=0.1, epochs=1000, stability_constant=10e-7):
+    def __init__(self, lr=0.1, epochs=1000, stability_constant=10e-7, log_verbose=False):
         '''
         Constructor that takes in a learning rate value
         and the number of epochs to be ran in our 
         training model
 
-        :param lr: The learning rate
-        :param epochs: The number of iterations
+        :param lr: The learning rate. Default is 0.1
+        :param epochs: The number of iterations. Default is 1000
         :param stability_constant: The constant to stabilize
-        our logs to ensure we do not get log(0) = infinity
+        our logs to ensure we do not get log(0) = infinity. Default is 10e-7
+        :param log_verbose: Flag to have extra logging for output. Default is false
 
         :return none
         '''
         self.lr = lr
         self.epochs = epochs
         self.stability_constant = stability_constant
+        self.log_verbose = log_verbose
 
         self.weights = 0
         self.bias = 0
@@ -102,7 +104,7 @@ class LogisticRegression:
         training_losses = []
         validation_losses = []
 
-        for i in range(self.epochs):
+        for _ in range(self.epochs):
             # Compute gradients and train / valid probability
             dw, db, train_probability, valid_probability = self.compute_gradients(
                 x_train, y_train, x_valid)
@@ -120,6 +122,10 @@ class LogisticRegression:
             validation_loss = self.compute_mean_log_loss(
                 y_valid, valid_probability)
             validation_losses.append(validation_loss)
+
+        if self.log_verbose:
+            print("Weights:\n", self.weights)
+            print("Bias:", self.bias)
 
         return training_losses, validation_losses
 
@@ -151,6 +157,14 @@ class LogisticRegression:
         # Get gradients of loss
         dw, db = self.compute_partial_derivatives_of_weights_and_bias(
             x_train, y_train, train_probability)
+
+        if self.log_verbose:
+            print("\ntrain_y_hat:\n", train_y_hat)
+            print("train_probability:\n", train_probability)
+            print("\nvalid_y_hat:\n", valid_y_hat)
+            print("valid_probability:\n", valid_probability)
+            print("\ndw:\n", dw)
+            print("db:", db)
 
         return dw, db, train_probability, valid_probability
 

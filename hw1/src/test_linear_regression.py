@@ -24,7 +24,7 @@ def closed_form(filename, columns):
     
     X_train, y_train, X_valid, y_valid = load_data(filename, columns)
     
-    model = LinearRegressionClosedForm()
+    model = LinearRegressionClosedForm(print_weights=True)
     model.fit(X_train, y_train)
     
     train_preds = model.predict(X_train)

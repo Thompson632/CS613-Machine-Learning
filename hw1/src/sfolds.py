@@ -5,17 +5,19 @@ from closed_form import LinearRegressionClosedForm
 
 
 class LinearRegressionSFolds:
-    def __init__(self, folds):
+    def __init__(self, folds, print_weights=False):
         '''
         Constructor that initializes our folds to be used when performing
         cross validation and our Evaluator class to be used when computing
         metrics.
         
         :param folds: The different folds for cross validation
+        :param print_weights: Flag to print the calculated weights
         
         :return none
         '''
         self.folds = folds
+        self.print_weights = print_weights
         self.eval = Evaluator()
     
     def fit(self, data):
@@ -66,7 +68,7 @@ class LinearRegressionSFolds:
                 x_train_bias = data_util.add_bias_feature(x_train)
                 x_valid_bias = data_util.add_bias_feature(x_valid)
                 
-                model = LinearRegressionClosedForm()
+                model = LinearRegressionClosedForm(print_weights=self.print_weights)
                 model.fit(x_train_bias, y_train)
                 
                 valid_preds = model.predict(x_valid_bias)

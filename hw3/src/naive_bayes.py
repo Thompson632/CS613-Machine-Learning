@@ -4,7 +4,7 @@ import math_util
 
 
 class NaiveBayes:
-    def __init__(self, stability_constant):
+    def __init__(self, stability_constant=1e-4, log_verbose=False):
         '''
         Constructor that takes in a stability constant to be used 
         to avoid division by zero. The constructor also
@@ -13,6 +13,7 @@ class NaiveBayes:
 
         :param stability_constant: The stability constant to be used
         to avoid divide by zero in the probability calculation
+        :param log_verbose: Flag to have extra logging for output. Default is false
 
         :return none
         '''
@@ -24,6 +25,7 @@ class NaiveBayes:
         self.class_priors = None
 
         self.stability_constant = stability_constant
+        self.log_verbose = log_verbose
 
     def fit(self, X, y):
         '''
@@ -46,6 +48,10 @@ class NaiveBayes:
 
         # Get the number of classes
         self.num_classes = len(self.classes)
+        
+        if self.log_verbose:
+            print("\nclasses:", self.classes)
+            print("num_classes:", self.num_classes)
 
         # Create the class mean, standard deviation, and prior probability arrays
         self.class_means, self.class_stds, self.class_priors = data_util.create_mean_std_prior_arrays(
@@ -118,6 +124,16 @@ class NaiveBayes:
             # Compute the class' posterior probability
             posterior = prior + sum_gpdf
             posteriors.append(posterior)
+            
+            if self.log_verbose:
+                print("\nclass:\n", c)
+                print("class_prior:\n", class_prior)
+                print("prior:\n", prior)
+                print("means:\n", means)
+                print("stds:\n", stds)
+                print("gpf:", gpdf)
+                print("sum_gpdf:\n", sum_gpdf)
+                print("posterior:\n", posterior)
 
         # Get the index of the max class probability
         max_probability_index = np.argmax(posteriors)

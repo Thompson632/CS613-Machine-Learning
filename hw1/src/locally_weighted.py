@@ -4,16 +4,18 @@ import math
 
 
 class LinearRegressionLocallyWeighted:
-    def __init__(self, k=1):
+    def __init__(self, k=1, print_weights=False):
         '''
         Constructor that initializes our k value for computing the distances,
         X and y training data, and our LinearRegressionClosedForm model.
 
         :param k: Optional parameter k
+        :param print_weights: Flag to print the calculated weights
 
         :return none
         '''
         self.k = k
+        self.print_weights = print_weights
 
         self.X_train = None
         self.y_train = None
@@ -57,6 +59,9 @@ class LinearRegressionLocallyWeighted:
 
             weights = self.compute_local_weights(
                 self.X_train, validation_sample, self.y_train, self.k, self.num_train_observations)
+            
+            if self.print_weights:
+                print("Validation Sample", i, "Weights:\n", weights)
 
             y_hat = self.model.compute_y_hat(validation_sample, weights)
             y_hat_array[i] = y_hat

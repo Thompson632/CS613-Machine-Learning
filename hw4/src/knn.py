@@ -3,7 +3,7 @@ from collections import Counter
 
 
 class KNN:
-    def __init__(self, k=1):
+    def __init__(self, k=1, log_verbose=False):
         '''
         Constructor that takes in a value for the k-nearest neighbors 
         when sorting the indices values once the distances have been
@@ -11,10 +11,12 @@ class KNN:
         data to None upon initialization.
 
         :param k: The k-nearest neighbors value
-
+        :param log_verbose: Flag to have extra logging for output. Default is false
+        
         :return None
         '''
         self.k = k
+        self.log_verbose = log_verbose
 
         self.X_train = None
         self.y_train = None
@@ -67,7 +69,7 @@ class KNN:
         '''
         # Compute the distances for the given validation point for each
         # observation in the training data
-        distances = self.compute_distances(x)
+        distances = ([self.compute_euclidean_distance(x, xt) for xt in self.X_train])
 
         # Sort our distances
         sorted_distances = np.argsort(distances)
@@ -76,7 +78,7 @@ class KNN:
         k_indices = sorted_distances[:self.k]
 
         # Get class labels for the indices
-        k_labels = self.extract_class(k_indices)
+        k_labels = ([self.y_train[index] for index in k_indices])
 
         # Create a counter for our k-nearest neighbors labels
         k_labels_counter = Counter(k_labels)
@@ -86,45 +88,14 @@ class KNN:
 
         # Extract the most common label for classification
         most_common_label = most_common[0][0]
+        
+        if self.log_verbose:
+            print("\ndistances:\n", distances)
+            print("sorted_distances:\n", sorted_distances)
+            print("k_indices:\n", k_indices)
+            print("k_labels:\n", k_labels)
 
         return most_common_label
-
-    def compute_distances(self, x):
-        '''
-        Computes the distances between the current point and every
-        point in the training data.
-
-        :param x: The given validation point
-
-        :return the list of distances for the given validation point
-        '''
-        distances = []
-
-        # For each observation in the training data..
-        for xt in self.X_train:
-            # Compute the distance between the validation point
-            # and the current training point
-            distance = self.compute_euclidean_distance(x, xt)
-            distances.append(distance)
-
-        return distances
-
-    def extract_class(self, k_indices):
-        '''
-        Extracts the class associated with the given k-nearest neighbors
-        indices by return the value of the index in our training data.
-
-        :param k_indices: The indices for k-nearest neighbors for
-        the validation point
-
-        :return the list of classes for the given validation point
-        '''
-        k_class = []
-
-        for index in k_indices:
-            k_class.append(self.y_train[index])
-
-        return k_class
 
     def compute_euclidean_distance(self, x1, x2):
         '''

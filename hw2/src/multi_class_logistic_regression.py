@@ -4,17 +4,18 @@ import data_util
 
 
 class MultiClassLogisticRegression:
-    def __init__(self, lr, epochs, stability_constant, unique_classes):
+    def __init__(self, lr=0.1, epochs=1000, stability_constant=10e-7, log_verbose=False, unique_classes=None):
         '''
         Constructor that takes in a learning rate value,
         the number of epochs to be ran in our training model,
         stability constant for our log loss function, and
         the unique classes for this model.
 
-        :param lr: The learning rate
-        :param epochs: The number of iterations
+        param lr: The learning rate. Default is 0.1
+        :param epochs: The number of iterations. Default is 1000
         :param stability_constant: The constant to stabilize
-        our logs to ensure we do not get log(0) = infinity
+        our logs to ensure we do not get log(0) = infinity. Default is 10e-7
+        :param log_verbose: Flag to have extra logging for output. Default is false
         :param unique_classes: The unique number of classes to
         be used for this multi-class logistic regression model
 
@@ -23,6 +24,7 @@ class MultiClassLogisticRegression:
         self.lr = lr
         self.epochs = epochs
         self.stability_constant = stability_constant
+        self.log_verbose = log_verbose
 
         self.unique_classes = unique_classes
         self.class_models = []
@@ -48,7 +50,7 @@ class MultiClassLogisticRegression:
                 x_valid, y_valid, c)
 
             model = LogisticRegression(
-                self.lr, self.epochs, self.stability_constant)
+                lr=self.lr, epochs=self.epochs, stability_constant=self.stability_constant, log_verbose=self.log_verbose)
 
             # Not storing returned training and validation loss as not needed for assigning a class
             model.fit(x_train_sorted, y_train_sorted_binary,

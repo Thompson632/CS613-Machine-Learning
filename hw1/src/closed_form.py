@@ -1,16 +1,17 @@
 import numpy as np
 
 class LinearRegressionClosedForm:
-    def __init__(self):
+    def __init__(self, print_weights=False):
         '''
         Constructor that initializes a weights vector based on 
         the training data
         
-        :param none
+        :param print_weights: Flag to print the calculated weights
         
         :return none
         '''
         self.weights = None
+        self.print_weights = print_weights
 
     def fit(self, X, y):
         '''
@@ -27,6 +28,9 @@ class LinearRegressionClosedForm:
         y_mat = np.mat(y)
         
         self.weights = self.compute_weights(X, y_mat)
+        
+        if self.print_weights:
+            print("Weights:\n", self.weights)
 
     def predict(self, X):
         '''

@@ -46,7 +46,7 @@ def naive_bayes(stability_constant, filename):
 
     x_train, y_train, x_valid, y_valid = load_spambase(filename)
 
-    nb = NaiveBayes(stability_constant=stability_constant)
+    nb = NaiveBayes(stability_constant=stability_constant, log_verbose=False)
     nb.fit(x_train, y_train)
     valid_preds = nb.predict(x_valid)
 
@@ -66,7 +66,7 @@ def multi_class_naive_bayes(stability_constant, filename):
 
     x_train, y_train, x_valid, y_valid = load_ctg(filename)
 
-    nb = NaiveBayes(stability_constant=stability_constant)
+    nb = NaiveBayes(stability_constant=stability_constant, log_verbose=False)
     nb.fit(x_train, y_train)
     valid_preds = nb.predict(x_valid)
 
