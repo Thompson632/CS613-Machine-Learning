@@ -1,5 +1,6 @@
 import math_util
 import data_util
+import csv
 from evaluator import Evaluator
 from logistic_regression import LogisticRegression
 from decision_tree import DecisionTree
@@ -33,6 +34,18 @@ def load_data(filename, columns):
     x_valid_zscored = math_util.z_score_data(x_valid, means, stds)
 
     return x_train_zscored, y_train, x_valid_zscored, y_valid
+
+
+def load_data_for_bracket(filename, columns):
+    data = data_util.load_data(filename, columns=columns)
+    data = data_util.shuffle_data(data, 0)
+
+    X, y = data_util.get_features_actuals(data)
+
+    means, stds = math_util.calculate_feature_mean_std(X)
+    X_zscored = math_util.z_score_data(X, means, stds)
+
+    return X_zscored, y, means, stds
 
 
 def logistic_regression(filename, learning_rate, epochs, stability, game_fields):
@@ -149,14 +162,16 @@ def bracket_logistic_regression(filename, learning_rate, epochs, stability,
     print("\nLearning Rate:", learning_rate)
     print("Epochs:", epochs)
 
-    X_train, y_train, X_valid, y_valid = load_data(filename, game_fields)
+    X, y, _, _ = load_data_for_bracket(filename, game_fields)
 
     model = LogisticRegression(learning_rate, epochs, stability)
-    _, _ = model.fit(
-        X_train, y_train, X_valid, y_valid)
+    # This is fine to do because the validation x, y (last two parameters)
+    # don't contribute to the gradients
+    _, _ = model.fit(X, y, X, y)
 
-    bracket = Bracket(year, model, fields, game_fields)
-    bracket.run_bracket()
+    bracket = Bracket(year=year, model=model, model_name="Logistic Regression",
+                      fields=fields, game_fields=game_fields)
+    return bracket.run_bracket()
 
 
 def bracket_decision_tree(filename, min_observation_split, min_information_gain,
@@ -167,14 +182,15 @@ def bracket_decision_tree(filename, min_observation_split, min_information_gain,
     print("Min Observation Split:", min_observation_split)
     print("Min Information Gain:", min_information_gain)
 
-    X_train, y_train, _, _ = load_data(filename, game_fields)
+    X, y, _, _ = load_data_for_bracket(filename, game_fields)
 
     model = DecisionTree(min_observation_split=min_observation_split,
                          min_information_gain=min_information_gain)
-    model.fit(X_train, y_train)
+    model.fit(X, y)
 
-    bracket = Bracket(year, model, fields, game_fields)
-    bracket.run_bracket()
+    bracket = Bracket(year=year, model=model, model_name="Decision Tree",
+                      fields=fields, game_fields=game_fields)
+    return bracket.run_bracket()
 
 
 def bracket_random_forest(filename, forest_size, num_observations_per_tree,
@@ -189,15 +205,16 @@ def bracket_random_forest(filename, forest_size, num_observations_per_tree,
     print("Min Observation Split:", min_observation_split)
     print("Min Information Gain:", min_information_gain)
 
-    X_train, y_train, _, _ = load_data(filename, game_fields)
+    X, y, _, _ = load_data_for_bracket(filename, game_fields)
 
     model = RandomForest(forest_size=forest_size, num_observations_per_tree=num_observations_per_tree,
                          min_observation_split=min_observation_split,
                          min_information_gain=min_information_gain)
-    model.fit(X_train, y_train)
+    model.fit(X, y)
 
-    bracket = Bracket(year, model, fields, game_fields)
-    bracket.run_bracket()
+    bracket = Bracket(year=year, model=model, model_name="Random Forest",
+                      fields=fields, game_fields=game_fields)
+    return bracket.run_bracket()
 
 
 def run_classifiers(file_path, game_fields):
@@ -210,19 +227,42 @@ def run_classifiers(file_path, game_fields):
 
 
 def run_brackets(file_path, fields, game_fields, years):
+    bracket_output = []
+
     for year in years:
-        bracket_logistic_regression(filename=file_path, learning_rate=0.1,
-                                    epochs=1000, stability=10e-7, fields=fields,
-                                    game_fields=game_fields, year=year)
-        bracket_decision_tree(filename=file_path, min_observation_split=2,
-                              min_information_gain=0, fields=fields,
-                              game_fields=game_fields, year=year)
-        bracket_random_forest(filename=file_path, forest_size=100, num_observations_per_tree=0.25,
-                              min_observation_split=2, min_information_gain=0,
-                              fields=fields, game_fields=game_fields, year=year)
+        lr_output = bracket_logistic_regression(filename=file_path, learning_rate=0.1,
+                                                epochs=1000, stability=10e-7,
+                                                fields=fields, game_fields=game_fields,
+                                                year=year)
+        bracket_output.append(lr_output)
+
+        dt_output = bracket_decision_tree(filename=file_path, min_observation_split=2,
+                                          min_information_gain=0, fields=fields,
+                                          game_fields=game_fields, year=year)
+        bracket_output.append(dt_output)
+
+        rf_output = bracket_random_forest(filename=file_path, forest_size=100,
+                                          num_observations_per_tree=0.25,
+                                          min_observation_split=2,
+                                          min_information_gain=0,
+                                          fields=fields, game_fields=game_fields,
+                                          year=year)
+        bracket_output.append(rf_output)
+
+    write_csv(bracket_output)
 
 
-# File Path
+def write_csv(data):
+    header = ['model', 'year', 'actual_winner', 'predicted_winner',
+              'correctly_predicted_games', 'prediction_accuracy', 'espn_points']
+
+    with open(bracket_output_path, 'w', encoding='UTF8', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=header)
+        writer.writeheader()
+        writer.writerows(data)
+
+
+# File Input Path
 file_path = "games.csv"
 
 # Define our most informative features based on our knowledge
@@ -234,6 +274,9 @@ game_fields = generate_game_fields(fields, "home_win")
 
 # Years to Predict
 years = [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2021, 2022]
+
+# Bracket Output Path
+bracket_output_path = "bracket_output.csv"
 
 run_classifiers(file_path=file_path, game_fields=game_fields)
 run_brackets(file_path=file_path, fields=fields,

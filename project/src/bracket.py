@@ -3,19 +3,23 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import re
+import math_util
 
 
 class Bracket:
-    def __init__(self, year, model, fields, game_fields):
+    def __init__(self, year, model, model_name, fields, game_fields, means=None, stds=None):
         self.year = year
         self.bracket, self.winners_bracket = self.get_bracket()
         self.teams = {}
         self.model = model
+        self.model_name = model_name
         self.correct_count = 0
         self.region_count = 0
         self.points = 0
         self.fields = fields
         self.game_fields = game_fields
+        self.means = means
+        self.stds = stds
 
     def determine_bracket_order(self, soup_data, bracket, winners_bracket):
         final_four_teams = []
@@ -112,7 +116,7 @@ class Bracket:
 
         self.bracket.clear()
         self.bracket["FINAL FOUR"] = final_four
-        self.run_region("FINAL FOUR", 160)
+        region_winner = self.run_region("FINAL FOUR", 160)
         print("\tCorrectly Predicted Games in FINAL FOUR: {}".format(
             self.region_count))
         percentage = (self.region_count/3) * 100
@@ -120,18 +124,33 @@ class Bracket:
             percentage))
         print("")
 
-        print("\t{} Champion: {}".format(
-            self.year, self.bracket["FINAL FOUR"][0]))
+        predicted_winner = self.bracket["FINAL FOUR"][0]
+        print("\t{} Champion: {}".format(self.year, predicted_winner))
         print("\tCorrectly Predicted Games: {}".format(self.correct_count))
         percentage = (self.correct_count/63) * 100
         print("\tPercentage of Correctly Predicted Games: {}".format(percentage))
         print("\tTotal Points: {}".format(self.points))
 
+        output = {
+            "model": self.model_name,
+            "year": self.year,
+            "actual_winner": region_winner,
+            "predicted_winner": predicted_winner,
+            "correctly_predicted_games": self.correct_count,
+            "prediction_accuracy": percentage,
+            "espn_points": self.points
+        }
+
+        return output
+
     def run_region(self, region, starting_points=10):
         winners = []
         region_size = len(self.bracket.get(region))
         winners_bracket = self.winners_bracket.get(region)
+        # Last item
+        region_winner = winners_bracket[-1]
         print(region)
+
         while region_size != 1:
             for index, team in enumerate(self.bracket.get(region)):
                 if index % 2 == 0:
@@ -160,6 +179,8 @@ class Bracket:
             winners = []
             starting_points = starting_points * 2
             print("")
+
+        return region_winner
 
     def get_team_by_name(self, team_name, year, team_fields):
         # return a team entry from sportsipy
@@ -190,4 +211,12 @@ class Bracket:
                         on='joincol', suffixes=('_away', '_home'))
         game = game.drop(columns=['joincol']).dropna(axis='columns')
         game.columns = game_fields
-        return game.to_numpy()
+
+        X = game.to_numpy()
+
+        if self.means is None and self.stds is None:
+            return X
+        else:
+            # Code below will z-score each game if we pass in means, stds
+            X_zscored = math_util.z_score_data(X, self.means, self.stds)
+            return X_zscored
