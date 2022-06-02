@@ -1,7 +1,7 @@
 import data_util
 import math_util
 from evaluator import Evaluator
-from svm import SupportVectorMachine
+from svm import SVM
 import numpy as np
 
 
@@ -22,14 +22,14 @@ def load_data(filename):
 
     return x_train_bias, y_train, x_valid_bias, y_valid
 
+
 def svm(filename, learning_rate, epochs):
     print("\n======================================================")
     print("SUPPORT VECTOR MACHINE CLASSIFIER:")
 
     X_train, y_train, X_valid, y_valid = load_data(filename)
-    
-    model = SupportVectorMachine(
-        lr=learning_rate, epochs=epochs, log_verbose=True)
+
+    model = SVM(lr=learning_rate, epochs=epochs, log_verbose=True)
     model.fit(X_train, y_train)
 
     train_preds = model.predict(X_train)
@@ -50,5 +50,6 @@ def svm(filename, learning_rate, epochs):
     print("Validation Recall:", valid_recall)
     print("Validation F-Measure:", valid_f_measure)
     print("Validation Accuracy:", valid_accuracy)
+
 
 svm(filename="spambase.data", learning_rate=0.001, epochs=1000)

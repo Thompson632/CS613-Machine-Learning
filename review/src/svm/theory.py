@@ -1,4 +1,4 @@
-from svm import SupportVectorMachine
+from svm import SVM
 import data_util
 import numpy as np
 
@@ -13,7 +13,7 @@ print("X_bias:\n", X_bias)
 
 print("\n======================================================")
 print("SVM MODEL")
-model = SupportVectorMachine()
+model = SVM()
 model.fit(X_bias, y)
 print("Weights:\n", model.weights)
 print("Bias:\n", model.bias)

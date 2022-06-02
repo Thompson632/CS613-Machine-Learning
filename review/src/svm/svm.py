@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class SupportVectorMachine:
+class SVM:
     def __init__(self, lr=0.001, epochs=1000, lambda_value=0.01, log_verbose=False):
         '''
         Constructor that initializes our linear support vector machine.
