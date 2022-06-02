@@ -48,7 +48,7 @@ class Evaluator:
 
         return TP, TN, FP, FN
 
-    def evaluate_y_hat_with_threshold(self, y_hat, threshold):
+    def evaluate_y_hat_with_threshold(self, y_hat, threshold=0.5):
         '''
         Iterates through the y_hat values sets the values to 1 if there
         value is greater than the threshold (0.5) provided or to 0
