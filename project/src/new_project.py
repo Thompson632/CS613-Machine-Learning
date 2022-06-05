@@ -155,49 +155,43 @@ def random_forest(filename, forest_size, num_observations_per_tree, min_observat
 
 
 def bracket_logistic_regression(filename, learning_rate, epochs, stability,
-                                fields, game_fields, year):
+                                game_fields):
     print("\n======================================================")
-    print(year, "LOGISTIC REGRESSION BRACKET PREDICTION:")
+    print("TRAINING LOGISTIC REGRESSION MODEL FOR BRACKET PREDICTION:")
 
     print("Learning Rate:", learning_rate)
     print("Epochs:", epochs)
 
-    X, y, _, _ = load_data_for_bracket(filename, game_fields)
+    X, y, means, stds = load_data_for_bracket(filename, game_fields)
 
     model = LogisticRegression(learning_rate, epochs, stability)
     # This is fine to do because the validation x, y (last two parameters)
     # don't contribute to the gradients
     _, _ = model.fit(X, y, X, y)
-
-    bracket = Bracket(year=year, model=model, model_name="Logistic Regression",
-                      fields=fields, game_fields=game_fields)
-    return bracket.run_bracket()
+    return model, means, stds
 
 
 def bracket_decision_tree(filename, min_observation_split, min_information_gain,
-                          fields, game_fields, year):
+                          game_fields):
     print("\n======================================================")
-    print(year, "DECISION TREE BRACKET PREDICTION:")
+    print("TRAINING DECISION TREE MODEL FOR BRACKET PREDICTION:")
 
     print("Min Observation Split:", min_observation_split)
     print("Min Information Gain:", min_information_gain)
 
-    X, y, _, _ = load_data_for_bracket(filename, game_fields)
+    X, y, means, stds = load_data_for_bracket(filename, game_fields)
 
     model = DecisionTree(min_observation_split=min_observation_split,
                          min_information_gain=min_information_gain)
     model.fit(X, y)
-
-    bracket = Bracket(year=year, model=model, model_name="Decision Tree",
-                      fields=fields, game_fields=game_fields)
-    return bracket.run_bracket()
+    return model, means, stds
 
 
 def bracket_random_forest(filename, forest_size, num_observations_per_tree,
                           min_observation_split, min_information_gain,
-                          fields, game_fields, year):
+                          game_fields):
     print("\n======================================================")
-    print(year, "RANDOM FOREST BRACKET PREDICTION:")
+    print("TRAINING RANDOM FOREST MODEL FOR BRACKET PREDICTION:")
 
     print("Forest Size:", forest_size)
     print("Percentage Observations Per Tree: {}%".format(
@@ -205,16 +199,13 @@ def bracket_random_forest(filename, forest_size, num_observations_per_tree,
     print("Min Observation Split:", min_observation_split)
     print("Min Information Gain:", min_information_gain)
 
-    X, y, _, _ = load_data_for_bracket(filename, game_fields)
+    X, y, means, stds = load_data_for_bracket(filename, game_fields)
 
     model = RandomForest(forest_size=forest_size, num_observations_per_tree=num_observations_per_tree,
                          min_observation_split=min_observation_split,
                          min_information_gain=min_information_gain)
     model.fit(X, y)
-
-    bracket = Bracket(year=year, model=model, model_name="Random Forest",
-                      fields=fields, game_fields=game_fields)
-    return bracket.run_bracket()
+    return model, means, stds
 
 
 def run_classifiers(file_path, game_fields):
@@ -229,25 +220,37 @@ def run_classifiers(file_path, game_fields):
 def run_brackets(file_path, fields, game_fields, years):
     bracket_output = []
 
+    lr_model, means, stds = bracket_logistic_regression(filename=file_path, learning_rate=0.1,
+                                                        epochs=1000, stability=10e-7,
+                                                        game_fields=game_fields)
+
+    dt_model, _, _ = bracket_decision_tree(filename=file_path, min_observation_split=2,
+                                           min_information_gain=0, game_fields=game_fields)
+
+    rf_model, _, _ = bracket_random_forest(filename=file_path, forest_size=100,
+                                           num_observations_per_tree=0.25,
+                                           min_observation_split=2,
+                                           min_information_gain=0,
+                                           game_fields=game_fields)
+
     for year in years:
-        lr_output = bracket_logistic_regression(filename=file_path, learning_rate=0.1,
-                                                epochs=1000, stability=10e-7,
-                                                fields=fields, game_fields=game_fields,
-                                                year=year)
-        bracket_output.append(lr_output)
+        print("\n======================================================")
+        print("EVALUATING LOGISTIC REGRESSION MODEL FOR BRACKET PREDICTION:", year)
+        bracket = Bracket(year=year, model=lr_model, model_name="Logistic Regression",
+                          fields=fields, game_fields=game_fields, means=means, stds=stds)
+        bracket_output.append(bracket.run_bracket())
 
-        dt_output = bracket_decision_tree(filename=file_path, min_observation_split=2,
-                                          min_information_gain=0, fields=fields,
-                                          game_fields=game_fields, year=year)
-        bracket_output.append(dt_output)
+        print("\n======================================================")
+        print("EVALUATING DECISION TREE MODEL FOR BRACKET PREDICTION:", year)
+        bracket = Bracket(year=year, model=dt_model, model_name="Decision Tree",
+                          fields=fields, game_fields=game_fields, means=means, stds=stds)
+        bracket_output.append(bracket.run_bracket())
 
-        rf_output = bracket_random_forest(filename=file_path, forest_size=100,
-                                          num_observations_per_tree=0.25,
-                                          min_observation_split=2,
-                                          min_information_gain=0,
-                                          fields=fields, game_fields=game_fields,
-                                          year=year)
-        bracket_output.append(rf_output)
+        print("\n======================================================")
+        print("EVALUATING RANDOM FOREST MODEL FOR BRACKET PREDICTION:", year)
+        bracket = Bracket(year=year, model=rf_model, model_name="Random Forest",
+                          fields=fields, game_fields=game_fields, means=means, stds=stds)
+        bracket_output.append(bracket.run_bracket())
 
     write_csv(bracket_output)
 
@@ -273,11 +276,12 @@ fields = ['offensive_rating', 'effective_field_goal_percentage', 'total_rebound_
 game_fields = generate_game_fields(fields, "home_win")
 
 # Years to Predict
-years = [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2021, 2022]
+# years = [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2021, 2022]
+years = [2018]
 
 # Bracket Output Path
 bracket_output_path = "bracket_output.csv"
 
-run_classifiers(file_path=file_path, game_fields=game_fields)
+# run_classifiers(file_path=file_path, game_fields=game_fields)
 run_brackets(file_path=file_path, fields=fields,
              game_fields=game_fields, years=years)
