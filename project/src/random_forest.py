@@ -78,8 +78,10 @@ class RandomForest:
         num_features_split = round(math.sqrt(num_features))
 
         # Generate random observation indices
+        # Setting replace to False means we get no duplicate indices aka no 
+        # duplicate observations
         random_observation_indices = np.random.choice(
-            a=num_observations, size=num_observation_split, replace=True)
+            a=num_observations, size=num_observation_split, replace=False)
 
         x_subset = X[random_observation_indices, :]
         y_subset = y[random_observation_indices]

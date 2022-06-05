@@ -100,8 +100,10 @@ class DecisionTree:
         # Stop building our tree if we don't have at least 2 observations
         if num_observations >= self.min_observation_split:
             # Random subset of features
+            # Setting replace to False means we get no duplicate indices aka no
+            # duplicate features
             feature_indices = np.random.choice(
-                num_features, self.num_features_per_tree, replace=True)
+                num_features, self.num_features_per_tree, replace=False)
 
             # Find the most informative feature
             most_informative_feature = self.find_most_informative_feature(
