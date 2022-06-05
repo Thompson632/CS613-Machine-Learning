@@ -17,7 +17,7 @@ model = SVM()
 model.fit(X_bias, y)
 print("Weights:\n", model.weights)
 print("Bias:\n", model.bias)
-print("Prediction:\n",model.predict(X_bias))
+print("Prediction:\n", model.predict(X_bias))
 
 print("\n======================================================")
 print("SVM SLIDES IN-CODE FORMULAS")
@@ -59,3 +59,28 @@ print("weights:\n", w_second_term)
 
 gx = np.dot(X_bias, w_second_term)
 print("\nPrediction:\n", gx)
+
+x = np.array([(2, 1), (0, 3), (2, 1)])
+w = np.array([2, -1])
+w = np.array([(2), (-1)])
+# w = np.array([2],[-1])
+print("\n\nX:\n", x)
+print("Weights:\n", w)
+gx = np.dot(x, w)
+print("11a):\n", gx)
+gx = np.where(gx <= 0, 0, 1)
+print("11b):\n", gx)
+
+
+
+# y = np.array([0, 1, 1, 0, 0, 0, 1])
+# y_hat = np.array([1, 1, 1, 0, 0, 1, 1])
+
+# from evaluator import Evaluator
+# eval = Evaluator()
+# valid_precision, valid_recall, valid_f_measure, valid_accuracy = eval.evaluate_classifier(
+# y, y_hat)
+# print("\nValidation Precision:", valid_precision)
+# print("Validation Recall:", valid_recall)
+# print("Validation F-Measure:", valid_f_measure)
+# print("Validation Accuracy:", valid_accuracy)

@@ -126,6 +126,7 @@ class Evaluator:
         :return accuracy
         '''
         num_observations = np.shape(y)[0]
+        print(np.sum(y == y_hat))
         return (1 / num_observations) * np.sum(y == y_hat)
 
     def compute_precision_and_recall(self, y, y_hat):
@@ -143,6 +144,11 @@ class Evaluator:
         '''
         # Compute the classification errors
         TP, TN, FP, FN = self.compute_classification_error_types(y, y_hat)
+        
+        print("TP:", TP)
+        print("TN:", TN)
+        print("FP:", FP)
+        print("FN:", FN)
 
         precision = self.compute_precision(TP, FP)
         recall = self.compute_recall(TP, FN)
@@ -164,14 +170,14 @@ class Evaluator:
         :return accuracy
         '''
         # Evaluate y_hat with a threshold value of 0.5
-        y_hat_with_threshold = self.evaluate_y_hat_with_threshold(y_hat, 0.5)
+        # y_hat_with_threshold = self.evaluate_y_hat_with_threshold(y_hat, 0.5)
 
         # Calculate the precision and recall for the current increment
         precision, recall = self.compute_precision_and_recall(
-            y, y_hat_with_threshold)
+            y, y_hat)
 
         f_measure = self.compute_f_measure(precision, recall)
-        accuracy = self.evaluate_accuracy(y, y_hat_with_threshold)
+        accuracy = self.evaluate_accuracy(y, y_hat)
 
         return precision, recall, f_measure, accuracy
 

@@ -16,14 +16,14 @@ def preprocess():
     print("\nX:\n", X)
     print("\ny:\n", y)
 
-    means, stds = math_util.calculate_feature_mean_std(X)
-    x_zscored = math_util.z_score_data(X, means, stds)
+    # means, stds = math_util.calculate_feature_mean_std(X)
+    # x_zscored = math_util.z_score_data(X, means, stds)
 
-    print("\nMeans:", means)
-    print("Std:", stds)
-    print("X-Zscored:\n", x_zscored)
+    # print("\nMeans:", means)
+    # print("Std:", stds)
+    # print("X-Zscored:\n", x_zscored)
 
-    return x_zscored, y
+    return X, y
 
 
 def plot():
@@ -51,8 +51,8 @@ def plot():
     X_2 = X[y == 2]
 
     # Plot our data
-    plt.scatter(X_1[:, 0], X_1[:, 1], marker="s", label='Class1')
-    plt.scatter(X_2[:, 0], X_2[:, 1], marker="o", label='Class2')
+    plt.scatter(X_1[:, 0], X_1[:, 1], marker="o", label='Class1')
+    plt.scatter(X_2[:, 0], X_2[:, 1], marker="s", label='Class2')
 
     # Save and show our plot
     plt.legend()
@@ -66,9 +66,45 @@ def pca():
 
     # Load and Zscore Data
     X, y = preprocess()
+    
+    model = PCA(num_components=2, log_verbose=True)
+    eigenvectors = model.fit(X)
+    print("\nNum Components: 2")
+    print("\nlargest_eigenvectors:\n", eigenvectors)
+
+    z = model.predict(X, eigenvectors)
+    print("\nz:\n", z)
+
+    # Title
+    title = "PCA 2D"
+
+    # Name of File
+    filename = "theory_" + title.lower().replace(" ", "_") + ".png"
+
+    # Title of the Plot
+    plt.title(title)
+
+    # Set our X and Y Labels
+    plt.xlabel('Class1', fontsize=14)
+    plt.ylabel('Class2', fontsize=14)
+
+    # Plot our data
+    zero_y = np.zeros((z.shape))
+    plt.scatter(z[y == 1], zero_y[y == 1], marker="o", label='Class1')
+    plt.scatter(z[y == 2], zero_y[y == 2], marker="s", label='Class2')
+
+    # Save and show our plot
+    plt.legend()
+    plt.savefig(filename)
+    plt.show()
+    
+    
+    
+    
 
     model = PCA(num_components=1, log_verbose=True)
     eigenvectors = model.fit(X)
+    print("\nNum Components: 2")
     print("\nlargest_eigenvectors:\n", eigenvectors)
 
     z = model.predict(X, eigenvectors)
@@ -89,8 +125,8 @@ def pca():
 
     # Plot our data
     zero_y = np.zeros((z.shape))
-    plt.scatter(z[y == 1], zero_y[y == 1], marker="s", label='Class1')
-    plt.scatter(z[y == 2], zero_y[y == 2], marker="o", label='Class2')
+    plt.scatter(z[y == 1], zero_y[y == 1], marker="o", label='Class1')
+    plt.scatter(z[y == 2], zero_y[y == 2], marker="s", label='Class2')
 
     # Save and show our plot
     plt.legend()
@@ -104,6 +140,40 @@ def lda():
 
     # Load and Zscore Data
     X, y = preprocess()
+    
+    model = LDA(num_components=2, log_verbose=True)
+    eigenvectors = model.fit(X, y)
+    print("\nlargest_eigenvectors:\n", eigenvectors)
+
+    z = model.predict(X, eigenvectors)
+    print("\nz:\n", z)
+
+    # Title
+    title = "LDA 2D"
+
+    # Name of File
+    filename = "theory_" + title.lower().replace(" ", "_") + ".png"
+
+    # Title of the Plot
+    plt.title(title)
+
+    # Set our X and Y Labels
+    plt.xlabel('Class1', fontsize=14)
+    plt.ylabel('Class2', fontsize=14)
+
+    # Plot our data
+    zero_y = np.zeros((z.shape))
+    plt.scatter(z[y == 1], zero_y[y == 1], marker="o", label='Class1')
+    plt.scatter(z[y == 2], zero_y[y == 2], marker="s", label='Class2')
+
+    # Save and show our plot
+    plt.legend()
+    plt.savefig(filename)
+    plt.show()
+    
+    
+    
+    
 
     model = LDA(num_components=1, log_verbose=True)
     eigenvectors = model.fit(X, y)
@@ -127,8 +197,8 @@ def lda():
 
     # Plot our data
     zero_y = np.zeros((z.shape))
-    plt.scatter(z[y == 1], zero_y[y == 1], marker="s", label='Class1')
-    plt.scatter(z[y == 2], zero_y[y == 2], marker="o", label='Class2')
+    plt.scatter(z[y == 1], zero_y[y == 1], marker="o", label='Class1')
+    plt.scatter(z[y == 2], zero_y[y == 2], marker="s", label='Class2')
 
     # Save and show our plot
     plt.legend()
