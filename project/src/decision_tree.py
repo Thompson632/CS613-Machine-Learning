@@ -34,8 +34,7 @@ class Node:
 
 
 class DecisionTree:
-    def __init__(self, min_observation_split=2, min_information_gain=0,
-                 num_features_per_tree=None):
+    def __init__(self, min_observation_split=2, min_information_gain=0):
         '''
         Constructor that creates our decision tree classifier. The construction takes in
         a value for the minimum observations required to continue splitting the feature data, 
@@ -54,7 +53,6 @@ class DecisionTree:
 
         self.min_observation_split = min_observation_split
         self.min_information_gain = min_information_gain
-        self.num_features_per_tree = num_features_per_tree
 
     def fit(self, X, y):
         '''
@@ -69,10 +67,6 @@ class DecisionTree:
         # To make it easier when manipulating our data, we are going to
         # merge our X and y back into one data set
         data = data_util.merge_arrays(X, y)
-
-        # If num_features_per_tree is None, use all features
-        if self.num_features_per_tree is None:
-            self.num_features_per_tree = np.shape(X)[1]
 
         # Build our tree from our training data
         self.root = self.build_tree(data=data)
@@ -99,15 +93,9 @@ class DecisionTree:
 
         # Stop building our tree if we don't have at least 2 observations
         if num_observations >= self.min_observation_split:
-            # Random subset of features
-            # Setting replace to False means we get no duplicate indices aka no
-            # duplicate features
-            feature_indices = np.random.choice(
-                num_features, self.num_features_per_tree, replace=False)
-
             # Find the most informative feature
             most_informative_feature = self.find_most_informative_feature(
-                data, feature_indices)
+                data, num_features)
 
             # Check that we have an informative feature
             if most_informative_feature is not None:
@@ -133,7 +121,7 @@ class DecisionTree:
         # Build and return our leaf node
         return Node(leaf_value=leaf_value)
 
-    def find_most_informative_feature(self, data, feature_indices):
+    def find_most_informative_feature(self, data, num_features):
         '''
         Finds the feature with the highest information value by iterating through each feature, 
         calculating the mean of the feature that will be used as our threshold value per Professor
@@ -145,7 +133,7 @@ class DecisionTree:
         create a node in our decision tree.
 
         :param data: The data we are iterating searching
-        :param feature_indices: The feature indices
+        :param num_features: The number of features in the current data
 
         :return a dictionary of attributes pertaining to the feature with the most information gain
         '''
@@ -156,7 +144,7 @@ class DecisionTree:
         max_info_gain_feature = None
 
         # For each feature...
-        for feature_index in feature_indices:
+        for feature_index in range(num_features):
             # Get all observations for this feature
             feature_values = data[:, feature_index]
             # Calculate the mean of the values for our threshold value
@@ -348,3 +336,12 @@ class DecisionTree:
             return self._predict(x, tree.left_subtree)
         else:
             return self._predict(x, tree.right_subtree)
+
+    def print_tree(self, node, prestring=''):
+        print(prestring + str(node.feature_index))
+        if node.left_subtree is not None:
+            self.print_tree(node.left_subtree, prestring +
+                            str(node.feature_index)+'-')
+        if node.right_subtree is not None:
+            self.print_tree(node.right_subtree, prestring +
+                            str(node.feature_index)+'-')

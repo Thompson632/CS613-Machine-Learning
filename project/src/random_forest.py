@@ -43,12 +43,16 @@ class RandomForest:
 
         :return none
         '''
+        n_observations, n_features = np.shape(X)
+
+        print("Total Observations:", n_observations)
+        print("Total Features:", n_features)
+
         for i in range(self.forest_size):
-            random_X, random_y, num_features_per_tree = self.random_data(X, y)
+            random_X, random_y = self.random_data(X, y)
 
             model = DecisionTree(min_observation_split=self.min_observation_split,
-                                 min_information_gain=self.min_information_gain,
-                                 num_features_per_tree=num_features_per_tree)
+                                 min_information_gain=self.min_information_gain)
             model.fit(random_X, random_y)
 
             self.trees.append(model)
@@ -59,34 +63,31 @@ class RandomForest:
         each of our trees in our forest. Based on the number of observations,
         we random return n-number of indices, and then only return the
         observations and target data corresponding to the randomly generated
-        indices. We also calculate the number of features for each tree
-        that will be the sqrt of n_features in the data set.
+        indices.
 
         :param X: The features data
         :param y: The target data
 
-        :return random X and y data and number of features per tree
+        :return random X and y data
         '''
         # Get the number of observatios in the training data
-        num_observations, num_features = np.shape(X)
+        num_observations = np.shape(X)[0]
 
         # Split our observations
         num_observation_split = round(
             num_observations * self.num_observations_per_tree)
 
-        # Split our features
-        num_features_split = round(math.sqrt(num_features))
-
         # Generate random observation indices
-        # Setting replace to False means we get no duplicate indices aka no 
-        # duplicate observations
         random_observation_indices = np.random.choice(
-            a=num_observations, size=num_observation_split, replace=False)
+            a=num_observations, size=num_observation_split, replace=True)
 
+        # Slice random observations
         x_subset = X[random_observation_indices, :]
         y_subset = y[random_observation_indices]
 
-        return x_subset, y_subset, num_features_split
+        print("Num Observations Per Tree:", num_observation_split)
+
+        return x_subset, y_subset
 
     def predict(self, X):
         '''
