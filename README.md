@@ -49,7 +49,8 @@ The purpose of this repository is to hold the assignment deliverables for CS613 
 - [Logistic Regression](project/src/logistic_regression.py)
 - [Decision Trees](project/src/decision_tree.py)
 - [Random Forest](project/src/random_forest.py)
-- [Jupter Notebook](https://colab.research.google.com/drive/1BEbpVO7Ndp9e-EB_KQlehA2cXWBG81dJ#scrollTo=xc0ldZZRHuSP)
+- [Bracket](project/src/bracket.py)
+- [Bracket Predictions](project/src/bracket_output.csv)
 - [Report](project/report/CS613_Group3.pdf)
 - **Authors**
     - [Kyle Coughlin](kc3697@drexel.edu)

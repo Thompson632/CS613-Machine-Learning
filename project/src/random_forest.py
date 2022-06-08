@@ -12,7 +12,6 @@ class RandomForest:
         Constructor that creates our random forest classifier. The constructor 
         takes in a value for the number of trees that will be in our forest. 
         The constructor also initializes a list to store our decision tree models.
-
         :param forest_size: The number of trees in our forest
         :param num_observations_per_tree: Percentage of observations that will be used
         to build each tree. Default is 50% of the observation size
@@ -20,7 +19,6 @@ class RandomForest:
         to continue splitting the feature data for the decision tree
         :param min_information_gain: The minimum information gain value required 
         to continue splitting the feature data for the decision tree
-
         :return none
         '''
         self.forest_size = forest_size
@@ -37,10 +35,8 @@ class RandomForest:
         n-decision trees based on the provided forest_size variable at initialization. 
         The function will randomly split our features and target data, build a 
         decision tree, and add it to our forest for future classification.
-
         :param X: The features data
         :param y: The target data
-
         :return none
         '''
         n_observations, n_features = np.shape(X)
@@ -49,10 +45,11 @@ class RandomForest:
         print("Total Features:", n_features)
 
         for i in range(self.forest_size):
-            random_X, random_y = self.random_data(X, y)
+            random_X, random_y, num_features_per_tree = self.random_data(X, y)
 
             model = DecisionTree(min_observation_split=self.min_observation_split,
-                                 min_information_gain=self.min_information_gain)
+                                 min_information_gain=self.min_information_gain,
+                                 num_features_per_tree=num_features_per_tree)
             model.fit(random_X, random_y)
 
             self.trees.append(model)
@@ -63,31 +60,33 @@ class RandomForest:
         each of our trees in our forest. Based on the number of observations,
         we random return n-number of indices, and then only return the
         observations and target data corresponding to the randomly generated
-        indices.
-
+        indices. We also calculate the number of features for each tree
+        that will be the sqrt of n_features in the data set.
         :param X: The features data
         :param y: The target data
-
-        :return random X and y data
+        :return random X and y data and number of features per tree
         '''
         # Get the number of observatios in the training data
-        num_observations = np.shape(X)[0]
+        num_observations, num_features = np.shape(X)
 
         # Split our observations
         num_observation_split = round(
             num_observations * self.num_observations_per_tree)
 
+        # Split our features
+        num_features_split = round(math.sqrt(num_features))
+
         # Generate random observation indices
         random_observation_indices = np.random.choice(
             a=num_observations, size=num_observation_split, replace=True)
 
-        # Slice random observations
         x_subset = X[random_observation_indices, :]
         y_subset = y[random_observation_indices]
 
-        print("Num Observations Per Tree:", num_observation_split)
+        print("\nNum Observations Per Tree:", num_observation_split)
+        print("Num Features Per Tree:", num_features_split)
 
-        return x_subset, y_subset
+        return x_subset, y_subset, num_features_split
 
     def predict(self, X):
         '''
@@ -103,9 +102,7 @@ class RandomForest:
         (3) Loops through each of our decision tree classifier predicitions, 
         selects the most common, and adds it to a list of classifier 
         predictions to be returned
-
         :param X: The features validation data
-
         :return the classifier predictions
         '''
         # For each tree, predict the class
@@ -132,10 +129,8 @@ class RandomForest:
           (c) Extract the most common class prediction
           (d) Add it to our list of class predictions
         (2) Return the list of classifier predictions
-
         :param class_tree_preds: The 2D numpy array of all predicitions amongst 
         the decision trees
-
         :return the list of classifier predictions
         '''
         class_preds = []
