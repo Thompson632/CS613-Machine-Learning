@@ -41,9 +41,6 @@ class RandomForest:
         '''
         n_observations, n_features = np.shape(X)
 
-        print("Total Observations:", n_observations)
-        print("Total Features:", n_features)
-
         for i in range(self.forest_size):
             random_X, random_y, num_features_per_tree = self.random_data(X, y)
 
@@ -82,9 +79,6 @@ class RandomForest:
 
         x_subset = X[random_observation_indices, :]
         y_subset = y[random_observation_indices]
-
-        print("\nNum Observations Per Tree:", num_observation_split)
-        print("Num Features Per Tree:", num_features_split)
 
         return x_subset, y_subset, num_features_split
 

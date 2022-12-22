@@ -19,7 +19,6 @@ def load_data(filename, columns=None):
         data = pd.read_csv(filename, usecols=columns)
     else:
         data = pd.read_csv(filename)
-
     data = data.to_numpy()
     data[np.isnan(data)] = 0
     return data
