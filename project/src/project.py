@@ -44,7 +44,6 @@ def load_data_for_bracket(filename, columns):
 
     means, stds = math_util.calculate_feature_mean_std(X)
     X_zscored = math_util.z_score_data(X, means, stds)
-
     return X_zscored, y, means, stds
 
 
@@ -193,12 +192,6 @@ def bracket_random_forest(filename, forest_size, num_observations_per_tree,
     print("\n======================================================")
     print("TRAINING RANDOM FOREST MODEL FOR BRACKET PREDICTION:")
 
-    print("Forest Size:", forest_size)
-    print("Percentage Observations Per Tree: {}%".format(
-        num_observations_per_tree * 100))
-    print("Min Observation Split:", min_observation_split)
-    print("Min Information Gain:", min_information_gain)
-
     X, y, means, stds = load_data_for_bracket(filename, game_fields)
 
     model = RandomForest(forest_size=forest_size, num_observations_per_tree=num_observations_per_tree,
@@ -267,23 +260,23 @@ def write_csv(data):
         writer.writeheader()
         writer.writerows(data)
 
+    def start():
+        # File Input Path
+        file_path = "games.csv"
 
-# File Input Path
-file_path = "games.csv"
+        # Define our most informative features based on our knowledge
+        fields = ['offensive_rating', 'effective_field_goal_percentage', 'total_rebound_percentage', 'free_throw_attempt_rate',
+                'free_throw_percentage', 'three_point_attempt_rate', 'three_point_field_goal_percentage', 'turnover_percentage', 'true_shooting_percentage']
 
-# Define our most informative features based on our knowledge
-fields = ['offensive_rating', 'effective_field_goal_percentage', 'total_rebound_percentage', 'free_throw_attempt_rate',
-          'free_throw_percentage', 'three_point_attempt_rate', 'three_point_field_goal_percentage', 'turnover_percentage', 'true_shooting_percentage']
+        # Prepend away and home to each field
+        game_fields = generate_game_fields(fields, "home_win")
 
-# Prepend away and home to each field
-game_fields = generate_game_fields(fields, "home_win")
+        # Years to Predict
+        years = [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2021, 2022]
 
-# Years to Predict
-years = [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2021, 2022]
+        # Bracket Output Path
+        bracket_output_path = "bracket_output.csv"
 
-# Bracket Output Path
-bracket_output_path = "bracket_output.csv"
-
-run_classifiers(file_path=file_path, game_fields=game_fields)
-run_brackets(file_path=file_path, fields=fields,
-             game_fields=game_fields, years=years)
+        run_classifiers(file_path=file_path, game_fields=game_fields)
+        run_brackets(file_path=file_path, fields=fields,
+                    game_fields=game_fields, years=years)

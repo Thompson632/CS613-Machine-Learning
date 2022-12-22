@@ -1,5 +1,6 @@
 # CS613 Machine Learning
-The purpose of this repository is to hold the assignment deliverables for CS613 Machine Learning at Drexel University for the Spring 2022 Semester.
+
+The purpose of this repository is to hold the assignment and project deliverables for CS613 Machine Learning at Drexel University for the Spring 2021-2022 Quarter.
 
 ## Homework 1: Linear Regression
 - [Assignment](hw1/HW1.pdf)
